@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="10-create-triggers-and-functions" author="system">
+        <comment>Create database triggers and functions for auto-updates</comment>
+
+        <!-- Function: Auto-update updated_at timestamp -->
+        <sql>
+            CREATE OR REPLACE FUNCTION update_updated_at_column()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.updated_at = NOW();
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+
+        <!-- Trigger: Auto-update updated_at for users -->
+        <sql>
+            CREATE TRIGGER update_users_updated_at
+            BEFORE UPDATE ON users
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+
+        <!-- Trigger: Auto-update updated_at for articles -->
+        <sql>
+            CREATE TRIGGER update_articles_updated_at
+            BEFORE UPDATE ON articles
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+
+        <!-- Trigger: Auto-update updated_at for services -->
+        <sql>
+            CREATE TRIGGER update_services_updated_at
+            BEFORE UPDATE ON services
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+
+        <!-- Trigger: Auto-update updated_at for contact_messages -->
+        <sql>
+            CREATE TRIGGER update_contact_messages_updated_at
+            BEFORE UPDATE ON contact_messages
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+
+        <!-- Trigger: Auto-update updated_at for lawyer_profile -->
+        <sql>
+            CREATE TRIGGER update_lawyer_profile_updated_at
+            BEFORE UPDATE ON lawyer_profile
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+
+        <!-- Function: Auto-update search_vector for articles -->
+        <sql>
+            CREATE OR REPLACE FUNCTION update_article_search_vector()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.search_vector :=
+                    setweight(to_tsvector('polish', COALESCE(NEW.title, '')), 'A') ||
+                    setweight(to_tsvector('polish', COALESCE(NEW.content, '')), 'B');
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+
+        <!-- Trigger: Auto-update search_vector for articles -->
+        <sql>
+            CREATE TRIGGER update_article_search_vector_trigger
+            BEFORE INSERT OR UPDATE ON articles
+            FOR EACH ROW
+            EXECUTE FUNCTION update_article_search_vector();
+        </sql>
+
+        <!-- Function: Auto-update search_vector for services -->
+        <sql>
+            CREATE OR REPLACE FUNCTION update_service_search_vector()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.search_vector :=
+                    setweight(to_tsvector('polish', COALESCE(NEW.name, '')), 'A') ||
+                    setweight(to_tsvector('polish', COALESCE(NEW.description, '')), 'B');
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+
+        <!-- Trigger: Auto-update search_vector for services -->
+        <sql>
+            CREATE TRIGGER update_service_search_vector_trigger
+            BEFORE INSERT OR UPDATE ON services
+            FOR EACH ROW
+            EXECUTE FUNCTION update_service_search_vector();
+        </sql>
+
+        <!-- Function: Enforce singleton pattern for lawyer_profile -->
+        <sql>
+            CREATE OR REPLACE FUNCTION enforce_lawyer_profile_singleton()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                IF (SELECT COUNT(*) FROM lawyer_profile) >= 1 THEN
+                    RAISE EXCEPTION 'Only one lawyer profile record is allowed';
+                END IF;
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+
+        <!-- Trigger: Enforce singleton for lawyer_profile -->
+        <sql>
+            CREATE TRIGGER enforce_lawyer_profile_singleton_trigger
+            BEFORE INSERT ON lawyer_profile
+            FOR EACH ROW
+            EXECUTE FUNCTION enforce_lawyer_profile_singleton();
+        </sql>
+
+        <rollback>
+            <!-- Drop triggers -->
+            <sql>DROP TRIGGER IF EXISTS enforce_lawyer_profile_singleton_trigger ON lawyer_profile;</sql>
+            <sql>DROP TRIGGER IF EXISTS update_service_search_vector_trigger ON services;</sql>
+            <sql>DROP TRIGGER IF EXISTS update_article_search_vector_trigger ON articles;</sql>
+            <sql>DROP TRIGGER IF EXISTS update_lawyer_profile_updated_at ON lawyer_profile;</sql>
+            <sql>DROP TRIGGER IF EXISTS update_contact_messages_updated_at ON contact_messages;</sql>
+            <sql>DROP TRIGGER IF EXISTS update_services_updated_at ON services;</sql>
+            <sql>DROP TRIGGER IF EXISTS update_articles_updated_at ON articles;</sql>
+            <sql>DROP TRIGGER IF EXISTS update_users_updated_at ON users;</sql>
+
+            <!-- Drop functions -->
+            <sql>DROP FUNCTION IF EXISTS enforce_lawyer_profile_singleton();</sql>
+            <sql>DROP FUNCTION IF EXISTS update_service_search_vector();</sql>
+            <sql>DROP FUNCTION IF EXISTS update_article_search_vector();</sql>
+            <sql>DROP FUNCTION IF EXISTS update_updated_at_column();</sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="03-create-articles-table" author="system">
+        <comment>Create articles table with full SEO support and audit trail</comment>
+
+        <createTable tableName="articles">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_articles"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slug" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_articles_slug"/>
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="excerpt" type="VARCHAR(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" type="article_status_enum" defaultValue="DRAFT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author_id" type="BIGINT">
+                <constraints nullable="false"
+                            foreignKeyName="fk_articles_author"
+                            references="users(id)"
+                            deleteCascade="false"/>
+            </column>
+            <column name="published_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- SEO Fields -->
+            <column name="meta_title" type="VARCHAR(60)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="meta_description" type="VARCHAR(160)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="og_image_url" type="VARCHAR(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="canonical_url" type="VARCHAR(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="keywords" type="TEXT[]">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Full-text search vector -->
+            <column name="search_vector" type="TSVECTOR">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Audit Trail -->
+            <column name="created_by" type="BIGINT">
+                <constraints nullable="false"
+                            foreignKeyName="fk_articles_created_by"
+                            references="users(id)"
+                            deleteCascade="false"/>
+            </column>
+            <column name="updated_by" type="BIGINT">
+                <constraints nullable="false"
+                            foreignKeyName="fk_articles_updated_by"
+                            references="users(id)"
+                            deleteCascade="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Soft Delete -->
+            <column name="deleted_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <rollback>
+            <dropTable tableName="articles"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

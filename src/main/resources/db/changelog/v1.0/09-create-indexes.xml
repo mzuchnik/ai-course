@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="09-create-indexes" author="system">
+        <comment>Create all indexes for optimal query performance</comment>
+
+        <!-- Articles Indexes -->
+        <!-- Status + published_at for listing published articles (partial index excluding soft-deleted) -->
+        <sql>
+            CREATE INDEX idx_articles_status_published_at
+            ON articles(status, published_at DESC)
+            WHERE deleted_at IS NULL;
+        </sql>
+
+        <!-- Full-text search index on search_vector -->
+        <sql>
+            CREATE INDEX idx_articles_search_vector
+            ON articles USING GIN(search_vector);
+        </sql>
+
+        <!-- Keywords GIN index for keyword search -->
+        <sql>
+            CREATE INDEX idx_articles_keywords
+            ON articles USING GIN(keywords);
+        </sql>
+
+        <!-- Author index for queries by author -->
+        <createIndex tableName="articles" indexName="idx_articles_author_id">
+            <column name="author_id"/>
+        </createIndex>
+
+        <!-- Deleted_at index for soft delete filtering -->
+        <createIndex tableName="articles" indexName="idx_articles_deleted_at">
+            <column name="deleted_at"/>
+        </createIndex>
+
+        <!-- Services Indexes -->
+        <!-- Category + display_order for listing (partial index excluding soft-deleted) -->
+        <sql>
+            CREATE INDEX idx_services_category_order
+            ON services(category, display_order)
+            WHERE deleted_at IS NULL;
+        </sql>
+
+        <!-- Full-text search index on search_vector -->
+        <sql>
+            CREATE INDEX idx_services_search_vector
+            ON services USING GIN(search_vector);
+        </sql>
+
+        <!-- Keywords GIN index -->
+        <sql>
+            CREATE INDEX idx_services_keywords
+            ON services USING GIN(keywords);
+        </sql>
+
+        <!-- FAQ JSONB index for JSON queries -->
+        <sql>
+            CREATE INDEX idx_services_faq
+            ON services USING GIN(faq);
+        </sql>
+
+        <!-- Deleted_at index for soft delete filtering -->
+        <createIndex tableName="services" indexName="idx_services_deleted_at">
+            <column name="deleted_at"/>
+        </createIndex>
+
+        <!-- Contact Messages Indexes -->
+        <!-- Created_at DESC for admin panel sorting -->
+        <createIndex tableName="contact_messages" indexName="idx_contact_messages_created_at">
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <!-- Status + created_at for filtering by status -->
+        <createIndex tableName="contact_messages" indexName="idx_contact_messages_status_created">
+            <column name="status"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <!-- Email index for searching by sender -->
+        <createIndex tableName="contact_messages" indexName="idx_contact_messages_email">
+            <column name="email"/>
+        </createIndex>
+
+        <!-- AI Generations Indexes -->
+        <!-- User_id + created_at for daily limit check -->
+        <createIndex tableName="ai_generations" indexName="idx_ai_generations_daily_limit">
+            <column name="user_id"/>
+            <column name="created_at"/>
+        </createIndex>
+
+        <!-- Article_id for finding generation history for article -->
+        <createIndex tableName="ai_generations" indexName="idx_ai_generations_article_id">
+            <column name="article_id"/>
+        </createIndex>
+
+        <!-- Created_at DESC for history listing -->
+        <createIndex tableName="ai_generations" indexName="idx_ai_generations_created_at">
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <!-- Images Indexes (Polymorphic Relationships) -->
+        <!-- Partial index for article images -->
+        <sql>
+            CREATE INDEX idx_images_article
+            ON images(entity_id)
+            WHERE entity_type = 'article';
+        </sql>
+
+        <!-- Partial index for service images -->
+        <sql>
+            CREATE INDEX idx_images_service
+            ON images(entity_id)
+            WHERE entity_type = 'service';
+        </sql>
+
+        <!-- Composite index on entity_type + entity_id for general queries -->
+        <createIndex tableName="images" indexName="idx_images_entity">
+            <column name="entity_type"/>
+            <column name="entity_id"/>
+        </createIndex>
+
+        <rollback>
+            <!-- Drop all indexes -->
+            <dropIndex tableName="articles" indexName="idx_articles_status_published_at"/>
+            <dropIndex tableName="articles" indexName="idx_articles_search_vector"/>
+            <dropIndex tableName="articles" indexName="idx_articles_keywords"/>
+            <dropIndex tableName="articles" indexName="idx_articles_author_id"/>
+            <dropIndex tableName="articles" indexName="idx_articles_deleted_at"/>
+
+            <dropIndex tableName="services" indexName="idx_services_category_order"/>
+            <dropIndex tableName="services" indexName="idx_services_search_vector"/>
+            <dropIndex tableName="services" indexName="idx_services_keywords"/>
+            <dropIndex tableName="services" indexName="idx_services_faq"/>
+            <dropIndex tableName="services" indexName="idx_services_deleted_at"/>
+
+            <dropIndex tableName="contact_messages" indexName="idx_contact_messages_created_at"/>
+            <dropIndex tableName="contact_messages" indexName="idx_contact_messages_status_created"/>
+            <dropIndex tableName="contact_messages" indexName="idx_contact_messages_email"/>
+
+            <dropIndex tableName="ai_generations" indexName="idx_ai_generations_daily_limit"/>
+            <dropIndex tableName="ai_generations" indexName="idx_ai_generations_article_id"/>
+            <dropIndex tableName="ai_generations" indexName="idx_ai_generations_created_at"/>
+
+            <dropIndex tableName="images" indexName="idx_images_article"/>
+            <dropIndex tableName="images" indexName="idx_images_service"/>
+            <dropIndex tableName="images" indexName="idx_images_entity"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

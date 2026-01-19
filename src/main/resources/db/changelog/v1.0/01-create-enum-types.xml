@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="01-create-enum-types" author="system">
+        <comment>Create ENUM types for the database schema</comment>
+
+        <!-- Article status ENUM -->
+        <sql>
+            CREATE TYPE article_status_enum AS ENUM ('DRAFT', 'PUBLISHED', 'ARCHIVED');
+        </sql>
+
+        <!-- Service category ENUM -->
+        <sql>
+            CREATE TYPE service_category_enum AS ENUM ('CIVIL_LAW', 'CRIMINAL_LAW');
+        </sql>
+
+        <!-- Message category ENUM -->
+        <sql>
+            CREATE TYPE message_category_enum AS ENUM ('CIVIL_LAW', 'CRIMINAL_LAW', 'GENERAL', 'OTHER');
+        </sql>
+
+        <!-- Message status ENUM -->
+        <sql>
+            CREATE TYPE message_status_enum AS ENUM ('NEW', 'READ', 'REPLIED', 'ARCHIVED');
+        </sql>
+
+        <!-- AI Generation status ENUM -->
+        <sql>
+            CREATE TYPE generation_status_enum AS ENUM ('SUCCESS', 'FAILED', 'TIMEOUT');
+        </sql>
+
+        <rollback>
+            DROP TYPE IF EXISTS generation_status_enum CASCADE;
+            DROP TYPE IF EXISTS message_status_enum CASCADE;
+            DROP TYPE IF EXISTS message_category_enum CASCADE;
+            DROP TYPE IF EXISTS service_category_enum CASCADE;
+            DROP TYPE IF EXISTS article_status_enum CASCADE;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

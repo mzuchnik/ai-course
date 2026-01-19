@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- MVP Database Schema - Initial Setup -->
+
+    <!-- 1. Create ENUM types -->
+    <include file="db/changelog/v1.0/01-create-enum-types.xml"/>
+
+    <!-- 2. Create tables -->
+    <include file="db/changelog/v1.0/02-create-users-table.xml"/>
+    <include file="db/changelog/v1.0/03-create-articles-table.xml"/>
+    <include file="db/changelog/v1.0/04-create-services-table.xml"/>
+    <include file="db/changelog/v1.0/05-create-contact-messages-table.xml"/>
+    <include file="db/changelog/v1.0/06-create-ai-generations-table.xml"/>
+    <include file="db/changelog/v1.0/07-create-images-table.xml"/>
+    <include file="db/changelog/v1.0/08-create-lawyer-profile-table.xml"/>
+
+    <!-- 3. Create indexes -->
+    <include file="db/changelog/v1.0/09-create-indexes.xml"/>
+
+    <!-- 4. Create triggers and functions -->
+    <include file="db/changelog/v1.0/10-create-triggers.xml"/>
+
+</databaseChangeLog>
