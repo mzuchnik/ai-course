@@ -1,7 +1,9 @@
 package pl.klastbit.lexpage.infrastructure.adapters.persistence.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * JPA Entity for ai_generations table.
@@ -9,7 +11,10 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "ai_generations")
-public class AIGenerationEntity {
+@Getter
+@Setter
+@NoArgsConstructor
+public class AIGenerationEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,118 +55,4 @@ public class AIGenerationEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id", foreignKey = @ForeignKey(name = "fk_ai_generations_article"))
     private ArticleEntity article;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-
-    // Getters and Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public UserEntity getUser() {
-        return user;
-    }
-
-    public void setUser(UserEntity user) {
-        this.user = user;
-    }
-
-    public String getPrompt() {
-        return prompt;
-    }
-
-    public void setPrompt(String prompt) {
-        this.prompt = prompt;
-    }
-
-    public String getKeywords() {
-        return keywords;
-    }
-
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
-    }
-
-    public Integer getWordCount() {
-        return wordCount;
-    }
-
-    public void setWordCount(Integer wordCount) {
-        this.wordCount = wordCount;
-    }
-
-    public String getGeneratedContent() {
-        return generatedContent;
-    }
-
-    public void setGeneratedContent(String generatedContent) {
-        this.generatedContent = generatedContent;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public Integer getTokensUsed() {
-        return tokensUsed;
-    }
-
-    public void setTokensUsed(Integer tokensUsed) {
-        this.tokensUsed = tokensUsed;
-    }
-
-    public Integer getGenerationTimeMs() {
-        return generationTimeMs;
-    }
-
-    public void setGenerationTimeMs(Integer generationTimeMs) {
-        this.generationTimeMs = generationTimeMs;
-    }
-
-    public GenerationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(GenerationStatus status) {
-        this.status = status;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-
-    public ArticleEntity getArticle() {
-        return article;
-    }
-
-    public void setArticle(ArticleEntity article) {
-        this.article = article;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
