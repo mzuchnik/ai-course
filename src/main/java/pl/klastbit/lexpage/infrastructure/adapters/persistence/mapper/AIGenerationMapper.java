@@ -12,7 +12,6 @@ import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.UserEntity
  * Mapper between AIGeneration domain entity and AIGenerationEntity persistence entity.
  * Part of the infrastructure layer (Hexagonal Architecture outbound adapter).
  */
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class AIGenerationMapper {

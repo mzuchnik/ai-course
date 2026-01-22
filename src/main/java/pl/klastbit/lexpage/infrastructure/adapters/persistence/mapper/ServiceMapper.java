@@ -7,23 +7,23 @@ import pl.klastbit.lexpage.domain.service.FaqItem;
 import pl.klastbit.lexpage.domain.service.Service;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ServiceEntity;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.UserEntity;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * Mapper between Service domain entity and ServiceEntity persistence entity.
  * Part of the infrastructure layer (Hexagonal Architecture outbound adapter).
  * Handles JSON serialization/deserialization for FAQ items.
  */
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class ServiceMapper {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Maps ServiceEntity (JPA) to Service (domain).
@@ -37,24 +37,24 @@ public class ServiceMapper {
         }
 
         return Service.ofExisting(
-            entity.getId(),
-            entity.getName(),
-            entity.getSlug(),
-            entity.getDescription(),
-            toDomainCategory(entity.getCategory()),
-            entity.getScope(),
-            entity.getProcess(),
-            jsonToFaqList(entity.getFaq()),
-            entity.getDisplayOrder(),
-            entity.getMetaTitle(),
-            entity.getMetaDescription(),
-            entity.getOgImageUrl(),
-            arrayToList(entity.getKeywords()),
-            getCreatedById(entity),
-            getUpdatedById(entity),
-            entity.getCreatedAt(),
-            entity.getUpdatedAt(),
-            entity.getDeletedAt()
+                entity.getId(),
+                entity.getName(),
+                entity.getSlug(),
+                entity.getDescription(),
+                toDomainCategory(entity.getCategory()),
+                entity.getScope(),
+                entity.getProcess(),
+                jsonToFaqList(entity.getFaq()),
+                entity.getDisplayOrder(),
+                entity.getMetaTitle(),
+                entity.getMetaDescription(),
+                entity.getOgImageUrl(),
+                arrayToList(entity.getKeywords()),
+                getCreatedById(entity),
+                getUpdatedById(entity),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt(),
+                entity.getDeletedAt()
         );
     }
 
@@ -134,8 +134,8 @@ public class ServiceMapper {
      */
     public Long getCreatedById(ServiceEntity entity) {
         return entity != null && entity.getCreatedBy() != null
-            ? entity.getCreatedBy().getId()
-            : null;
+                ? entity.getCreatedBy().getId()
+                : null;
     }
 
     /**
@@ -146,14 +146,14 @@ public class ServiceMapper {
      */
     public Long getUpdatedById(ServiceEntity entity) {
         return entity != null && entity.getUpdatedBy() != null
-            ? entity.getUpdatedBy().getId()
-            : null;
+                ? entity.getUpdatedBy().getId()
+                : null;
     }
 
     /**
      * Sets UserEntity references on ServiceEntity from IDs.
      *
-     * @param entity JPA entity to update
+     * @param entity    JPA entity to update
      * @param createdBy Created by user entity
      * @param updatedBy Updated by user entity
      */
@@ -176,21 +176,7 @@ public class ServiceMapper {
         if (faqItems == null || faqItems.isEmpty()) {
             return null;
         }
-
-        StringBuilder json = new StringBuilder("[");
-        for (int i = 0; i < faqItems.size(); i++) {
-            if (i > 0) {
-                json.append(",");
-            }
-            FaqItem item = faqItems.get(i);
-            json.append("{\"question\":\"")
-                .append(escapeJson(item.question()))
-                .append("\",\"answer\":\"")
-                .append(escapeJson(item.answer()))
-                .append("\"}");
-        }
-        json.append("]");
-        return json.toString();
+        return objectMapper.writeValueAsString(faqItems);
     }
 
     /**
@@ -203,53 +189,14 @@ public class ServiceMapper {
         }
 
         try {
-            List<FaqItem> items = new ArrayList<>();
-
-            // Simple regex-based JSON parsing for FAQ items
-            Pattern itemPattern = Pattern.compile("\\{\\s*\"question\"\\s*:\\s*\"([^\"]*)\""
-                + "\\s*,\\s*\"answer\"\\s*:\\s*\"([^\"]*)\"\\s*\\}");
-            Matcher matcher = itemPattern.matcher(faqJson);
-
-            while (matcher.find()) {
-                String question = unescapeJson(matcher.group(1));
-                String answer = unescapeJson(matcher.group(2));
-                items.add(new FaqItem(question, answer));
-            }
-
-            return items;
+            return objectMapper.readValue(faqJson, new TypeReference<List<FaqItem>>() {
+            });
         } catch (Exception e) {
-            log.error("Failed to deserialize FAQ items from JSON: {}", faqJson, e);
-            return Collections.emptyList();
+            log.warn("Cannot map: %s to List<FaqItem>".formatted(faqJson), e);
+            return List.of();
         }
     }
 
-    /**
-     * Escapes special characters for JSON.
-     */
-    private String escapeJson(String str) {
-        if (str == null) {
-            return "";
-        }
-        return str.replace("\\", "\\\\")
-                  .replace("\"", "\\\"")
-                  .replace("\n", "\\n")
-                  .replace("\r", "\\r")
-                  .replace("\t", "\\t");
-    }
-
-    /**
-     * Unescapes JSON special characters.
-     */
-    private String unescapeJson(String str) {
-        if (str == null) {
-            return "";
-        }
-        return str.replace("\\\"", "\"")
-                  .replace("\\n", "\n")
-                  .replace("\\r", "\r")
-                  .replace("\\t", "\t")
-                  .replace("\\\\", "\\");
-    }
 
     private String[] listToArray(List<String> list) {
         if (list == null) {

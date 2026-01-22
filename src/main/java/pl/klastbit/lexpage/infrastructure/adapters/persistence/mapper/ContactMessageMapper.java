@@ -9,7 +9,6 @@ import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ContactMes
  * Mapper between ContactMessage domain entity and ContactMessageEntity persistence entity.
  * Part of the infrastructure layer (Hexagonal Architecture outbound adapter).
  */
-@Component
 @Slf4j
 public class ContactMessageMapper {
 

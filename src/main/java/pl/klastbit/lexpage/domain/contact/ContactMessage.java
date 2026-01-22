@@ -220,22 +220,4 @@ public class ContactMessage {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
-
-    // Setters for infrastructure layer (reconstruction from DB)
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    void setStatus(MessageStatus status) {
-        this.status = status;
-    }
-
-    void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }

@@ -287,47 +287,4 @@ public class Article {
     public LocalDateTime getDeletedAt() {
         return deletedAt;
     }
-
-    // Setters for infrastructure layer (reconstruction from DB)
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setSlug(String slug) {
-        this.slug = slug;
-    }
-
-    public void setExcerpt(String excerpt) {
-        this.excerpt = excerpt;
-    }
-
-    public void setOgImageUrl(String ogImageUrl) {
-        this.ogImageUrl = ogImageUrl;
-    }
-
-    public void setCanonicalUrl(String canonicalUrl) {
-        this.canonicalUrl = canonicalUrl;
-    }
-
-    // Package-private setters for reconstruction
-    void setStatus(ArticleStatus status) {
-        this.status = status;
-    }
-
-    void setPublishedAt(LocalDateTime publishedAt) {
-        this.publishedAt = publishedAt;
-    }
-
-    void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    void setDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
-    }
 }

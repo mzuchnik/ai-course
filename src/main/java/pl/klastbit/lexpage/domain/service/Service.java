@@ -239,35 +239,4 @@ public class Service {
     public LocalDateTime getDeletedAt() {
         return deletedAt;
     }
-
-    // Setters for infrastructure layer (reconstruction from DB)
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setSlug(String slug) {
-        this.slug = slug;
-    }
-
-    public void setOgImageUrl(String ogImageUrl) {
-        this.ogImageUrl = ogImageUrl;
-    }
-
-    // Package-private setters for reconstruction
-    void setCategory(ServiceCategory category) {
-        this.category = category;
-    }
-
-    void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    void setDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
-    }
 }
