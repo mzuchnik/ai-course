@@ -86,6 +86,42 @@ public class AIGeneration {
     }
 
     /**
+     * Factory method to reconstruct an existing AI generation from database.
+     * Used by infrastructure layer mappers. No business validation applied.
+     */
+    public static AIGeneration ofExisting(
+            Long id,
+            Long userId,
+            String prompt,
+            String keywords,
+            Integer wordCount,
+            String generatedContent,
+            String model,
+            Integer tokensUsed,
+            Integer generationTimeMs,
+            GenerationStatus status,
+            String errorMessage,
+            Long articleId,
+            LocalDateTime createdAt
+    ) {
+        AIGeneration generation = new AIGeneration();
+        generation.id = id;
+        generation.userId = userId;
+        generation.prompt = prompt;
+        generation.keywords = keywords;
+        generation.wordCount = wordCount;
+        generation.generatedContent = generatedContent;
+        generation.model = model;
+        generation.tokensUsed = tokensUsed;
+        generation.generationTimeMs = generationTimeMs;
+        generation.status = status;
+        generation.errorMessage = errorMessage;
+        generation.articleId = articleId;
+        generation.createdAt = createdAt;
+        return generation;
+    }
+
+    /**
      * Links this generation to an article.
      */
     public void linkToArticle(Long articleId) {

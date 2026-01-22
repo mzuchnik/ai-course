@@ -53,6 +53,52 @@ public class Article {
     }
 
     /**
+     * Factory method to reconstruct an existing article from database.
+     * Used by infrastructure layer mappers. No business validation applied.
+     */
+    public static Article ofExisting(
+            Long id,
+            String title,
+            String slug,
+            String content,
+            String excerpt,
+            ArticleStatus status,
+            Long authorId,
+            LocalDateTime publishedAt,
+            String metaTitle,
+            String metaDescription,
+            String ogImageUrl,
+            String canonicalUrl,
+            List<String> keywords,
+            Long createdBy,
+            Long updatedBy,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt,
+            LocalDateTime deletedAt
+    ) {
+        Article article = new Article();
+        article.id = id;
+        article.title = title;
+        article.slug = slug;
+        article.content = content;
+        article.excerpt = excerpt;
+        article.status = status;
+        article.authorId = authorId;
+        article.publishedAt = publishedAt;
+        article.metaTitle = metaTitle;
+        article.metaDescription = metaDescription;
+        article.ogImageUrl = ogImageUrl;
+        article.canonicalUrl = canonicalUrl;
+        article.keywords = keywords;
+        article.createdBy = createdBy;
+        article.updatedBy = updatedBy;
+        article.createdAt = createdAt;
+        article.updatedAt = updatedAt;
+        article.deletedAt = deletedAt;
+        return article;
+    }
+
+    /**
      * Publishes the article.
      * Business rule: Only DRAFT or ARCHIVED articles can be published.
      */

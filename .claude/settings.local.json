@@ -6,7 +6,8 @@
       "Bash(.gradlew.bat clean build)",
       "Bash(./gradlew clean build:*)",
       "Bash(java -version:*)",
-      "Bash(./gradlew compileJava:*)"
+      "Bash(./gradlew compileJava:*)",
+      "Bash(./gradlew build:*)"
     ]
   }
 }

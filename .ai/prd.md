@@ -5,7 +5,7 @@
 1. **Stack technologiczny**: Spring Boot + Thymeleaf + MaterialUI + PostgreSQL, hostowana na VPS
 2. **Architektura**: Monolityczna aplikacja z architekturą heksagonalną opartą na DDD
 3. **AI Content Generation**: Workflow AI → weryfikacja prawnika → publikacja. API do wyboru: Anthropic Claude lub OpenAI
-4. **Zakres MVP**: Strona informacyjna + blog + formularz kontaktowy + panel admin z generatorem AI
+4. **Zakres MVP**: Strona informacyjna + blog + formularz kontaktowy + panel admin z generatorem treści artykułów przez AI
 5. **Specjalizacja**: Prawo cywilne (niebieski) i karne (bordowy) - subtelne różnicowanie kolorystyczne
 6. **Autentykacja**: Spring Security, form login, jedno konto administratora
 7. **Security**: Whitelist HTML (p, h2, h3, ul, li, strong, em, a), reCAPTCHA v3, CSRF protection

@@ -63,6 +63,42 @@ public class ContactMessage {
     }
 
     /**
+     * Factory method to reconstruct an existing contact message from database.
+     * Used by infrastructure layer mappers. No business validation applied.
+     */
+    public static ContactMessage ofExisting(
+            Long id,
+            String firstName,
+            String lastName,
+            String email,
+            String phone,
+            MessageCategory category,
+            String message,
+            MessageStatus status,
+            BigDecimal recaptchaScore,
+            String ipAddress,
+            String userAgent,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
+    ) {
+        ContactMessage contactMessage = new ContactMessage();
+        contactMessage.id = id;
+        contactMessage.firstName = firstName;
+        contactMessage.lastName = lastName;
+        contactMessage.email = email;
+        contactMessage.phone = phone;
+        contactMessage.category = category;
+        contactMessage.message = message;
+        contactMessage.status = status;
+        contactMessage.recaptchaScore = recaptchaScore;
+        contactMessage.ipAddress = ipAddress;
+        contactMessage.userAgent = userAgent;
+        contactMessage.createdAt = createdAt;
+        contactMessage.updatedAt = updatedAt;
+        return contactMessage;
+    }
+
+    /**
      * Marks the message as read.
      */
     public void markAsRead() {

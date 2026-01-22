@@ -52,6 +52,52 @@ public class Service {
     }
 
     /**
+     * Factory method to reconstruct an existing service from database.
+     * Used by infrastructure layer mappers. No business validation applied.
+     */
+    public static Service ofExisting(
+            Long id,
+            String name,
+            String slug,
+            String description,
+            ServiceCategory category,
+            String scope,
+            String process,
+            List<FaqItem> faqItems,
+            Integer displayOrder,
+            String metaTitle,
+            String metaDescription,
+            String ogImageUrl,
+            List<String> keywords,
+            Long createdBy,
+            Long updatedBy,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt,
+            LocalDateTime deletedAt
+    ) {
+        Service service = new Service();
+        service.id = id;
+        service.name = name;
+        service.slug = slug;
+        service.description = description;
+        service.category = category;
+        service.scope = scope;
+        service.process = process;
+        service.faqItems = faqItems;
+        service.displayOrder = displayOrder;
+        service.metaTitle = metaTitle;
+        service.metaDescription = metaDescription;
+        service.ogImageUrl = ogImageUrl;
+        service.keywords = keywords;
+        service.createdBy = createdBy;
+        service.updatedBy = updatedBy;
+        service.createdAt = createdAt;
+        service.updatedAt = updatedAt;
+        service.deletedAt = deletedAt;
+        return service;
+    }
+
+    /**
      * Updates service details.
      */
     public void updateDetails(String name, String description, String scope, String process, Long userId) {
