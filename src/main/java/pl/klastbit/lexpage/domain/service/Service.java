@@ -1,5 +1,8 @@
 package pl.klastbit.lexpage.domain.service;
 
+import lombok.Getter;
+import pl.klastbit.lexpage.domain.user.UserId;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -8,6 +11,7 @@ import java.util.Objects;
  * Service Domain Entity (DDD Aggregate Root).
  * Encapsulates legal service business logic including categorization and display ordering.
  */
+@Getter
 public class Service {
 
     private Long id;
@@ -27,8 +31,8 @@ public class Service {
     private List<String> keywords;
 
     // Audit
-    private Long createdBy;
-    private Long updatedBy;
+    private UserId createdBy;
+    private UserId updatedBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
@@ -38,7 +42,7 @@ public class Service {
     /**
      * Factory method to create a new service.
      */
-    public static Service create(String name, String description, ServiceCategory category, Long userId) {
+    public static Service create(String name, String description, ServiceCategory category, UserId userId) {
         Service service = new Service();
         service.name = Objects.requireNonNull(name, "Service name cannot be null");
         service.description = Objects.requireNonNull(description, "Description cannot be null");
@@ -69,8 +73,8 @@ public class Service {
             String metaDescription,
             String ogImageUrl,
             List<String> keywords,
-            Long createdBy,
-            Long updatedBy,
+            UserId createdBy,
+            UserId updatedBy,
             LocalDateTime createdAt,
             LocalDateTime updatedAt,
             LocalDateTime deletedAt
@@ -100,7 +104,7 @@ public class Service {
     /**
      * Updates service details.
      */
-    public void updateDetails(String name, String description, String scope, String process, Long userId) {
+    public void updateDetails(String name, String description, String scope, String process, UserId userId) {
         this.name = Objects.requireNonNull(name, "Service name cannot be null");
         this.description = Objects.requireNonNull(description, "Description cannot be null");
         this.scope = scope;
@@ -164,79 +168,5 @@ public class Service {
      */
     public boolean isDeleted() {
         return deletedAt != null;
-    }
-
-    // Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getSlug() {
-        return slug;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public ServiceCategory getCategory() {
-        return category;
-    }
-
-    public String getScope() {
-        return scope;
-    }
-
-    public String getProcess() {
-        return process;
-    }
-
-    public List<FaqItem> getFaqItems() {
-        return faqItems;
-    }
-
-    public Integer getDisplayOrder() {
-        return displayOrder;
-    }
-
-    public String getMetaTitle() {
-        return metaTitle;
-    }
-
-    public String getMetaDescription() {
-        return metaDescription;
-    }
-
-    public String getOgImageUrl() {
-        return ogImageUrl;
-    }
-
-    public List<String> getKeywords() {
-        return keywords;
-    }
-
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public Long getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
     }
 }

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 /**
  * JPA Entity for users table (Spring Security authentication).
  * Maps to the database users table in the infrastructure layer.
@@ -17,13 +19,12 @@ import lombok.Setter;
 public class UserEntity extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "username", nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(name = "password_hash", nullable = false, length = 60)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
     @Column(name = "email", nullable = false, unique = true)

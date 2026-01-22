@@ -1,5 +1,8 @@
 package pl.klastbit.lexpage.domain.article;
 
+import lombok.Getter;
+import pl.klastbit.lexpage.domain.user.UserId;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -8,6 +11,7 @@ import java.util.Objects;
  * Article Domain Entity (DDD Aggregate Root).
  * Encapsulates article business logic including publication workflow, SEO, and lifecycle management.
  */
+@Getter
 public class Article {
 
     private Long id;
@@ -16,7 +20,7 @@ public class Article {
     private String content;
     private String excerpt;
     private ArticleStatus status;
-    private Long authorId;
+    private UserId authorId;
     private LocalDateTime publishedAt;
 
     // SEO fields
@@ -27,8 +31,8 @@ public class Article {
     private List<String> keywords;
 
     // Audit
-    private Long createdBy;
-    private Long updatedBy;
+    private UserId createdBy;
+    private UserId updatedBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
@@ -39,7 +43,7 @@ public class Article {
     /**
      * Factory method to create a new draft article.
      */
-    public static Article createDraft(String title, String content, Long authorId) {
+    public static Article createDraft(String title, String content, UserId authorId) {
         Article article = new Article();
         article.title = Objects.requireNonNull(title, "Title cannot be null");
         article.content = Objects.requireNonNull(content, "Content cannot be null");
@@ -63,15 +67,15 @@ public class Article {
             String content,
             String excerpt,
             ArticleStatus status,
-            Long authorId,
+            UserId authorId,
             LocalDateTime publishedAt,
             String metaTitle,
             String metaDescription,
             String ogImageUrl,
             String canonicalUrl,
             List<String> keywords,
-            Long createdBy,
-            Long updatedBy,
+            UserId createdBy,
+            UserId updatedBy,
             LocalDateTime createdAt,
             LocalDateTime updatedAt,
             LocalDateTime deletedAt
@@ -144,7 +148,7 @@ public class Article {
      * Updates article content.
      * Business rule: Content must not be empty.
      */
-    public void updateContent(String newTitle, String newContent, Long userId) {
+    public void updateContent(String newTitle, String newContent, UserId userId) {
         this.title = Objects.requireNonNull(newTitle, "Title cannot be null");
         this.content = Objects.requireNonNull(newContent, "Content cannot be null");
 
@@ -212,79 +216,5 @@ public class Article {
             return 0;
         }
         return content.trim().split("\\s+").length;
-    }
-
-    // Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getSlug() {
-        return slug;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public String getExcerpt() {
-        return excerpt;
-    }
-
-    public ArticleStatus getStatus() {
-        return status;
-    }
-
-    public Long getAuthorId() {
-        return authorId;
-    }
-
-    public LocalDateTime getPublishedAt() {
-        return publishedAt;
-    }
-
-    public String getMetaTitle() {
-        return metaTitle;
-    }
-
-    public String getMetaDescription() {
-        return metaDescription;
-    }
-
-    public String getOgImageUrl() {
-        return ogImageUrl;
-    }
-
-    public String getCanonicalUrl() {
-        return canonicalUrl;
-    }
-
-    public List<String> getKeywords() {
-        return keywords;
-    }
-
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public Long getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
     }
 }

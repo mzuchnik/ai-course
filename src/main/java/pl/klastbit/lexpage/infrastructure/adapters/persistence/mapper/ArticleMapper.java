@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import pl.klastbit.lexpage.domain.article.Article;
+import pl.klastbit.lexpage.domain.user.UserId;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleEntity;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.UserEntity;
 
@@ -31,24 +32,24 @@ public class ArticleMapper {
         }
 
         return Article.ofExisting(
-            entity.getId(),
-            entity.getTitle(),
-            entity.getSlug(),
-            entity.getContent(),
-            entity.getExcerpt(),
-            toDomainStatus(entity.getStatus()),
-            getAuthorId(entity),
-            entity.getPublishedAt(),
-            entity.getMetaTitle(),
-            entity.getMetaDescription(),
-            entity.getOgImageUrl(),
-            entity.getCanonicalUrl(),
-            arrayToList(entity.getKeywords()),
-            getCreatedById(entity),
-            getUpdatedById(entity),
-            entity.getCreatedAt(),
-            entity.getUpdatedAt(),
-            entity.getDeletedAt()
+                entity.getId(),
+                entity.getTitle(),
+                entity.getSlug(),
+                entity.getContent(),
+                entity.getExcerpt(),
+                toDomainStatus(entity.getStatus()),
+                getAuthorId(entity),
+                entity.getPublishedAt(),
+                entity.getMetaTitle(),
+                entity.getMetaDescription(),
+                entity.getOgImageUrl(),
+                entity.getCanonicalUrl(),
+                arrayToList(entity.getKeywords()),
+                getCreatedById(entity),
+                getUpdatedById(entity),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt(),
+                entity.getDeletedAt()
         );
     }
 
@@ -125,10 +126,10 @@ public class ArticleMapper {
      * @param entity JPA entity
      * @return Author ID or null if not set
      */
-    public Long getAuthorId(ArticleEntity entity) {
+    public UserId getAuthorId(ArticleEntity entity) {
         return entity != null && entity.getAuthor() != null
-            ? entity.getAuthor().getId()
-            : null;
+                ? UserId.of(entity.getAuthor().getId())
+                : null;
     }
 
     /**
@@ -137,10 +138,10 @@ public class ArticleMapper {
      * @param entity JPA entity
      * @return Created by user ID or null if not set
      */
-    public Long getCreatedById(ArticleEntity entity) {
+    public UserId getCreatedById(ArticleEntity entity) {
         return entity != null && entity.getCreatedBy() != null
-            ? entity.getCreatedBy().getId()
-            : null;
+                ? UserId.of(entity.getCreatedBy().getId())
+                : null;
     }
 
     /**
@@ -149,23 +150,23 @@ public class ArticleMapper {
      * @param entity JPA entity
      * @return Updated by user ID or null if not set
      */
-    public Long getUpdatedById(ArticleEntity entity) {
+    public UserId getUpdatedById(ArticleEntity entity) {
         return entity != null && entity.getUpdatedBy() != null
-            ? entity.getUpdatedBy().getId()
-            : null;
+                ? UserId.of(entity.getUpdatedBy().getId())
+                : null;
     }
 
     /**
      * Sets UserEntity references on ArticleEntity from IDs.
      * This method should be called by repository with loaded UserEntity references.
      *
-     * @param entity JPA entity to update
-     * @param author Author user entity
+     * @param entity    JPA entity to update
+     * @param author    Author user entity
      * @param createdBy Created by user entity
      * @param updatedBy Updated by user entity
      */
     public void setUserReferences(ArticleEntity entity, UserEntity author,
-                                   UserEntity createdBy, UserEntity updatedBy) {
+                                  UserEntity createdBy, UserEntity updatedBy) {
         if (entity == null) {
             return;
         }

@@ -60,4 +60,13 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+
+    // Kontynuuj wykonywanie wszystkich testów nawet jeśli niektóre się nie powiodą
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+
+    // Wyłącz failFast - wszystkie testy będą wykonane niezależnie od niepowodzeń
+    systemProperty 'junit.jupiter.execution.failfast.enabled', 'false'
 }

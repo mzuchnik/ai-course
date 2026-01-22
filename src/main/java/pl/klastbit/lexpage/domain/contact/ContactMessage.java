@@ -1,5 +1,7 @@
 package pl.klastbit.lexpage.domain.contact;
 
+import lombok.Getter;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -8,6 +10,7 @@ import java.util.Objects;
  * ContactMessage Domain Entity (DDD Aggregate Root).
  * Encapsulates contact form message business logic including status management and spam detection.
  */
+@Getter
 public class ContactMessage {
 
     private Long id;
@@ -165,59 +168,5 @@ public class ContactMessage {
         if (!email.contains("@")) {
             throw new IllegalArgumentException("Invalid email format");
         }
-    }
-
-    // Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public MessageCategory getCategory() {
-        return category;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public MessageStatus getStatus() {
-        return status;
-    }
-
-    public BigDecimal getRecaptchaScore() {
-        return recaptchaScore;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public String getUserAgent() {
-        return userAgent;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }

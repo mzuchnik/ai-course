@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import pl.klastbit.lexpage.domain.ai.AIGeneration;
+import pl.klastbit.lexpage.domain.user.UserId;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.AIGenerationEntity;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleEntity;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.UserEntity;
@@ -104,9 +105,9 @@ public class AIGenerationMapper {
      * @param entity JPA entity
      * @return User ID or null if not set
      */
-    public Long getUserId(AIGenerationEntity entity) {
+    public UserId getUserId(AIGenerationEntity entity) {
         return entity != null && entity.getUser() != null
-            ? entity.getUser().getId()
+            ? UserId.of(entity.getUser().getId())
             : null;
     }
 

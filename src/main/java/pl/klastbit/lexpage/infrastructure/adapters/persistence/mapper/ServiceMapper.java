@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import pl.klastbit.lexpage.domain.service.FaqItem;
 import pl.klastbit.lexpage.domain.service.Service;
+import pl.klastbit.lexpage.domain.user.UserId;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ServiceEntity;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.UserEntity;
 import tools.jackson.core.type.TypeReference;
@@ -132,9 +133,9 @@ public class ServiceMapper {
      * @param entity JPA entity
      * @return Created by user ID or null if not set
      */
-    public Long getCreatedById(ServiceEntity entity) {
+    public UserId getCreatedById(ServiceEntity entity) {
         return entity != null && entity.getCreatedBy() != null
-                ? entity.getCreatedBy().getId()
+                ? UserId.of(entity.getCreatedBy().getId())
                 : null;
     }
 
@@ -144,9 +145,9 @@ public class ServiceMapper {
      * @param entity JPA entity
      * @return Updated by user ID or null if not set
      */
-    public Long getUpdatedById(ServiceEntity entity) {
+    public UserId getUpdatedById(ServiceEntity entity) {
         return entity != null && entity.getUpdatedBy() != null
-                ? entity.getUpdatedBy().getId()
+                ? UserId.of(entity.getUpdatedBy().getId())
                 : null;
     }
 

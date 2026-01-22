@@ -1,5 +1,8 @@
 package pl.klastbit.lexpage.domain.ai;
 
+import lombok.Getter;
+import pl.klastbit.lexpage.domain.user.UserId;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -7,10 +10,11 @@ import java.util.Objects;
  * AIGeneration Domain Entity.
  * Encapsulates AI content generation business logic including tracking and limits.
  */
+@Getter
 public class AIGeneration {
 
     private Long id;
-    private Long userId;
+    private UserId userId;
     private String prompt;
     private String keywords;
     private Integer wordCount;
@@ -26,13 +30,14 @@ public class AIGeneration {
     public static final int DAILY_GENERATION_LIMIT = 20;
     public static final int MAX_WORD_COUNT = 5000;
 
-    private AIGeneration() {}
+    private AIGeneration() {
+    }
 
     /**
      * Factory method to create a successful generation.
      */
     public static AIGeneration createSuccessful(
-            Long userId,
+            UserId userId,
             String prompt,
             String keywords,
             String generatedContent,
@@ -61,7 +66,7 @@ public class AIGeneration {
      * Factory method to create a failed generation.
      */
     public static AIGeneration createFailed(
-            Long userId,
+            UserId userId,
             String prompt,
             String keywords,
             String model,
@@ -91,7 +96,7 @@ public class AIGeneration {
      */
     public static AIGeneration ofExisting(
             Long id,
-            Long userId,
+            UserId userId,
             String prompt,
             String keywords,
             Integer wordCount,
@@ -165,7 +170,7 @@ public class AIGeneration {
     private void validateWordCount() {
         if (wordCount != null && wordCount > MAX_WORD_COUNT) {
             throw new IllegalArgumentException(
-                "Generated content exceeds maximum word count of " + MAX_WORD_COUNT
+                    "Generated content exceeds maximum word count of " + MAX_WORD_COUNT
             );
         }
     }
@@ -180,71 +185,4 @@ public class AIGeneration {
         return content.trim().split("\\s+").length;
     }
 
-    // Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public String getPrompt() {
-        return prompt;
-    }
-
-    public String getKeywords() {
-        return keywords;
-    }
-
-    public Integer getWordCount() {
-        return wordCount;
-    }
-
-    public String getGeneratedContent() {
-        return generatedContent;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public Integer getTokensUsed() {
-        return tokensUsed;
-    }
-
-    public Integer getGenerationTimeMs() {
-        return generationTimeMs;
-    }
-
-    public GenerationStatus getStatus() {
-        return status;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public Long getArticleId() {
-        return articleId;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    // Setters for infrastructure layer (reconstruction from DB)
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    void setStatus(GenerationStatus status) {
-        this.status = status;
-    }
-
-    void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
