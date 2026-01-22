@@ -835,6 +835,411 @@ public class OrderService {
 }
 ```
 
+## REST API i Obsługa Wyjątków
+
+### 1. Globalny Handler Wyjątków (@RestControllerAdvice)
+
+**ZASADA**: ZAWSZE używaj globalnego handlera wyjątków zamiast try-catch w kontrolerach!
+
+```java
+// DOBRZE - Globalny handler z ProblemDetail (RFC 7807)
+package pl.klastbit.lexpage.infrastructure.web.exception;
+
+@RestControllerAdvice
+@Slf4j
+public class GlobalExceptionApiHandler {
+
+    /**
+     * Obsługa wyjątków domenowych (np. rate limiting).
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ProblemDetail handleRateLimitExceeded(RateLimitExceededException ex) {
+        log.warn("Rate limit exceeded: {}", ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+            HttpStatus.TOO_MANY_REQUESTS,
+            "Osiągnięto limit wiadomości. Spróbuj ponownie za godzinę."
+        );
+
+        problemDetail.setTitle("Rate Limit Exceeded");
+        problemDetail.setType(URI.create("https://klastbit.pl/errors/rate-limit-exceeded"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("maxAllowed", ex.getMaxAllowed());
+        problemDetail.setProperty("periodInHours", ex.getPeriodInHours());
+
+        return problemDetail;
+    }
+
+    /**
+     * Obsługa błędów Bean Validation (@NotBlank, @Email, @Size).
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail handleValidationErrors(MethodArgumentNotValidException ex) {
+        log.warn("Validation error: {}", ex.getMessage());
+
+        String errorMessage = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .collect(Collectors.joining(", "));
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+            HttpStatus.BAD_REQUEST,
+            errorMessage
+        );
+
+        problemDetail.setTitle("Validation Error");
+        problemDetail.setType(URI.create("https://klastbit.pl/errors/validation-error"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("fieldErrors", ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(error -> new FieldError(
+                error.getField(),
+                error.getDefaultMessage(),
+                error.getRejectedValue()
+            ))
+            .collect(Collectors.toList())
+        );
+
+        return problemDetail;
+    }
+
+    /**
+     * Obsługa błędów walidacji domenowej (IllegalArgumentException).
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("Invalid argument: {}", ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+            HttpStatus.BAD_REQUEST,
+            ex.getMessage()
+        );
+
+        problemDetail.setTitle("Invalid Request");
+        problemDetail.setType(URI.create("https://klastbit.pl/errors/invalid-request"));
+        problemDetail.setProperty("timestamp", Instant.now());
+
+        return problemDetail;
+    }
+
+    /**
+     * Obsługa wszystkich innych nieoczekiwanych wyjątków.
+     */
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleGenericException(Exception ex) {
+        log.error("Unexpected error occurred", ex);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Wystąpił nieoczekiwany błąd. Spróbuj ponownie lub skontaktuj się z nami."
+        );
+
+        problemDetail.setTitle("Internal Server Error");
+        problemDetail.setType(URI.create("https://klastbit.pl/errors/internal-error"));
+        problemDetail.setProperty("timestamp", Instant.now());
+
+        return problemDetail;
+    }
+
+    private record FieldError(String field, String message, Object rejectedValue) {}
+}
+```
+
+### 2. ProblemDetail vs Własne DTO
+
+**ZASADA**: ZAWSZE używaj `ProblemDetail` (RFC 7807) zamiast własnych klas `ErrorResponse`!
+
+```java
+// DOBRZE - Spring's ProblemDetail
+@ExceptionHandler(NotFoundException.class)
+public ProblemDetail handleNotFound(NotFoundException ex) {
+    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+        HttpStatus.NOT_FOUND,
+        ex.getMessage()
+    );
+    problemDetail.setTitle("Resource Not Found");
+    problemDetail.setType(URI.create("https://klastbit.pl/errors/not-found"));
+    problemDetail.setProperty("resourceId", ex.getResourceId());
+    return problemDetail;
+}
+
+// ŹLE - własna klasa ErrorResponse
+public record ErrorResponse(String message, String errorCode, LocalDateTime timestamp) {}
+
+@ExceptionHandler(NotFoundException.class)
+public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(new ErrorResponse(ex.getMessage(), "NOT_FOUND", LocalDateTime.now()));
+}
+```
+
+**Korzyści ProblemDetail:**
+- Zgodny ze standardem RFC 7807
+- Wspierany przez Spring Boot 3.x+
+- Automatyczna serializacja do JSON
+- Rozszerzalny przez dodatkowe właściwości
+- Lepsze wsparcie narzędzi i klientów API
+
+### 3. Czysty Kod w Kontrolerach
+
+**ZASADA**: NIE używaj try-catch w kontrolerach. Pozwól wyjątkom propagować do globalnego handlera!
+
+```java
+// DOBRZE - czysty kontroler bez try-catch
+@RestController
+@RequestMapping("/api/contact")
+@RequiredArgsConstructor
+@Slf4j
+public class ContactFormController {
+
+    private final ContactFormApplicationService contactFormService;
+
+    @PostMapping
+    public ResponseEntity<ContactFormResponse> submitContactForm(
+            @Valid @RequestBody SubmitContactFormRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        log.info("Received contact form submission from IP: {}", getClientIp(httpRequest));
+
+        SubmitContactFormCommand command = new SubmitContactFormCommand(
+            request.firstName(),
+            request.lastName(),
+            request.email(),
+            request.phone(),
+            request.category(),
+            request.message(),
+            getClientIp(httpRequest),
+            getUserAgent(httpRequest)
+        );
+
+        ContactFormResult result = contactFormService.submitContactForm(command);
+
+        return ResponseEntity.ok(ContactFormResponse.fromResult(result));
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty()) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isEmpty()) {
+            ip = request.getRemoteAddr();
+        }
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+        return ip;
+    }
+
+    private String getUserAgent(HttpServletRequest request) {
+        return request.getHeader("User-Agent");
+    }
+}
+
+// ŹLE - try-catch w kontrolerze
+@PostMapping
+public ResponseEntity<?> submitContactForm(@Valid @RequestBody SubmitContactFormRequest request) {
+    try {
+        // logika
+        return ResponseEntity.ok(response);
+    } catch (RateLimitExceededException e) {
+        return ResponseEntity.status(429).body(new ErrorResponse(...));
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(...));
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body(new ErrorResponse(...));
+    }
+}
+```
+
+### 4. Application Service - Propagacja Wyjątków
+
+**ZASADA**: Application services powinny propagować wyjątki, nie łapać ich!
+
+```java
+// DOBRZE - wyjątki propagują naturalnie
+@Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional
+public class ContactFormApplicationService {
+
+    private final ContactRepository contactRepository;
+
+    public ContactFormResult submitContactForm(SubmitContactFormCommand command) {
+        log.info("Processing contact form submission from: {} {}",
+            command.firstName(), command.lastName());
+
+        // 1. Sprawdzenie rate limit (rzuca RateLimitExceededException)
+        checkRateLimit(command.ipAddress());
+
+        // 2. Tworzenie encji domenowej (rzuca IllegalArgumentException przy błędach walidacji)
+        ContactMessage contactMessage = ContactMessage.create(
+            command.firstName(),
+            command.lastName(),
+            command.email(),
+            command.phone(),
+            command.category(),
+            command.message(),
+            new BigDecimal("0.9"),
+            command.ipAddress(),
+            command.userAgent()
+        );
+
+        // 3. Zapis do bazy danych
+        ContactMessage savedMessage = contactRepository.save(contactMessage);
+        log.info("Contact message saved with ID: {}", savedMessage.getId());
+
+        return ContactFormResult.success(
+            savedMessage.getId(),
+            savedMessage.getFullName(),
+            savedMessage.getEmail()
+        );
+    }
+
+    private void checkRateLimit(String ipAddress) {
+        if (ipAddress == null) return;
+
+        LocalDateTime since = LocalDateTime.now().minusHours(1);
+        int messageCount = contactRepository.countByIpAddressAndCreatedAtAfter(ipAddress, since);
+
+        if (messageCount >= 3) {
+            throw new RateLimitExceededException(3, 1);
+        }
+    }
+}
+
+// ŹLE - łapanie wyjątków w application service
+public ContactFormResult submitContactForm(SubmitContactFormCommand command) {
+    try {
+        checkRateLimit(command.ipAddress());
+        ContactMessage contactMessage = ContactMessage.create(...);
+        // ...
+        return ContactFormResult.success(...);
+    } catch (RateLimitExceededException e) {
+        log.warn("Rate limit exceeded: {}", e.getMessage());
+        throw e;  // po co łapać tylko po to, żeby rzucić dalej?
+    } catch (IllegalArgumentException e) {
+        log.warn("Invalid data: {}", e.getMessage());
+        return ContactFormResult.failure(e.getMessage()); // mieszanie exceptionsów z Result!
+    }
+}
+```
+
+### 5. Wyjątki Domenowe
+
+**ZASADA**: Wyjątki domenowe powinny być w pakiecie `domain/*/exception/`
+
+```java
+// DOBRZE - wyjątek domenowy
+package pl.klastbit.lexpage.domain.contact.exception;
+
+public class RateLimitExceededException extends RuntimeException {
+
+    private final int maxAllowed;
+    private final int periodInHours;
+
+    public RateLimitExceededException(int maxAllowed, int periodInHours) {
+        super(String.format("Rate limit exceeded. Maximum %d messages allowed per %d hour(s)",
+            maxAllowed, periodInHours));
+        this.maxAllowed = maxAllowed;
+        this.periodInHours = periodInHours;
+    }
+
+    public int getMaxAllowed() {
+        return maxAllowed;
+    }
+
+    public int getPeriodInHours() {
+        return periodInHours;
+    }
+}
+
+// DOBRZE - hierarchia wyjątków
+package pl.klastbit.lexpage.domain.order.exception;
+
+public abstract class OrderException extends RuntimeException {
+    protected OrderException(String message) {
+        super(message);
+    }
+}
+
+public class OrderNotFoundException extends OrderException {
+    public OrderNotFoundException(Long orderId) {
+        super("Order not found: " + orderId);
+    }
+}
+
+public class OrderAlreadyConfirmedException extends OrderException {
+    public OrderAlreadyConfirmedException(String orderNumber) {
+        super("Order already confirmed: " + orderNumber);
+    }
+}
+```
+
+### 6. Mapowanie HTTP Status Codes
+
+Standardowe mapowanie wyjątków na kody HTTP:
+
+| Wyjątek | HTTP Status | Użycie |
+|---------|-------------|--------|
+| `NotFoundException` | 404 Not Found | Zasób nie istnieje |
+| `IllegalArgumentException` | 400 Bad Request | Nieprawidłowe dane wejściowe |
+| `MethodArgumentNotValidException` | 400 Bad Request | Bean Validation errors |
+| `RateLimitExceededException` | 429 Too Many Requests | Przekroczono limit zapytań |
+| `UnauthorizedException` | 401 Unauthorized | Brak lub nieprawidłowe uwierzytelnienie |
+| `ForbiddenException` | 403 Forbidden | Brak uprawnień |
+| `ConflictException` | 409 Conflict | Konflikt stanu (np. duplikat) |
+| `Exception` (ogólny) | 500 Internal Server Error | Nieoczekiwany błąd |
+
+### 7. Przykładowa Odpowiedź ProblemDetail
+
+```json
+{
+  "type": "https://klastbit.pl/errors/rate-limit-exceeded",
+  "title": "Rate Limit Exceeded",
+  "status": 429,
+  "detail": "Osiągnięto limit wiadomości. Spróbuj ponownie za godzinę.",
+  "timestamp": "2026-01-22T10:30:00Z",
+  "maxAllowed": 3,
+  "periodInHours": 1
+}
+```
+
+```json
+{
+  "type": "https://klastbit.pl/errors/validation-error",
+  "title": "Validation Error",
+  "status": 400,
+  "detail": "firstName: Imię jest wymagane, message: Wiadomość musi mieć od 50 do 5000 znaków",
+  "timestamp": "2026-01-22T10:30:00Z",
+  "fieldErrors": [
+    {
+      "field": "firstName",
+      "message": "Imię jest wymagane",
+      "rejectedValue": ""
+    },
+    {
+      "field": "message",
+      "message": "Wiadomość musi mieć od 50 do 5000 znaków",
+      "rejectedValue": "Za krótka"
+    }
+  ]
+}
+```
+
+### 8. Korzyści Globalnego Handlera
+
+✅ **Separation of Concerns** - kontrolery zajmują się tylko routingiem
+✅ **DRY Principle** - obsługa wyjątków w jednym miejscu
+✅ **Czytelność** - kontrolery są krótkie i przejrzyste
+✅ **Łatwiejsze testowanie** - nie trzeba mock'ować obsługi błędów
+✅ **Spójność** - jednolity format odpowiedzi błędów w całym API
+✅ **RFC 7807** - zgodność ze standardem przemysłowym
+✅ **Rozszerzalność** - łatwe dodawanie nowych typów wyjątków
+
 ## Najlepsze Praktyki Testów
 
 ### 1. AAA Pattern
@@ -990,17 +1395,25 @@ void shouldThrowExceptionWhenEmailAlreadyExists() {
 13. **Adaptery w infrastrukturze** - implementacje w infrastructure/adapters/
 14. **Kierunek zależności**: Infrastructure → Application → Domain
 
+### REST API i Obsługa Wyjątków
+
+15. **Global Exception Handler** - ZAWSZE używaj @RestControllerAdvice zamiast try-catch w kontrolerach
+16. **ProblemDetail (RFC 7807)** - ZAWSZE zamiast własnych klas ErrorResponse
+17. **Propagacja wyjątków** - application services nie łapią wyjątków, tylko je rzucają
+18. **Wyjątki domenowe** - w pakiecie domain/*/exception/
+19. **Czysty kontroler** - bez try-catch, bez logiki biznesowej
+
 ### Testowanie
 
-15. **Coverage**: domain >90%, application >80%
-16. **AssertJ** - fluent asercje
-17. **Izolacja** - niezależne testy
-18. **AAA Pattern** - Arrange, Act, Assert
-19. **Mockuj porty** - w testach application layer
+20. **Coverage**: domain >90%, application >80%
+21. **AssertJ** - fluent asercje
+22. **Izolacja** - niezależne testy
+23. **AAA Pattern** - Arrange, Act, Assert
+24. **Mockuj porty** - w testach application layer
 
 ### Inne
 
-20. **SOLID** - pojedyncze odpowiedzialności, dependency inversion
-21. **Walidacja** - fail fast
-22. **Constructor Injection** - final fields z @RequiredArgsConstructor
-23. **Immutability** - preferuj niezmienne obiekty
+25. **SOLID** - pojedyncze odpowiedzialności, dependency inversion
+26. **Walidacja** - fail fast
+27. **Constructor Injection** - final fields z @RequiredArgsConstructor
+28. **Immutability** - preferuj niezmienne obiekty

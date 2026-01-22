@@ -1,7 +1,6 @@
 package pl.klastbit.lexpage.infrastructure.adapters.persistence.mapper;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import pl.klastbit.lexpage.domain.contact.ContactMessage;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ContactMessageEntity;
 

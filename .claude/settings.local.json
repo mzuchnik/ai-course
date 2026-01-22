@@ -11,7 +11,14 @@
       "Bash(./gradlew test:*)",
       "Bash(./gradlew compileTestJava:*)",
       "Bash(javac:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(dir /S \"C:\\\\Users\\\\mateu\\\\IdeaProjects\\\\lexpage\\\\src\\\\main\\\\java\\\\pl\\\\klastbit\\\\lexpage\\\\infrastructure\")",
+      "Bash(dir \"C:\\\\Users\\\\mateu\\\\IdeaProjects\\\\lexpage\\\\src\\\\main\\\\java\\\\pl\\\\klastbit\\\\lexpage\")",
+      "Bash(dir \"C:\\\\Users\\\\mateu\\\\IdeaProjects\\\\lexpage\\\\src\\\\main\\\\java\\\\pl\\\\klastbit\\\\lexpage\\\\domain\")",
+      "Bash(dir \"C:\\\\Users\\\\mateu\\\\IdeaProjects\\\\lexpage\\\\src\\\\main\\\\java\\\\pl\\\\klastbit\\\\lexpage\\\\infrastructure\")",
+      "Bash(dir \"C:\\\\Users\\\\mateu\\\\IdeaProjects\\\\lexpage\\\\src\\\\main\\\\java\\\\pl\\\\klastbit\\\\lexpage\\\\infrastructure\\\\adapters\")",
+      "Bash(dir \"C:\\\\Users\\\\mateu\\\\IdeaProjects\\\\lexpage\\\\src\\\\main\\\\java\\\\pl\\\\klastbit\\\\lexpage\\\\infrastructure\\\\adapters\\\\persistence\")",
+      "Bash(dir:*)"
     ]
   }
 }
