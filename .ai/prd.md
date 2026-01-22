@@ -58,10 +58,136 @@
 
 ## User Stories
 
-1. **Klient szuka pomocy prawnej**: Google → usługi → szczegóły → formularz kontaktowy
-2. **Klient dzwoni z mobile**: Strona → klikalny telefon w stopce → bezpośredni kontakt
-3. **Prawnik tworzy artykuł**: Login → generator AI → edycja WYSIWYG → draft → publikacja
-4. **Czytelnik blogowy**: Google → artykuł → social sharing → CTA → formularz
+### US1: Klient wypełnia formularz kontaktowy (Priorytet: WYSOKI)
+**Jako** odwiedzający stronę kancelarii
+**Chcę** wysłać zapytanie przez formularz kontaktowy
+**Aby** szybko skontaktować się z prawnikiem bez konieczności dzwonienia
+
+**Akceptacja:**
+- Pola: Imię i nazwisko*, Email*, Telefon, Kategoria sprawy* (Cywilne/Karne), Wiadomość* (min 50 znaków)
+- Walidacja po stronie klienta (HTML5 + JS) i serwera
+- reCAPTCHA v3 w tle (score >0.5)
+- Po wysłaniu: komunikat sukcesu + informacja o czasie odpowiedzi (max 24h)
+- Prawnik otrzymuje email z powiadomieniem
+- Dane zapisane w bazie
+- Brak możliwości wysłania >3 wiadomości z tego samego IP w ciągu 1h
+
+**Flow:**
+1. Użytkownik klika "Kontakt" w menu
+2. Wypełnia formularz (walidacja na bieżąco)
+3. Wybiera kategorię sprawy z dropdown (Cywilne/Karne)
+4. Klika "Wyślij zapytanie"
+5. System: walidacja serwer-side → sprawdzenie reCAPTCHA → zapis do DB → wysłanie emaila
+6. Wyświetlenie: "Dziękujemy! Odpowiemy w ciągu 24h."
+
+**Błędy:**
+- Puste pola: czerwone obramowanie + komunikat pod polem
+- Email niepoprawny: "Podaj prawidłowy adres email"
+- Wiadomość <50 znaków: "Opisz swoją sprawę (minimum 50 znaków)"
+- reCAPTCHA fail: "Weryfikacja bezpieczeństwa nie powiodła się. Spróbuj ponownie."
+- Błąd serwera: "Wystąpił problem. Spróbuj ponownie lub zadzwoń: [telefon]"
+
+---
+
+### US2: Klient szuka pomocy prawnej przez wyszukiwarkę
+**Jako** osoba potrzebująca pomocy prawnika
+**Chcę** znaleźć specjalistę w Google i szybko zrozumieć jego specjalizację
+**Aby** ocenić, czy może mi pomóc
+
+**Flow:**
+1. Google search: "prawnik prawo karne [miasto]"
+2. Kliknięcie w wynik (meta description jasno wskazuje specjalizację)
+3. Landing: strona główna lub usługi
+4. Przegląd: hero section z specjalizacją, lista usług, ostatnie artykuły
+5. Decyzja: kliknięcie w konkretną usługę lub bezpośrednio "Kontakt"
+
+**Akceptacja:**
+- Meta title/description zoptymalizowane pod kluczowe frazy
+- Hero section jednoznacznie komunikuje: Kim jest prawnik, Co oferuje (Cywilne/Karne)
+- Czas do podjęcia decyzji o kontakcie <2 min
+
+---
+
+### US3: Klient dzwoni z urządzenia mobilnego
+**Jako** użytkownik mobile w pilnej sprawie
+**Chcę** szybko zadzwonić do kancelarii
+**Aby** natychmiast porozmawiać z prawnikiem
+
+**Flow:**
+1. Wejście na stronę z telefonu
+2. Scroll lub kliknięcie "Kontakt"
+3. Kliknięcie w numer telefonu (klikalny link `tel:`)
+4. Automatyczne uruchomienie aplikacji telefonu
+
+**Akceptacja:**
+- Numer telefonu widoczny w header (mobile) i stopce (wszystkie urządzenia)
+- Link `<a href="tel:+48...">` działa na iOS i Android
+- Icon telefonu obok numeru dla czytelności
+
+---
+
+### US4: Prawnik tworzy artykuł blogowy z AI
+**Jako** prawnik prowadzący bloga
+**Chcę** wygenerować szkic artykułu przez AI i go edytować
+**Aby** regularnie publikować treści bez spędzania godzin na pisaniu
+
+**Flow:**
+1. Login do panelu admin
+2. Sekcja "Blog" → "Nowy artykuł z AI"
+3. Formularz: Temat*, Keywords (max 5), Długość (500-5000 słów)
+4. Kliknięcie "Generuj" → loading (timeout 60s)
+5. AI zwraca tekst → edytor WYSIWYG (TinyMCE/Quill)
+6. Edycja: formatowanie, dodanie obrazów, korekta prawnicza
+7. Zapis jako Draft lub Publikacja
+
+**Akceptacja:**
+- Czas generowania <60s dla artykułu 2000 słów
+- AI success rate >95%
+- Limit 20 generowań/dzień (licznik w UI)
+- WYSIWYG obsługuje: h2, h3, p, ul, li, strong, em, a
+- Podgląd artykułu przed publikacją
+- SEO: auto-generowanie meta description z pierwszych 160 znaków
+
+---
+
+### US5: Czytelnik znajduje artykuł blogowy
+**Jako** czytelnik szukający informacji prawnych
+**Chcę** znaleźć wartościowy artykuł i móc się skontaktować
+**Aby** rozwiązać swój problem prawny
+
+**Flow:**
+1. Google search: "jak napisać pozew [temat]"
+2. Kliknięcie w artykuł z bloga kancelarii
+3. Czytanie artykułu (formatowanie, struktura, FAQ)
+4. Przekonanie: "Ten prawnik zna się na rzeczy"
+5. Kliknięcie CTA: "Masz podobną sprawę? Skontaktuj się"
+6. Wypełnienie formularza kontaktowego
+
+**Akceptacja:**
+- Artykuł ładuje się <2s
+- Social sharing buttons (Facebook, LinkedIn, Twitter/X)
+- Related articles na końcu (3 podobne tematy)
+- CTA co 800-1000 słów + na końcu artykułu
+- Breadcrumbs: Home > Blog > [Kategoria] > [Tytuł]
+
+---
+
+### US6: Administrator zarządza treścią
+**Jako** administrator strony (prawnik lub asystent)
+**Chcę** edytować opisy usług i artykuły
+**Aby** utrzymywać treść aktualną
+
+**Flow:**
+1. Login do panelu
+2. Sekcje: Usługi / Blog / Wiadomości kontaktowe
+3. Lista elementów z akcjami: Edytuj / Usuń / Duplikuj
+4. Edycja w WYSIWYG → Zapisz
+5. Publikacja natychmiastowa (cache invalidation)
+
+**Akceptacja:**
+- Upload obrazów: max 5MB, auto-kompresja do WebP
+- Wersjonowanie treści (możliwość cofnięcia zmian)
+- Wiadomości kontaktowe: oznaczanie jako przeczytane, archiwizacja
 
 ## Kwestie Otwarte (Wymagają Decyzji)
 
