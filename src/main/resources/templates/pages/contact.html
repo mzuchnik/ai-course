@@ -22,14 +22,32 @@
         <div class="container mx-auto px-4">
             <div class="max-w-2xl mx-auto">
 
-                <!-- Success Alert -->
-                <div th:if="${successMessage}"
-                     th:replace="~{fragments/components/alerts :: success(${successMessage}, true)}">
+                <!-- Success Alert (hidden by default) -->
+                <div id="successAlert" class="hidden mb-6">
+                    <div class="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <i class="material-icons text-green-600">check_circle</i>
+                        <div class="flex-1">
+                            <p id="successMessage" class="text-sm text-green-800 font-medium"></p>
+                        </div>
+                        <button type="button" onclick="document.getElementById('successAlert').classList.add('hidden')"
+                                class="text-green-600 hover:text-green-800">
+                            <i class="material-icons text-xl">close</i>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Error Alert -->
-                <div th:if="${errorMessage}"
-                     th:replace="~{fragments/components/alerts :: error(${errorMessage}, true)}">
+                <!-- Error Alert (hidden by default) -->
+                <div id="errorAlert" class="hidden mb-6">
+                    <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <i class="material-icons text-red-600">error</i>
+                        <div class="flex-1">
+                            <p id="errorMessage" class="text-sm text-red-800 font-medium"></p>
+                        </div>
+                        <button type="button" onclick="document.getElementById('errorAlert').classList.add('hidden')"
+                                class="text-red-600 hover:text-red-800">
+                            <i class="material-icons text-xl">close</i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Contact Form Card -->
@@ -42,54 +60,91 @@
 
                     <!-- Form Content -->
                     <div th:fragment="contact-form-content">
-                        <form id="contactForm" th:action="@{/api/contact}" method="POST" class="space-y-6">
+                        <form id="contactForm" class="space-y-6" novalidate>
 
                             <!-- First Name -->
-                            <div th:replace="~{fragments/components/inputs :: input(
-                                'firstName',
-                                'firstName',
-                                'Imię',
-                                'text',
-                                null,
-                                null,
-                                true,
-                                false,
-                                ${errors != null ? errors['firstName'] : null},
-                                'person')}">
+                            <div class="relative w-full">
+                                <div th:replace="~{fragments/components/inputs :: input(
+                                    'firstName',
+                                    'firstName',
+                                    'Imię',
+                                    'text',
+                                    null,
+                                    null,
+                                    true,
+                                    false,
+                                    null,
+                                    'person')}">
+                                </div>
+                                <p id="firstName-error" class="hidden mt-2 text-xs text-red-600"></p>
                             </div>
 
                             <!-- Last Name -->
-                            <div th:replace="~{fragments/components/inputs :: input(
-                                'lastName',
-                                'lastName',
-                                'Nazwisko',
-                                'text',
-                                null,
-                                null,
-                                true,
-                                false,
-                                ${errors != null ? errors['lastName'] : null},
-                                'person')}">
+                            <div class="relative w-full">
+                                <div th:replace="~{fragments/components/inputs :: input(
+                                    'lastName',
+                                    'lastName',
+                                    'Nazwisko',
+                                    'text',
+                                    null,
+                                    null,
+                                    true,
+                                    false,
+                                    null,
+                                    'person')}">
+                                </div>
+                                <p id="lastName-error" class="hidden mt-2 text-xs text-red-600"></p>
                             </div>
 
                             <!-- Email -->
-                            <div th:replace="~{fragments/components/inputs :: email(
-                                'email',
-                                'email',
-                                'Email',
-                                null,
-                                true,
-                                ${errors != null ? errors['email'] : null})}">
+                            <div class="relative w-full">
+                                <div th:replace="~{fragments/components/inputs :: email(
+                                    'email',
+                                    'email',
+                                    'Email',
+                                    null,
+                                    true,
+                                    null)}">
+                                </div>
+                                <p id="email-error" class="hidden mt-2 text-xs text-red-600"></p>
                             </div>
 
                             <!-- Phone -->
-                            <div th:replace="~{fragments/components/inputs :: phone(
-                                'phone',
-                                'phone',
-                                'Telefon',
-                                null,
-                                false,
-                                ${errors != null ? errors['phone'] : null})}">
+                            <div class="relative w-full">
+                                <div th:replace="~{fragments/components/inputs :: phone(
+                                    'phone',
+                                    'phone',
+                                    'Telefon',
+                                    null,
+                                    false,
+                                    null)}">
+                                </div>
+                                <p id="phone-error" class="hidden mt-2 text-xs text-red-600"></p>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="relative w-full">
+                                <label for="category" class="block mb-2 text-sm font-medium text-gray-900">
+                                    <span>Kategoria sprawy</span>
+                                    <span class="text-red-600 ml-1">*</span>
+                                </label>
+                                <div class="relative">
+                                    <i class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xl">
+                                        category
+                                    </i>
+                                    <select id="category" name="category" required
+                                            class="block w-full pl-10 pr-10 py-3 text-sm rounded-lg border border-gray-300 appearance-none bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-primary-500 focus:border-primary-500 text-gray-900">
+                                        <option value="" disabled selected>Wybierz kategorię</option>
+                                        <option value="CIVIL_LAW">Prawo cywilne</option>
+                                        <option value="CRIMINAL_LAW">Prawo karne</option>
+                                        <option value="GENERAL">Sprawy ogólne</option>
+                                        <option value="OTHER">Inne</option>
+                                    </select>
+                                    <i class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                                        expand_more
+                                    </i>
+                                </div>
+                                <p id="category-error" class="hidden mt-2 text-xs text-red-600"></p>
                             </div>
 
                             <!-- Message -->
@@ -101,6 +156,10 @@
                                     <span>Wiadomość</span>
                                     <span class="text-red-600">*</span>
                                 </label>
+                                <p id="message-error" class="hidden mt-2 text-xs text-red-600"></p>
+                                <p id="message-counter" class="mt-2 text-xs text-gray-500">
+                                    <span id="message-count">0</span> / 5000 znaków (minimum 50)
+                                </p>
                             </div>
 
                         </form>
@@ -108,25 +167,347 @@
 
                     <!-- Form Actions -->
                     <div th:fragment="contact-form-actions">
-                        <button type="submit" form="contactForm"
-                                th:replace="~{fragments/components/buttons :: button(
-                                    'Wyślij wiadomość',
-                                    'submit',
-                                    'filled',
-                                    'primary',
-                                    'md',
-                                    true,
-                                    false,
-                                    'send',
-                                    'right',
-                                    '',
-                                    null)}">
+                        <button id="submitButton" type="submit" form="contactForm"
+                                class="w-full align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none rounded-lg text-xs py-3 px-6 bg-primary-500 text-white shadow-md hover:shadow-lg">
+                            <span id="buttonText" class="inline-block align-middle">Wyślij wiadomość</span>
+                            <i id="buttonIcon" class="material-icons ml-2 inline-block align-middle text-base">send</i>
+                            <span id="buttonSpinner" class="hidden">
+                                <svg class="animate-spin h-5 w-5 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('contactForm');
+        const submitButton = document.getElementById('submitButton');
+
+        if (!submitButton) {
+            console.error('Submit button not found');
+            return;
+        }
+
+        // Verify all elements exist
+        const requiredElements = ['firstName', 'lastName', 'email', 'phone', 'category', 'message'];
+        for (let elemId of requiredElements) {
+            if (!document.getElementById(elemId)) {
+                console.error('Missing element:', elemId);
+            }
+        }
+
+        const fields = {
+            firstName: {
+                element: document.getElementById('firstName'),
+                error: document.getElementById('firstName-error'),
+                touched: false,
+                validators: [
+                    { test: (val) => val.trim().length > 0, message: 'Imię jest wymagane' },
+                    { test: (val) => val.trim().length >= 2, message: 'Imię musi mieć co najmniej 2 znaki' },
+                    { test: (val) => val.length <= 100, message: 'Imię nie może przekraczać 100 znaków' }
+                ]
+            },
+            lastName: {
+                element: document.getElementById('lastName'),
+                error: document.getElementById('lastName-error'),
+                touched: false,
+                validators: [
+                    { test: (val) => val.trim().length > 0, message: 'Nazwisko jest wymagane' },
+                    { test: (val) => val.trim().length >= 2, message: 'Nazwisko musi mieć co najmniej 2 znaki' },
+                    { test: (val) => val.length <= 100, message: 'Nazwisko nie może przekraczać 100 znaków' }
+                ]
+            },
+            email: {
+                element: document.getElementById('email'),
+                error: document.getElementById('email-error'),
+                touched: false,
+                validators: [
+                    { test: (val) => val.trim().length > 0, message: 'Email jest wymagany' },
+                    { test: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), message: 'Nieprawidłowy format email' },
+                    { test: (val) => val.length <= 255, message: 'Email nie może przekraczać 255 znaków' }
+                ]
+            },
+            phone: {
+                element: document.getElementById('phone'),
+                error: document.getElementById('phone-error'),
+                touched: false,
+                validators: [
+                    { test: (val) => val.trim().length === 0 || val.length <= 20, message: 'Numer telefonu nie może przekraczać 20 znaków' }
+                ]
+            },
+            category: {
+                element: document.getElementById('category'),
+                error: document.getElementById('category-error'),
+                touched: false,
+                validators: [
+                    { test: (val) => val.trim().length > 0, message: 'Kategoria jest wymagana' }
+                ]
+            },
+            message: {
+                element: document.getElementById('message'),
+                error: document.getElementById('message-error'),
+                touched: false,
+                validators: [
+                    { test: (val) => val.trim().length > 0, message: 'Wiadomość jest wymagana' },
+                    { test: (val) => val.trim().length >= 50, message: 'Wiadomość musi mieć co najmniej 50 znaków' },
+                    { test: (val) => val.length <= 5000, message: 'Wiadomość nie może przekraczać 5000 znaków' }
+                ]
+            }
+        };
+
+        // Message counter
+        const messageCounter = document.getElementById('message-count');
+        fields.message.element.addEventListener('input', function() {
+            messageCounter.textContent = this.value.length;
+        });
+
+        // Check field validity without showing errors (for submit button state)
+        function checkFieldValidity(fieldName) {
+            const field = fields[fieldName];
+            const value = field.element.value;
+
+            for (let validator of field.validators) {
+                if (!validator.test(value)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Validate single field (shows errors only if field was touched)
+        function validateField(fieldName) {
+            const field = fields[fieldName];
+            const value = field.element.value;
+
+            // Only show errors if field was touched
+            if (!field.touched) {
+                return checkFieldValidity(fieldName);
+            }
+
+            for (let validator of field.validators) {
+                if (!validator.test(value)) {
+                    showError(fieldName, validator.message);
+                    return false;
+                }
+            }
+
+            hideError(fieldName);
+            return true;
+        }
+
+        // Show error message
+        function showError(fieldName, message) {
+            const field = fields[fieldName];
+            field.error.textContent = message;
+            field.error.classList.remove('hidden');
+            field.element.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+            field.element.classList.remove('border-gray-300', 'focus:border-primary-500', 'focus:ring-primary-500');
+        }
+
+        // Hide error message
+        function hideError(fieldName) {
+            const field = fields[fieldName];
+            field.error.classList.add('hidden');
+            field.element.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+            field.element.classList.add('border-gray-300', 'focus:border-primary-500', 'focus:ring-primary-500');
+        }
+
+        // Check if all fields are valid (without showing errors)
+        function checkFormValidity() {
+            let isValid = true;
+
+            for (let fieldName in fields) {
+                if (!checkFieldValidity(fieldName)) {
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        // Validate all fields (shows errors for touched fields)
+        function validateForm() {
+            let isValid = true;
+
+            for (let fieldName in fields) {
+                if (!validateField(fieldName)) {
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        // Update submit button state (without showing errors)
+        function updateSubmitButton() {
+            const isValid = checkFormValidity();
+            submitButton.disabled = !isValid;
+
+            if (isValid) {
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Add input event listeners
+        for (let fieldName in fields) {
+            const field = fields[fieldName];
+            if (field.element) {
+                // Mark field as touched on first interaction and validate
+                field.element.addEventListener('input', function() {
+                    field.touched = true;
+                    validateField(fieldName);
+                    updateSubmitButton();
+                });
+
+                // Mark field as touched when leaving and validate
+                field.element.addEventListener('blur', function() {
+                    field.touched = true;
+                    validateField(fieldName);
+                    updateSubmitButton();
+                });
+            } else {
+                console.error('Element not found for field:', fieldName);
+            }
+        }
+
+        // Show success alert
+        function showSuccessAlert(message) {
+            const successAlert = document.getElementById('successAlert');
+            const successMessage = document.getElementById('successMessage');
+            const errorAlert = document.getElementById('errorAlert');
+
+            successMessage.textContent = message;
+            successAlert.classList.remove('hidden');
+            errorAlert.classList.add('hidden');
+
+            // Scroll to alert
+            successAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Show error alert
+        function showErrorAlert(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const successAlert = document.getElementById('successAlert');
+
+            errorMessage.textContent = message;
+            errorAlert.classList.remove('hidden');
+            successAlert.classList.add('hidden');
+
+            // Scroll to alert
+            errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Hide all alerts
+        function hideAlerts() {
+            document.getElementById('successAlert').classList.add('hidden');
+            document.getElementById('errorAlert').classList.add('hidden');
+        }
+
+        // Set loading state on button
+        function setButtonLoading(loading) {
+            const buttonText = document.getElementById('buttonText');
+            const buttonIcon = document.getElementById('buttonIcon');
+            const buttonSpinner = document.getElementById('buttonSpinner');
+
+            if (loading) {
+                buttonText.textContent = 'Wysyłanie...';
+                buttonIcon.classList.add('hidden');
+                buttonSpinner.classList.remove('hidden');
+                submitButton.disabled = true;
+            } else {
+                buttonText.textContent = 'Wyślij wiadomość';
+                buttonIcon.classList.remove('hidden');
+                buttonSpinner.classList.add('hidden');
+                updateSubmitButton();
+            }
+        }
+
+        // Submit form asynchronously
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Mark all fields as touched before validating
+            for (let fieldName in fields) {
+                fields[fieldName].touched = true;
+            }
+
+            // Validate and show errors for all fields
+            if (!validateForm()) {
+                updateSubmitButton();
+                return;
+            }
+
+            // Hide previous alerts
+            hideAlerts();
+
+            // Set loading state
+            setButtonLoading(true);
+
+            // Prepare payload
+            const payload = {
+                firstName: fields.firstName.element.value.trim(),
+                lastName: fields.lastName.element.value.trim(),
+                email: fields.email.element.value.trim(),
+                phone: fields.phone.element.value.trim() || null,
+                category: fields.category.element.value,
+                message: fields.message.element.value.trim()
+            };
+
+            try {
+                // Send request
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Success (2xx status)
+                    showSuccessAlert(data.message || 'Dziękujemy! Wiadomość została wysłana pomyślnie.');
+
+                    // Reset form
+                    form.reset();
+
+                    // Reset touched state
+                    for (let fieldName in fields) {
+                        fields[fieldName].touched = false;
+                        hideError(fieldName);
+                    }
+
+                    // Reset message counter
+                    messageCounter.textContent = '0';
+                } else {
+                    // Error response (4xx, 5xx)
+                    const errorMsg = data.message || 'Wystąpił błąd podczas wysyłania wiadomości. Spróbuj ponownie za chwilę.';
+                    showErrorAlert(errorMsg);
+                }
+            } catch (error) {
+                // Network error or parsing error
+                console.error('Error submitting form:', error);
+                showErrorAlert('Wystąpił błąd podczas wysyłania wiadomości. Sprawdź połączenie internetowe i spróbuj ponownie za chwilę.');
+            } finally {
+                // Reset loading state
+                setButtonLoading(false);
+            }
+        });
+
+        // Initial validation
+        updateSubmitButton();
+    });
+</script>
 
 </div>
 

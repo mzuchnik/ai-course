@@ -126,6 +126,54 @@ lexpage/
 </html>
 ```
 
+**⚠️ KRYTYCZNE: JavaScript w fragmentach content**
+
+JavaScript musi być **WEWNĄTRZ** fragmentu content, aby był renderowany przez Thymeleaf!
+
+**❌ ŹLE - Skrypt poza fragmentem:**
+```html
+<div th:fragment="pageContent">
+    <!-- Content -->
+</div>
+
+<script>
+    // Ten skrypt NIE ZOSTANIE wyrenderowany!
+</script>
+```
+
+**✅ DOBRZE - Skrypt wewnątrz fragmentu:**
+```html
+<div th:fragment="pageContent">
+    <!-- Content -->
+
+    <script th:inline="javascript">
+        // Ten skrypt ZOSTANIE wyrenderowany
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your JavaScript here
+        });
+    </script>
+</div>
+```
+
+**Przykład z walidacją formularza:**
+```html
+<div th:fragment="content">
+    <section class="py-16">
+        <form id="myForm">
+            <!-- Form fields -->
+        </form>
+    </section>
+
+    <!-- JavaScript musi być przed zamknięciem fragmentu! -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('myForm');
+            // Validation logic
+        });
+    </script>
+</div>
+```
+
 ### 2. Component Pattern
 
 **ZAWSZE** twórz reusable components w `fragments/components/`.
@@ -1031,6 +1079,30 @@ public String newPage(Model model) {
 </div>
 ```
 
+### JavaScript nie działa / nie jest renderowany
+
+**Problem:** Skrypt JavaScript nie jest widoczny w przeglądarce (View Source), walidacja formularza nie działa.
+
+**Przyczyna:** Skrypt znajduje się POZA fragmentem content i nie jest renderowany przez Thymeleaf.
+
+**Rozwiązanie:**
+1. Przenieś tag `<script>` **WEWNĄTRZ** fragmentu content (przed zamknięciem `</div>`)
+2. Upewnij się, że struktura wygląda tak:
+```html
+<div th:fragment="content">
+    <!-- Sections, forms, etc. -->
+
+    <script th:inline="javascript">
+        // Your JavaScript here
+    </script>
+</div>  <!-- Fragment kończy się TUTAJ -->
+```
+
+**Jak sprawdzić:**
+- Otwórz View Source (Ctrl+U) w przeglądarce
+- Szukaj swojego kodu JavaScript
+- Jeśli go nie ma, sprawdź czy jest wewnątrz fragmentu
+
 ### Hot-reload nie działa
 
 **Problem:** Zmiany w templates wymagają restartu aplikacji.
@@ -1069,6 +1141,7 @@ public String newPage(Model model) {
 - **NIE edytuj** `static/css/output.css` (generated)
 - **NIE edytuj** `static/js/material-tailwind.js` (copied)
 - **NIE używaj** `<button th:replace>` lub `<div th:replace>` - zawsze użyj `<th:block th:replace>` (powoduje nieskończoną pętlę!)
+- **NIE umieszczaj** `<script>` tagów POZA fragmentem content - nie będą renderowane!
 - **NIE używaj** inline styles - używaj Tailwind
 - **NIE twórz** custom CSS bez potrzeby
 - **NIE duplikuj** komponentów - użyj fragments
@@ -1081,6 +1154,7 @@ public String newPage(Model model) {
 Przed commitem sprawdź:
 
 - [ ] **KRYTYCZNE:** Wszystkie `th:replace` używają `<th:block>`, nie `<button>` czy `<div>` (zapobiega nieskończonym pętlom)
+- [ ] **KRYTYCZNE:** Wszystkie `<script>` tagi są WEWNĄTRZ fragmentu content (przed zamknięciem `</div>`)
 - [ ] Komponenty są reusable (w `fragments/components/`)
 - [ ] Strona jest responsywna (przetestuj mobile/tablet/desktop)
 - [ ] SEO metadata ustawione (title, description)
