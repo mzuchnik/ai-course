@@ -48,6 +48,9 @@
             <column name="updated_at" type="TIMESTAMP" defaultValueComputed="NOW()">
                 <constraints nullable="false"/>
             </column>
+            <column name="deleted_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
 
         <!-- CHECK constraint for minimum message length -->

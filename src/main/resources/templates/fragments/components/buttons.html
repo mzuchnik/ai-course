@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Material Tailwind Button Fragment
+
+  Parametry:
+  - text: Tekst przycisku (wymagany)
+  - type: Typ przycisku (default: 'button', opcje: 'button', 'submit', 'reset')
+  - variant: Wariant (default: 'filled', opcje: 'filled', 'outlined', 'text', 'gradient')
+  - color: Kolor (default: 'blue', opcje: 'blue', 'red', 'green', 'primary', 'burgundy')
+  - size: Rozmiar (default: 'md', opcje: 'sm', 'md', 'lg')
+  - fullWidth: Pełna szerokość (default: false)
+  - disabled: Wyłączony (default: false)
+  - icon: Nazwa ikony Material Icons (opcjonalnie)
+  - iconPosition: Pozycja ikony (default: 'left', opcje: 'left', 'right')
+  - customClass: Dodatkowe klasy CSS (opcjonalnie)
+  - onclick: JavaScript onclick handler (opcjonalnie)
+
+  Przykład użycia:
+  <button th:replace="~{fragments/components/buttons :: button('Wyślij', 'submit', 'filled', 'primary', 'md', true, false, 'send', 'right', '', null)}"></button>
+-->
+
+<button th:fragment="button(text, type, variant, color, size, fullWidth, disabled, icon, iconPosition, customClass, onclick)"
+        th:type="${type ?: 'button'}"
+        th:disabled="${disabled ?: false}"
+        th:onclick="${onclick}"
+        th:class="
+            'align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none rounded-lg ' +
+            ${(fullWidth ?: false) ? 'w-full ' : ''} +
+            ${customClass ?: ''} +
+            ${(size == 'sm') ? 'text-xs py-2 px-4 ' :
+              (size == 'lg') ? 'text-sm py-3.5 px-7 ' :
+              'text-xs py-3 px-6 '} +
+            ${(variant == 'outlined') ?
+                'border-2 border-' + (color ?: 'blue') + '-500 text-' + (color ?: 'blue') + '-500 hover:opacity-75 ' :
+              (variant == 'text') ?
+                'text-' + (color ?: 'blue') + '-500 hover:bg-' + (color ?: 'blue') + '-500/10 ' :
+              (variant == 'gradient') ?
+                'bg-gradient-to-tr from-' + (color ?: 'blue') + '-600 to-' + (color ?: 'blue') + '-400 text-white shadow-md hover:shadow-lg ' :
+              'bg-' + (color ?: 'blue') + '-500 text-white shadow-md hover:shadow-lg '}"
+        th:attr="data-ripple-light=${variant != 'text'}">
+
+    <!-- Icon Left -->
+    <i th:if="${icon != null and (iconPosition == null or iconPosition == 'left')}"
+       class="material-icons mr-2 inline-block align-middle text-base"
+       th:text="${icon}">send</i>
+
+    <!-- Button Text -->
+    <span class="inline-block align-middle" th:text="${text}">Button</span>
+
+    <!-- Icon Right -->
+    <i th:if="${icon != null and iconPosition == 'right'}"
+       class="material-icons ml-2 inline-block align-middle text-base"
+       th:text="${icon}">send</i>
+</button>
+
+<!-- Convenience Fragments -->
+
+<th:block th:fragment="primary(text, icon)"
+          th:replace="~{fragments/components/buttons :: button(${text}, 'button', 'filled', 'primary', 'md', false, false, ${icon}, 'left', '', null)}">
+</th:block>
+
+<th:block th:fragment="secondary(text, icon)"
+          th:replace="~{fragments/components/buttons :: button(${text}, 'button', 'outlined', 'primary', 'md', false, false, ${icon}, 'left', '', null)}">
+</th:block>
+
+<th:block th:fragment="submit(text)"
+          th:replace="~{fragments/components/buttons :: button(${text}, 'submit', 'filled', 'primary', 'md', false, false, null, 'left', '', null)}">
+</th:block>
+
+</body>
+</html>

@@ -12,7 +12,7 @@
             <column name="id" type="BIGSERIAL" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="pk_ai_generations"/>
             </column>
-            <column name="user_id" type="BIGINT">
+            <column name="user_id" type="UUID">
                 <constraints nullable="false"
                             foreignKeyName="fk_ai_generations_user"
                             references="users(id)"
@@ -53,6 +53,12 @@
             </column>
             <column name="created_at" type="TIMESTAMP" defaultValueComputed="NOW()">
                 <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
             </column>
         </createTable>
 

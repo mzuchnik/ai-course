@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Material Tailwind overrides */
+@layer components {
+  /* Możesz tutaj dodać własne komponenty CSS */
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-4 focus:ring-primary-300;
+  }
+
+  .btn-secondary {
+    @apply bg-burgundy-600 text-white hover:bg-burgundy-700 focus:ring-4 focus:ring-burgundy-300;
+  }
+}
+
+@layer utilities {
+  /* Własne utility classes */
+  .text-balance {
+    text-wrap: balance;
+  }
+}

@@ -53,6 +53,41 @@ Package structure: `pl.klastbit.lexpage`
 
 Database connection details must be configured in `application.properties` before running the application.
 
+## Detailed Implementation Guidelines
+
+**IMPORTANT:** This project has comprehensive coding standards and best practices:
+
+### Backend Implementation Rules
+**File:** `.ai/rules/backend.md`
+
+This file contains all detailed rules for backend Java code implementation:
+- Lombok usage (mandatory annotations, patterns)
+- Java Records for immutable classes (DTOs, Value Objects, Commands)
+- Domain-Driven Design principles (Aggregates, Value Objects, Domain Services, Domain Events)
+- Hexagonal Architecture implementation (Ports & Adapters, package structure)
+- REST API conventions and global exception handling with ProblemDetail (RFC 7807)
+- Logging best practices with SLF4J
+- Testing conventions and patterns
+- SOLID principles and clean code practices
+
+**ALWAYS refer to `.ai/rules/backend.md` when implementing backend features.**
+
+### Frontend Implementation Rules
+**File:** `.ai/rules/frontend.md`
+
+This file contains all detailed rules for frontend implementation:
+- Material Tailwind HTML components usage
+- Thymeleaf template patterns (layouts, fragments, components)
+- Server-Side Rendering (SSR) architecture
+- Build process and development workflow
+- Tailwind CSS configuration and conventions
+- Responsive design patterns (mobile-first)
+- Accessibility and SEO guidelines
+- Component creation and page structure
+- Critical: `<th:block th:replace>` usage to prevent infinite loops
+
+**ALWAYS refer to `.ai/rules/frontend.md` when implementing frontend features.**
+
 ## Architecture Notes
 
 ### Hexagonal Architecture (Ports and Adapters) with DDD

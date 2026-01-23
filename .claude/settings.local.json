@@ -18,7 +18,11 @@
       "Bash(dir \"C:\\\\Users\\\\mateu\\\\IdeaProjects\\\\lexpage\\\\src\\\\main\\\\java\\\\pl\\\\klastbit\\\\lexpage\\\\infrastructure\")",
       "Bash(dir \"C:\\\\Users\\\\mateu\\\\IdeaProjects\\\\lexpage\\\\src\\\\main\\\\java\\\\pl\\\\klastbit\\\\lexpage\\\\infrastructure\\\\adapters\")",
       "Bash(dir \"C:\\\\Users\\\\mateu\\\\IdeaProjects\\\\lexpage\\\\src\\\\main\\\\java\\\\pl\\\\klastbit\\\\lexpage\\\\infrastructure\\\\adapters\\\\persistence\")",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(tree:*)",
+      "Bash(./gradlew npmInstall:*)",
+      "Bash(./gradlew buildFrontend:*)",
+      "Bash(./gradlew bootRun:*)"
     ]
   }
 }

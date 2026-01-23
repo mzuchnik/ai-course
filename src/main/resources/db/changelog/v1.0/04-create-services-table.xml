@@ -57,13 +57,13 @@
             </column>
 
             <!-- Audit Trail -->
-            <column name="created_by" type="BIGINT">
+            <column name="created_by" type="UUID">
                 <constraints nullable="false"
                             foreignKeyName="fk_services_created_by"
                             references="users(id)"
                             deleteCascade="false"/>
             </column>
-            <column name="updated_by" type="BIGINT">
+            <column name="updated_by" type="UUID">
                 <constraints nullable="false"
                             foreignKeyName="fk_services_updated_by"
                             references="users(id)"

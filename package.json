@@ -1,0 +1,23 @@
+{
+  "name": "lexpage-frontend",
+  "version": "1.0.0",
+  "description": "Frontend assets for Lexpage - Material Tailwind with Spring Boot",
+  "private": true,
+  "scripts": {
+    "dev": "tailwindcss -i ./frontend/css/input.css -o ./src/main/resources/static/css/output.css --watch",
+    "build": "tailwindcss -i ./frontend/css/input.css -o ./src/main/resources/static/css/output.css --minify",
+    "clean": "rimraf ./src/main/resources/static/css/output.css ./src/main/resources/static/js/material-tailwind.js",
+    "postinstall": "node scripts/copy-material-tailwind.js"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "tailwindcss": "^3.4.1",
+    "postcss": "^8.4.35",
+    "autoprefixer": "^10.4.17",
+    "rimraf": "^5.0.5"
+  },
+  "dependencies": {
+    "@material-tailwind/html": "^2.3.2"
+  }
+}

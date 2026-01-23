@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: html}">
+<head>
+    <title th:text="${pageTitle}">Page Title</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <!-- Navbar -->
+        <nav th:replace="~{fragments/components/navbar :: navbar}"></nav>
+
+        <!-- Main Content -->
+        <main class="min-h-screen bg-gray-50">
+            <th:block th:replace="${pageContent}"></th:block>
+        </main>
+
+        <!-- Footer -->
+        <footer th:replace="~{fragments/components/footer :: footer}"></footer>
+    </div>
+</body>
+</html>

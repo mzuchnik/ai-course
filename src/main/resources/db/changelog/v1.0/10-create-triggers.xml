@@ -9,7 +9,7 @@
         <comment>Create database triggers and functions for auto-updates</comment>
 
         <!-- Function: Auto-update updated_at timestamp -->
-        <sql>
+        <sql splitStatements="false">
             CREATE OR REPLACE FUNCTION update_updated_at_column()
             RETURNS TRIGGER AS $$
             BEGIN
@@ -60,7 +60,7 @@
         </sql>
 
         <!-- Function: Auto-update search_vector for articles -->
-        <sql>
+        <sql splitStatements="false">
             CREATE OR REPLACE FUNCTION update_article_search_vector()
             RETURNS TRIGGER AS $$
             BEGIN
@@ -81,7 +81,7 @@
         </sql>
 
         <!-- Function: Auto-update search_vector for services -->
-        <sql>
+        <sql splitStatements="false">
             CREATE OR REPLACE FUNCTION update_service_search_vector()
             RETURNS TRIGGER AS $$
             BEGIN
@@ -102,7 +102,7 @@
         </sql>
 
         <!-- Function: Enforce singleton pattern for lawyer_profile -->
-        <sql>
+        <sql splitStatements="false">
             CREATE OR REPLACE FUNCTION enforce_lawyer_profile_singleton()
             RETURNS TRIGGER AS $$
             BEGIN

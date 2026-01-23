@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<nav th:fragment="navbar" class="block w-full max-w-full px-4 py-2 text-white bg-primary-600 shadow-md rounded-none lg:px-8 lg:py-3">
+    <div class="container flex flex-wrap items-center justify-between mx-auto text-white">
+        <!-- Logo -->
+        <a href="/" class="mr-4 block cursor-pointer py-1.5 font-sans text-2xl font-bold leading-relaxed tracking-normal text-inherit antialiased">
+            Lexpage
+        </a>
+
+        <!-- Desktop Menu -->
+        <div class="hidden lg:block">
+            <ul class="flex flex-col gap-2 mt-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
+                <li class="flex items-center p-1 font-sans text-sm antialiased font-normal leading-normal gap-x-2 text-white">
+                    <a href="/" class="flex items-center hover:text-blue-100 transition-colors">
+                        Strona główna
+                    </a>
+                </li>
+                <li class="flex items-center p-1 font-sans text-sm antialiased font-normal leading-normal gap-x-2 text-white">
+                    <a href="/services" class="flex items-center hover:text-blue-100 transition-colors">
+                        Usługi
+                    </a>
+                </li>
+                <li class="flex items-center p-1 font-sans text-sm antialiased font-normal leading-normal gap-x-2 text-white">
+                    <a href="/blog" class="flex items-center hover:text-blue-100 transition-colors">
+                        Blog
+                    </a>
+                </li>
+                <li class="flex items-center p-1 font-sans text-sm antialiased font-normal leading-normal gap-x-2 text-white">
+                    <a href="/contact" class="flex items-center hover:text-blue-100 transition-colors">
+                        Kontakt
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button class="relative ml-auto h-6 max-h-[40px] w-6 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-inherit transition-all hover:bg-transparent focus:bg-transparent active:bg-transparent disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none lg:hidden"
+                type="button"
+                onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+            <span class="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+                <i class="material-icons text-2xl">menu</i>
+            </span>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden lg:hidden mt-2">
+        <ul class="flex flex-col gap-2 pb-4">
+            <li class="flex items-center p-1 font-sans text-sm antialiased font-normal leading-normal gap-x-2 text-white">
+                <a href="/" class="flex items-center">
+                    Strona główna
+                </a>
+            </li>
+            <li class="flex items-center p-1 font-sans text-sm antialiased font-normal leading-normal gap-x-2 text-white">
+                <a href="/services" class="flex items-center">
+                    Usługi
+                </a>
+            </li>
+            <li class="flex items-center p-1 font-sans text-sm antialiased font-normal leading-normal gap-x-2 text-white">
+                <a href="/blog" class="flex items-center">
+                    Blog
+                </a>
+            </li>
+            <li class="flex items-center p-1 font-sans text-sm antialiased font-normal leading-normal gap-x-2 text-white">
+                <a href="/contact" class="flex items-center">
+                    Kontakt
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+</body>
+</html>

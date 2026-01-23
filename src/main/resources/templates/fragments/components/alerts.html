@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Material Tailwind Alert Fragment
+
+  Parametry:
+  - message: Wiadomość alertu (wymagany)
+  - type: Typ alertu (default: 'info', opcje: 'success', 'warning', 'error', 'info')
+  - dismissible: Czy można zamknąć (default: false)
+-->
+
+<div th:fragment="alert(message, type, dismissible)"
+     th:class="
+         'relative flex w-full px-4 py-4 text-base font-regular rounded-lg ' +
+         ${(type == 'success') ? 'bg-green-500/10 text-green-900 ' :
+           (type == 'warning') ? 'bg-amber-500/10 text-amber-900 ' :
+           (type == 'error') ? 'bg-red-500/10 text-red-900 ' :
+           'bg-blue-500/10 text-blue-900 '}"
+     role="alert">
+
+    <!-- Icon -->
+    <i class="material-icons mr-3 text-2xl"
+       th:text="${(type == 'success') ? 'check_circle' :
+                 (type == 'warning') ? 'warning' :
+                 (type == 'error') ? 'error' :
+                 'info'}">
+        info
+    </i>
+
+    <!-- Message -->
+    <div class="flex-1" th:text="${message}">
+        Alert message
+    </div>
+
+    <!-- Dismiss Button -->
+    <button th:if="${dismissible ?: false}"
+            class="flex items-center justify-center ml-4 transition-all w-8 h-8 rounded-md hover:bg-white/10"
+            onclick="this.parentElement.style.display='none'">
+        <i class="material-icons text-xl">close</i>
+    </button>
+</div>
+
+<!-- Convenience Fragments -->
+
+<div th:fragment="success(message, dismissible)"
+     th:replace="~{fragments/components/alerts :: alert(${message}, 'success', ${dismissible})}">
+</div>
+
+<div th:fragment="error(message, dismissible)"
+     th:replace="~{fragments/components/alerts :: alert(${message}, 'error', ${dismissible})}">
+</div>
+
+<div th:fragment="warning(message, dismissible)"
+     th:replace="~{fragments/components/alerts :: alert(${message}, 'warning', ${dismissible})}">
+</div>
+
+</body>
+</html>

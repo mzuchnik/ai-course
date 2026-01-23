@@ -32,7 +32,16 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
+.claude
 
 ### VS Code ###
 .vscode/
 ./nul
+
+### Frontend ###
+node_modules/
+package-lock.json
+
+### Built Frontend Assets ###
+src/main/resources/static/css/output.css
+src/main/resources/static/js/material-tailwind.js

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Material Tailwind Card Fragment
+
+  Parametry:
+  - title: Tytuł karty (opcjonalnie)
+  - subtitle: Podtytuł karty (opcjonalnie)
+  - content: Treść karty (wymagany fragment)
+  - actions: Akcje karty (opcjonalny fragment)
+  - customClass: Dodatkowe klasy CSS (opcjonalnie)
+-->
+
+<div th:fragment="card(title, subtitle, content, actions, customClass)"
+     th:class="
+         'relative flex flex-col bg-white text-gray-700 shadow-md bg-clip-border rounded-xl ' +
+         ${customClass ?: ''}">
+
+    <!-- Header -->
+    <div th:if="${title != null or subtitle != null}" class="p-6">
+        <h5 th:if="${title != null}"
+            class="block mb-2 font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900"
+            th:text="${title}">
+            Card Title
+        </h5>
+        <p th:if="${subtitle != null}"
+           class="block font-sans text-base antialiased font-light leading-relaxed text-gray-700"
+           th:text="${subtitle}">
+            Card subtitle
+        </p>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 pt-0">
+        <th:block th:replace="${content}"></th:block>
+    </div>
+
+    <!-- Actions -->
+    <div th:if="${actions != null}" class="p-6 pt-0">
+        <th:block th:replace="${actions}"></th:block>
+    </div>
+</div>
+
+</body>
+</html>

@@ -27,7 +27,7 @@
             <column name="status" type="article_status_enum" defaultValue="DRAFT">
                 <constraints nullable="false"/>
             </column>
-            <column name="author_id" type="BIGINT">
+            <column name="author_id" type="UUID">
                 <constraints nullable="false"
                             foreignKeyName="fk_articles_author"
                             references="users(id)"
@@ -60,13 +60,13 @@
             </column>
 
             <!-- Audit Trail -->
-            <column name="created_by" type="BIGINT">
+            <column name="created_by" type="UUID">
                 <constraints nullable="false"
                             foreignKeyName="fk_articles_created_by"
                             references="users(id)"
                             deleteCascade="false"/>
             </column>
-            <column name="updated_by" type="BIGINT">
+            <column name="updated_by" type="UUID">
                 <constraints nullable="false"
                             foreignKeyName="fk_articles_updated_by"
                             references="users(id)"

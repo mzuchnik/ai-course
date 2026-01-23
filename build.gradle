@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.0.1'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.github.node-gradle.node' version '7.1.0'
 }
 
 group = 'pl.klastbit'
@@ -19,6 +20,14 @@ repositories {
     maven {
         url 'https://projectlombok.org/edge-releases'
     }
+}
+
+// Node.js configuration
+node {
+    version = '20.11.0'  // LTS version
+    npmVersion = '10.2.4'
+    download = true  // Automatycznie pobierze Node.js
+    nodeProjectDir = file("${project.projectDir}")
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -46,6 +55,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     runtimeOnly 'org.postgresql:postgresql'
 
+    // Spring Boot DevTools dla hot-reload
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
     // Lombok - using edge build for Java 25 support
     compileOnly 'org.projectlombok:lombok:edge-SNAPSHOT'
     annotationProcessor 'org.projectlombok:lombok:edge-SNAPSHOT'
@@ -70,4 +82,54 @@ tasks.named('test') {
 
     // Wyłącz failFast - wszystkie testy będą wykonane niezależnie od niepowodzeń
     systemProperty 'junit.jupiter.execution.failfast.enabled', 'false'
+}
+
+// Task: Build frontend for production (minified CSS)
+tasks.register('buildFrontend', com.github.gradle.node.npm.task.NpmTask) {
+    description = 'Builds frontend assets (Tailwind CSS minified)'
+    dependsOn 'npmInstall'
+    args = ['run', 'build']
+}
+
+// Task: Run Tailwind in watch mode (development)
+tasks.register('tailwindWatch', com.github.gradle.node.npm.task.NpmTask) {
+    description = 'Runs Tailwind CSS in watch mode for development'
+    dependsOn 'npmInstall'
+    args = ['run', 'dev']
+}
+
+// Task: Clean frontend build artifacts
+tasks.register('cleanFrontend', com.github.gradle.node.npm.task.NpmTask) {
+    description = 'Cleans frontend build artifacts'
+    args = ['run', 'clean']
+}
+
+// Integrate frontend build with Gradle build lifecycle
+processResources {
+    dependsOn 'buildFrontend'
+}
+
+clean {
+    dependsOn 'cleanFrontend'
+}
+
+bootRun {
+    dependsOn 'npmInstall'
+}
+
+// Development task: Run Spring Boot with Tailwind watch
+tasks.register('devRun') {
+    description = 'Runs application in development mode with Tailwind watch'
+    group = 'application'
+
+    doFirst {
+        println "Starting development environment..."
+        println "- Spring Boot will run on port 8080"
+        println "- Tailwind CSS will watch for changes"
+        println "- LiveReload enabled on port 35729"
+        println ""
+        println "NOTE: Tailwind watch must be run separately in another terminal:"
+        println "  ./gradlew tailwindWatch"
+        println ""
+    }
 }
