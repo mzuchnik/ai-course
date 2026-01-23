@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Dropdown Menu Component
+
+  Main Fragment Parameters:
+  - id: Unique ID for the dropdown (required)
+  - buttonText: Dropdown button text (required)
+  - buttonIcon: Material icon for button (optional)
+  - items: List of menu items with 'text', 'url', 'icon', 'divider' (required)
+  - color: Button color - primary, secondary, etc (default: primary)
+  - variant: Button variant - filled, outlined, text (default: filled)
+  - size: Button size - sm, md, lg (default: md)
+  - align: Menu alignment - left, right (default: left)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="dropdown(id, buttonText, buttonIcon, items, color, variant, size, align, customClass)"
+     th:class="'relative inline-block text-left ' + ${customClass ?: ''}">
+
+    <!-- Dropdown Button -->
+    <button th:id="${id + '-button'}"
+            type="button"
+            th:attr="data-dropdown-toggle=${id}"
+            th:with="
+                sizeClass=${size == 'sm' ? 'px-3 py-1.5 text-sm' :
+                           size == 'lg' ? 'px-6 py-3 text-base' :
+                           'px-4 py-2.5 text-sm'},
+                colorClass=${variant == 'filled' ?
+                            (${color == 'primary'} ? 'bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-300' :
+                             'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-300') :
+                            variant == 'outlined' ?
+                            (${color == 'primary'} ? 'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-300' :
+                             'border-2 border-gray-600 text-gray-600 hover:bg-gray-50 focus:ring-gray-300') :
+                            (${color == 'primary'} ? 'text-primary-600 hover:bg-primary-50 focus:ring-primary-300' :
+                             'text-gray-600 hover:bg-gray-100 focus:ring-gray-300')}"
+            th:class="'inline-flex items-center gap-2 font-medium rounded-lg focus:ring-4 focus:outline-none transition-colors ' + ${sizeClass} + ' ' + ${colorClass}"
+            aria-expanded="false">
+
+        <i th:if="${buttonIcon != null}"
+           class="material-icons text-lg"
+           th:text="${buttonIcon}">icon</i>
+
+        <span th:text="${buttonText}">Dropdown</span>
+
+        <i class="material-icons text-lg">expand_more</i>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div th:id="${id}"
+         th:class="'z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg min-w-[200px] ' +
+                  (${align == 'right'} ? 'right-0' : 'left-0')"
+         style="position: absolute;">
+
+        <ul class="py-2 text-sm text-gray-700">
+            <li th:each="item, iterStat : ${items}">
+                <!-- Divider -->
+                <div th:if="${item.divider}"
+                     class="h-px my-1 bg-gray-200"></div>
+
+                <!-- Menu Item -->
+                <a th:if="${!item.divider}"
+                   th:href="${item.url ?: '#'}"
+                   th:onclick="${item.onclick}"
+                   class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 transition-colors"
+                   th:classappend="${item.disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}">
+
+                    <i th:if="${item.icon != null}"
+                       class="material-icons text-gray-600 text-base"
+                       th:text="${item.icon}">icon</i>
+
+                    <span th:text="${item.text}">Menu Item</span>
+
+                    <span th:if="${item.badge != null}"
+                          class="ml-auto inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full"
+                          th:text="${item.badge}">3</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!--
+  User Dropdown (Avatar + Menu)
+
+  Parameters:
+  - id: Unique ID (required)
+  - userName: User name (required)
+  - userEmail: User email (optional)
+  - avatar: Avatar URL (optional)
+  - initials: User initials if no avatar (optional)
+  - items: Menu items (required)
+-->
+
+<div th:fragment="userDropdown(id, userName, userEmail, avatar, initials, items, customClass)"
+     th:class="'relative inline-block text-left ' + ${customClass ?: ''}">
+
+    <!-- User Button -->
+    <button th:id="${id + '-button'}"
+            type="button"
+            th:attr="data-dropdown-toggle=${id}"
+            class="flex items-center gap-3 text-sm bg-white rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 px-3 py-2 transition-colors"
+            aria-expanded="false">
+
+        <!-- Avatar -->
+        <th:block th:replace="~{fragments/components/avatar :: avatar(${avatar}, ${userName}, ${initials}, 'sm', 'circular', false, '')}"></th:block>
+
+        <div class="text-left">
+            <div class="font-medium text-gray-900" th:text="${userName}">User Name</div>
+            <div th:if="${userEmail != null}"
+                 class="text-xs text-gray-500"
+                 th:text="${userEmail}">user@email.com</div>
+        </div>
+
+        <i class="material-icons text-gray-500">expand_more</i>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div th:id="${id}"
+         class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg min-w-[200px]"
+         style="position: absolute; right: 0;">
+
+        <ul class="py-2 text-sm text-gray-700">
+            <li th:each="item : ${items}">
+                <div th:if="${item.divider}"
+                     class="h-px my-1 bg-gray-200"></div>
+
+                <a th:if="${!item.divider}"
+                   th:href="${item.url ?: '#'}"
+                   th:onclick="${item.onclick}"
+                   class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 transition-colors">
+
+                    <i th:if="${item.icon != null}"
+                       class="material-icons text-gray-600 text-base"
+                       th:text="${item.icon}">icon</i>
+
+                    <span th:text="${item.text}">Menu Item</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!--
+  Icon Dropdown (Icon Button + Menu)
+
+  Parameters:
+  - id: Unique ID (required)
+  - icon: Material icon name (required)
+  - items: Menu items (required)
+  - color: Icon color (default: gray)
+  - align: Menu alignment (default: right)
+-->
+
+<div th:fragment="iconDropdown(id, icon, items, color, align, customClass)"
+     th:class="'relative inline-block text-left ' + ${customClass ?: ''}">
+
+    <button th:id="${id + '-button'}"
+            type="button"
+            th:attr="data-dropdown-toggle=${id}"
+            th:class="'p-2 text-gray-600 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-300 transition-colors ' +
+                     (${color == 'primary'} ? 'text-primary-600 hover:bg-primary-50' : '')"
+            aria-label="Open menu">
+        <i class="material-icons" th:text="${icon}">more_vert</i>
+    </button>
+
+    <div th:id="${id}"
+         th:class="'z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-lg min-w-[200px] ' +
+                  (${align == 'right'} ? 'right-0' : 'left-0')"
+         style="position: absolute;">
+
+        <ul class="py-2 text-sm text-gray-700">
+            <li th:each="item : ${items}">
+                <div th:if="${item.divider}"
+                     class="h-px my-1 bg-gray-200"></div>
+
+                <a th:if="${!item.divider}"
+                   th:href="${item.url ?: '#'}"
+                   th:onclick="${item.onclick}"
+                   class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 transition-colors">
+
+                    <i th:if="${item.icon != null}"
+                       class="material-icons text-gray-600 text-base"
+                       th:text="${item.icon}">icon</i>
+
+                    <span th:text="${item.text}">Menu Item</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(id, buttonText, items)"
+          th:replace="~{fragments/components/dropdown :: dropdown(${id}, ${buttonText}, null, ${items}, 'primary', 'filled', 'md', 'left', '')}">
+</th:block>
+
+<th:block th:fragment="outlined(id, buttonText, items)"
+          th:replace="~{fragments/components/dropdown :: dropdown(${id}, ${buttonText}, null, ${items}, 'primary', 'outlined', 'md', 'left', '')}">
+</th:block>
+
+</body>
+</html>

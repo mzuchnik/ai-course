@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Select Component (Dropdown List)
+
+  Main Fragment Parameters:
+  - id: Input ID (required)
+  - name: Input name attribute (required)
+  - label: Label text (required)
+  - options: List of option objects with 'value', 'text', 'selected' (required)
+  - placeholder: Placeholder option text (optional)
+  - required: Whether field is required (default: false)
+  - disabled: Whether field is disabled (default: false)
+  - size: Size variant - sm, md, lg (default: md)
+  - error: Error message (optional)
+  - helperText: Helper text below select (optional)
+  - icon: Material icon name (optional)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="select(id, name, label, options, placeholder, required, disabled, size, error, helperText, icon, customClass)"
+     th:class="'relative ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        isRequired=${required ?: false},
+        isDisabled=${disabled ?: false},
+        sizeType=${size ?: 'md'},
+
+        sizeClass=${sizeType == 'sm' ? 'py-2 text-sm' :
+                   sizeType == 'lg' ? 'py-3.5 text-base' :
+                   'py-3 text-sm'},
+
+        paddingClass=${icon != null ? 'pl-10 pr-10' : 'px-3'}">
+
+        <!-- Label -->
+        <label th:for="${id}"
+               th:class="'block mb-2 text-sm font-medium ' +
+                        (${error != null} ? 'text-red-700' : 'text-gray-900')">
+            <span th:text="${label}">Label</span>
+            <span th:if="${isRequired}" class="text-red-600 ml-1">*</span>
+        </label>
+
+        <!-- Select Container -->
+        <div class="relative">
+            <!-- Icon -->
+            <i th:if="${icon != null}"
+               th:class="'material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none ' +
+                        (${sizeType == 'sm'} ? 'text-base' : 'text-lg')"
+               th:text="${icon}">icon</i>
+
+            <!-- Select Element -->
+            <select th:id="${id}"
+                    th:name="${name}"
+                    th:required="${isRequired}"
+                    th:disabled="${isDisabled}"
+                    th:class="'block w-full rounded-lg border appearance-none bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 ' +
+                             ${sizeClass} + ' ' + ${paddingClass} + ' ' +
+                             (${error != null} ?
+                              'border-red-500 text-red-900 placeholder-red-400 focus:ring-red-500 focus:border-red-500' :
+                              'border-gray-300 text-gray-900 focus:ring-primary-500 focus:border-primary-500') +
+                             (${isDisabled} ? ' bg-gray-50 text-gray-500 cursor-not-allowed' : '')">
+
+                <!-- Placeholder Option -->
+                <option th:if="${placeholder != null}"
+                        value=""
+                        disabled
+                        selected
+                        th:text="${placeholder}">
+                    Select an option
+                </option>
+
+                <!-- Options -->
+                <option th:each="option : ${options}"
+                        th:value="${option.value}"
+                        th:selected="${option.selected}"
+                        th:disabled="${option.disabled}"
+                        th:text="${option.text}">
+                    Option
+                </option>
+            </select>
+
+            <!-- Dropdown Arrow -->
+            <i class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                expand_more
+            </i>
+        </div>
+
+        <!-- Helper Text or Error -->
+        <p th:if="${helperText != null && error == null}"
+           class="mt-2 text-xs text-gray-500"
+           th:text="${helperText}">
+            Helper text
+        </p>
+
+        <p th:if="${error != null}"
+           class="mt-2 text-xs text-red-600"
+           th:text="${error}">
+            Error message
+        </p>
+    </th:block>
+</div>
+
+<!--
+  Multi-Select Component
+
+  Parameters: Same as select but allows multiple selections
+-->
+
+<div th:fragment="multiSelect(id, name, label, options, required, disabled, size, error, helperText, customClass)"
+     th:class="'relative ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        isRequired=${required ?: false},
+        isDisabled=${disabled ?: false},
+        sizeType=${size ?: 'md'},
+
+        sizeClass=${sizeType == 'sm' ? 'py-1.5 text-sm' :
+                   sizeType == 'lg' ? 'py-2.5 text-base' :
+                   'py-2 text-sm'}">
+
+        <!-- Label -->
+        <label th:for="${id}"
+               th:class="'block mb-2 text-sm font-medium ' +
+                        (${error != null} ? 'text-red-700' : 'text-gray-900')">
+            <span th:text="${label}">Label</span>
+            <span th:if="${isRequired}" class="text-red-600 ml-1">*</span>
+        </label>
+
+        <!-- Multi-Select Element -->
+        <select th:id="${id}"
+                th:name="${name}"
+                multiple
+                th:size="${options.size() < 5 ? options.size() : 5}"
+                th:required="${isRequired}"
+                th:disabled="${isDisabled}"
+                th:class="'block w-full px-3 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 ' +
+                         ${sizeClass} + ' ' +
+                         (${error != null} ?
+                          'border-red-500 text-red-900 focus:ring-red-500 focus:border-red-500' :
+                          'border-gray-300 text-gray-900 focus:ring-primary-500 focus:border-primary-500') +
+                         (${isDisabled} ? ' bg-gray-50 text-gray-500 cursor-not-allowed' : ' bg-white')">
+
+            <option th:each="option : ${options}"
+                    th:value="${option.value}"
+                    th:selected="${option.selected}"
+                    th:disabled="${option.disabled}"
+                    th:text="${option.text}">
+                Option
+            </option>
+        </select>
+
+        <!-- Helper Text or Error -->
+        <p th:if="${helperText != null && error == null}"
+           class="mt-2 text-xs text-gray-500"
+           th:text="${helperText}">
+            Hold Ctrl/Cmd to select multiple options
+        </p>
+
+        <p th:if="${error != null}"
+           class="mt-2 text-xs text-red-600"
+           th:text="${error}">
+            Error message
+        </p>
+    </th:block>
+</div>
+
+<!--
+  Grouped Select (with optgroup)
+
+  Parameters:
+  - groups: List of group objects with 'label' and 'options' array
+  - Other parameters same as select
+-->
+
+<div th:fragment="groupedSelect(id, name, label, groups, placeholder, required, disabled, size, error, helperText, customClass)"
+     th:class="'relative ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        isRequired=${required ?: false},
+        isDisabled=${disabled ?: false},
+        sizeType=${size ?: 'md'},
+
+        sizeClass=${sizeType == 'sm' ? 'py-2 text-sm' :
+                   sizeType == 'lg' ? 'py-3.5 text-base' :
+                   'py-3 text-sm'}">
+
+        <!-- Label -->
+        <label th:for="${id}"
+               th:class="'block mb-2 text-sm font-medium ' +
+                        (${error != null} ? 'text-red-700' : 'text-gray-900')">
+            <span th:text="${label}">Label</span>
+            <span th:if="${isRequired}" class="text-red-600 ml-1">*</span>
+        </label>
+
+        <div class="relative">
+            <select th:id="${id}"
+                    th:name="${name}"
+                    th:required="${isRequired}"
+                    th:disabled="${isDisabled}"
+                    th:class="'block w-full px-3 pr-10 rounded-lg border appearance-none bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 ' +
+                             ${sizeClass} + ' ' +
+                             (${error != null} ?
+                              'border-red-500 text-red-900 focus:ring-red-500 focus:border-red-500' :
+                              'border-gray-300 text-gray-900 focus:ring-primary-500 focus:border-primary-500') +
+                             (${isDisabled} ? ' bg-gray-50 text-gray-500 cursor-not-allowed' : '')">
+
+                <option th:if="${placeholder != null}"
+                        value=""
+                        disabled
+                        selected
+                        th:text="${placeholder}">
+                    Select an option
+                </option>
+
+                <optgroup th:each="group : ${groups}"
+                          th:label="${group.label}">
+                    <option th:each="option : ${group.options}"
+                            th:value="${option.value}"
+                            th:selected="${option.selected}"
+                            th:text="${option.text}">
+                        Option
+                    </option>
+                </optgroup>
+            </select>
+
+            <i class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                expand_more
+            </i>
+        </div>
+
+        <p th:if="${helperText != null && error == null}"
+           class="mt-2 text-xs text-gray-500"
+           th:text="${helperText}">
+            Helper text
+        </p>
+
+        <p th:if="${error != null}"
+           class="mt-2 text-xs text-red-600"
+           th:text="${error}">
+            Error message
+        </p>
+    </th:block>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(id, name, label, options)"
+          th:replace="~{fragments/components/select :: select(${id}, ${name}, ${label}, ${options}, null, false, false, 'md', null, null, null, '')}">
+</th:block>
+
+<th:block th:fragment="withPlaceholder(id, name, label, options, placeholder)"
+          th:replace="~{fragments/components/select :: select(${id}, ${name}, ${label}, ${options}, ${placeholder}, false, false, 'md', null, null, null, '')}">
+</th:block>
+
+<th:block th:fragment="required(id, name, label, options)"
+          th:replace="~{fragments/components/select :: select(${id}, ${name}, ${label}, ${options}, null, true, false, 'md', null, null, null, '')}">
+</th:block>
+
+</body>
+</html>

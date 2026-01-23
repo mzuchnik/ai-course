@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Typography Components - Styled text elements
+
+  Headings, paragraphs, and other text components with consistent styling
+-->
+
+<!-- Heading 1 -->
+<h1 th:fragment="h1(text, customClass)"
+    th:class="'text-4xl md:text-5xl font-bold text-gray-900 leading-tight ' + ${customClass ?: ''}"
+    th:text="${text}">
+    Heading 1
+</h1>
+
+<!-- Heading 2 -->
+<h2 th:fragment="h2(text, customClass)"
+    th:class="'text-3xl md:text-4xl font-bold text-gray-900 leading-tight ' + ${customClass ?: ''}"
+    th:text="${text}">
+    Heading 2
+</h2>
+
+<!-- Heading 3 -->
+<h3 th:fragment="h3(text, customClass)"
+    th:class="'text-2xl md:text-3xl font-bold text-gray-900 leading-tight ' + ${customClass ?: ''}"
+    th:text="${text}">
+    Heading 3
+</h3>
+
+<!-- Heading 4 -->
+<h4 th:fragment="h4(text, customClass)"
+    th:class="'text-xl md:text-2xl font-semibold text-gray-900 leading-tight ' + ${customClass ?: ''}"
+    th:text="${text}">
+    Heading 4
+</h4>
+
+<!-- Heading 5 -->
+<h5 th:fragment="h5(text, customClass)"
+    th:class="'text-lg md:text-xl font-semibold text-gray-900 leading-tight ' + ${customClass ?: ''}"
+    th:text="${text}">
+    Heading 5
+</h5>
+
+<!-- Heading 6 -->
+<h6 th:fragment="h6(text, customClass)"
+    th:class="'text-base md:text-lg font-semibold text-gray-900 leading-tight ' + ${customClass ?: ''}"
+    th:text="${text}">
+    Heading 6
+</h6>
+
+<!-- Paragraph -->
+<p th:fragment="paragraph(text, customClass)"
+   th:class="'text-base text-gray-700 leading-relaxed ' + ${customClass ?: ''}"
+   th:text="${text}">
+    Paragraph text goes here.
+</p>
+
+<!-- Lead Paragraph (larger, for introductions) -->
+<p th:fragment="lead(text, customClass)"
+   th:class="'text-lg md:text-xl text-gray-600 leading-relaxed ' + ${customClass ?: ''}"
+   th:text="${text}">
+    Lead paragraph text.
+</p>
+
+<!-- Small Text -->
+<p th:fragment="small(text, customClass)"
+   th:class="'text-sm text-gray-600 leading-relaxed ' + ${customClass ?: ''}"
+   th:text="${text}">
+    Small text
+</p>
+
+<!-- Extra Small Text -->
+<p th:fragment="xs(text, customClass)"
+   th:class="'text-xs text-gray-500 leading-relaxed ' + ${customClass ?: ''}"
+   th:text="${text}">
+    Extra small text
+</p>
+
+<!-- Bold Text -->
+<strong th:fragment="bold(text, customClass)"
+        th:class="'font-bold text-gray-900 ' + ${customClass ?: ''}"
+        th:text="${text}">
+    Bold text
+</strong>
+
+<!-- Emphasized Text -->
+<em th:fragment="emphasis(text, customClass)"
+    th:class="'italic text-gray-700 ' + ${customClass ?: ''}"
+    th:text="${text}">
+    Emphasized text
+</em>
+
+<!-- Underlined Text -->
+<span th:fragment="underline(text, customClass)"
+      th:class="'underline text-gray-700 ' + ${customClass ?: ''}"
+      th:text="${text}">
+    Underlined text
+</span>
+
+<!-- Strikethrough Text -->
+<span th:fragment="strikethrough(text, customClass)"
+      th:class="'line-through text-gray-500 ' + ${customClass ?: ''}"
+      th:text="${text}">
+    Strikethrough text
+</span>
+
+<!-- Muted Text (gray) -->
+<span th:fragment="muted(text, customClass)"
+      th:class="'text-gray-500 ' + ${customClass ?: ''}"
+      th:text="${text}">
+    Muted text
+</span>
+
+<!-- Link -->
+<a th:fragment="link(text, url, customClass)"
+   th:href="${url}"
+   th:class="'text-primary-600 hover:text-primary-700 underline transition-colors ' + ${customClass ?: ''}"
+   th:text="${text}">
+    Link text
+</a>
+
+<!-- External Link (with icon) -->
+<a th:fragment="externalLink(text, url, customClass)"
+   th:href="${url}"
+   target="_blank"
+   rel="noopener noreferrer"
+   th:class="'inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 underline transition-colors ' + ${customClass ?: ''}">
+    <span th:text="${text}">External link</span>
+    <i class="material-icons text-sm">open_in_new</i>
+</a>
+
+<!-- Code (inline) -->
+<code th:fragment="code(text, customClass)"
+      th:class="'px-1.5 py-0.5 text-sm font-mono bg-gray-100 text-red-600 rounded ' + ${customClass ?: ''}"
+      th:text="${text}">
+    code
+</code>
+
+<!-- Code Block -->
+<pre th:fragment="codeBlock(code, customClass)"
+     th:class="'p-4 bg-gray-900 text-gray-100 rounded-lg overflow-x-auto text-sm font-mono ' + ${customClass ?: ''}"><code th:text="${code}">Code block</code></pre>
+
+<!-- Blockquote -->
+<blockquote th:fragment="blockquote(text, author, customClass)"
+            th:class="'p-4 my-4 border-l-4 border-primary-500 bg-gray-50 ' + ${customClass ?: ''}">
+    <p class="text-lg italic text-gray-700 leading-relaxed"
+       th:text="'\u201C' + ${text} + '\u201D'">
+        "Quote text"
+    </p>
+    <footer th:if="${author != null}"
+            class="mt-2 text-sm text-gray-600">
+        — <cite th:text="${author}">Author</cite>
+    </footer>
+</blockquote>
+
+<!-- Colored Text -->
+<span th:fragment="coloredText(text, color, customClass)">
+    <th:block th:with="
+        colorClass=${color == 'primary' ? 'text-primary-600' :
+                    color == 'success' ? 'text-green-600' :
+                    color == 'warning' ? 'text-yellow-600' :
+                    color == 'error' ? 'text-red-600' :
+                    color == 'info' ? 'text-blue-600' :
+                    'text-gray-600'}">
+
+        <span th:class="${colorClass} + ' ' + ${customClass ?: ''}"
+              th:text="${text}">
+            Colored text
+        </span>
+    </th:block>
+</span>
+
+<!-- Gradient Text -->
+<span th:fragment="gradientText(text, customClass)"
+      th:class="'text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-burgundy-600 font-bold ' + ${customClass ?: ''}"
+      th:text="${text}">
+    Gradient text
+</span>
+
+<!-- Divider with Text -->
+<div th:fragment="dividerWithText(text, customClass)"
+     th:class="'relative flex items-center py-5 ' + ${customClass ?: ''}">
+    <div class="flex-grow border-t border-gray-300"></div>
+    <span class="flex-shrink mx-4 text-sm font-medium text-gray-500"
+          th:text="${text}">OR</span>
+    <div class="flex-grow border-t border-gray-300"></div>
+</div>
+
+<!-- List - Unordered -->
+<ul th:fragment="ul(items, customClass)"
+    th:class="'list-disc list-inside space-y-2 text-gray-700 ' + ${customClass ?: ''}">
+    <li th:each="item : ${items}"
+        th:text="${item}">
+        List item
+    </li>
+</ul>
+
+<!-- List - Ordered -->
+<ol th:fragment="ol(items, customClass)"
+    th:class="'list-decimal list-inside space-y-2 text-gray-700 ' + ${customClass ?: ''}">
+    <li th:each="item : ${items}"
+        th:text="${item}">
+        List item
+    </li>
+</ol>
+
+<!-- Definition List -->
+<dl th:fragment="dl(items, customClass)"
+    th:class="'space-y-4 ' + ${customClass ?: ''}">
+    <div th:each="item : ${items}">
+        <dt class="font-semibold text-gray-900"
+            th:text="${item.term}">
+            Term
+        </dt>
+        <dd class="mt-1 text-gray-700"
+            th:text="${item.definition}">
+            Definition
+        </dd>
+    </div>
+</dl>
+
+<!-- Label -->
+<label th:fragment="label(text, forId, customClass)"
+       th:for="${forId}"
+       th:class="'block text-sm font-medium text-gray-900 ' + ${customClass ?: ''}"
+       th:text="${text}">
+    Label
+</label>
+
+<!-- Caption -->
+<p th:fragment="caption(text, customClass)"
+   th:class="'text-xs text-center text-gray-500 italic mt-2 ' + ${customClass ?: ''}"
+   th:text="${text}">
+    Caption text
+</p>
+
+<!-- Text with Icon -->
+<span th:fragment="textWithIcon(text, icon, iconPosition, customClass)">
+    <th:block th:with="position=${iconPosition ?: 'left'}">
+        <span th:class="'inline-flex items-center gap-2 ' + ${customClass ?: ''}">
+            <i th:if="${position == 'left'}"
+               class="material-icons text-base"
+               th:text="${icon}">icon</i>
+
+            <span th:text="${text}">Text</span>
+
+            <i th:if="${position == 'right'}"
+               class="material-icons text-base"
+               th:text="${icon}">icon</i>
+        </span>
+    </th:block>
+</span>
+
+<!-- Truncated Text (with ellipsis) -->
+<p th:fragment="truncate(text, lines, customClass)">
+    <th:block th:with="numLines=${lines ?: 1}">
+        <p th:class="'overflow-hidden text-ellipsis ' +
+                    (${numLines == 1} ? 'whitespace-nowrap' : 'line-clamp-' + ${numLines}) + ' ' +
+                    ${customClass ?: ''}"
+           th:text="${text}">
+            Text that will be truncated with ellipsis if too long
+        </p>
+    </th:block>
+</p>
+
+<!-- Highlight Text -->
+<span th:fragment="highlight(text, customClass)"
+      th:class="'bg-yellow-200 px-1 rounded ' + ${customClass ?: ''}"
+      th:text="${text}">
+    Highlighted text
+</span>
+
+<!-- Keyboard Key -->
+<kbd th:fragment="kbd(key, customClass)"
+     th:class="'px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded shadow-sm ' + ${customClass ?: ''}"
+     th:text="${key}">
+    Ctrl
+</kbd>
+
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Avatar Component
+
+  Main Fragment Parameters:
+  - src: Image URL (required if no initials)
+  - alt: Alt text for image (required for accessibility)
+  - initials: Text initials if no image (e.g., "JD")
+  - size: Size variant - xs, sm, md, lg, xl, xxl (default: md)
+  - variant: Shape variant - circular, rounded, square (default: circular)
+  - border: Show border (default: false)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="avatar(src, alt, initials, size, variant, border, customClass)">
+    <th:block th:with="
+        sizeClass=${size == 'xs' ? 'w-6 h-6 text-xs' :
+                   size == 'sm' ? 'w-8 h-8 text-sm' :
+                   size == 'lg' ? 'w-14 h-14 text-lg' :
+                   size == 'xl' ? 'w-20 h-20 text-xl' :
+                   size == 'xxl' ? 'w-32 h-32 text-3xl' :
+                   'w-10 h-10 text-base'},
+        variantClass=${variant == 'rounded' ? 'rounded-lg' :
+                      variant == 'square' ? 'rounded-none' :
+                      'rounded-full'},
+        borderClass=${border ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-100' : ''}">
+
+        <!-- Image Avatar -->
+        <div th:if="${src != null && !src.isEmpty()}"
+             th:class="'relative inline-flex items-center justify-center overflow-hidden bg-gray-300 ' + ${sizeClass} + ' ' + ${variantClass} + ' ' + ${borderClass} + ' ' + ${customClass ?: ''}">
+            <img th:src="${src}"
+                 th:alt="${alt ?: 'Avatar'}"
+                 class="w-full h-full object-cover">
+        </div>
+
+        <!-- Initials Avatar -->
+        <div th:if="${(src == null || src.isEmpty()) && initials != null}"
+             th:class="'relative inline-flex items-center justify-center overflow-hidden bg-primary-600 text-white font-medium ' + ${sizeClass} + ' ' + ${variantClass} + ' ' + ${borderClass} + ' ' + ${customClass ?: ''}">
+            <span th:text="${initials}">AB</span>
+        </div>
+
+        <!-- Placeholder Avatar -->
+        <div th:if="${(src == null || src.isEmpty()) && initials == null}"
+             th:class="'relative inline-flex items-center justify-center overflow-hidden bg-gray-300 text-gray-600 ' + ${sizeClass} + ' ' + ${variantClass} + ' ' + ${borderClass} + ' ' + ${customClass ?: ''}">
+            <svg class="w-1/2 h-1/2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+            </svg>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Avatar with Status Indicator
+
+  Parameters: Same as avatar + status
+  - status: Status color - online (green), offline (gray), busy (red), away (yellow) (optional)
+-->
+
+<div th:fragment="avatarWithStatus(src, alt, initials, size, variant, border, status, customClass)">
+    <div class="relative inline-block">
+        <th:block th:replace="~{fragments/components/avatar :: avatar(${src}, ${alt}, ${initials}, ${size}, ${variant}, ${border}, ${customClass})}"></th:block>
+
+        <span th:if="${status != null}"
+              th:class="'absolute bottom-0 right-0 block rounded-full ring-2 ring-white ' +
+                       (${size == 'xs' || size == 'sm'} ? 'w-2 h-2' :
+                        ${size == 'lg' || size == 'xl' || size == 'xxl'} ? 'w-4 h-4' : 'w-3 h-3') + ' ' +
+                       (${status == 'online'} ? 'bg-green-500' :
+                        ${status == 'busy'} ? 'bg-red-500' :
+                        ${status == 'away'} ? 'bg-yellow-500' :
+                        'bg-gray-400')">
+        </span>
+    </div>
+</div>
+
+<!--
+  Avatar Group
+
+  Parameters:
+  - avatars: List of avatar objects with src, alt, initials
+  - size: Size for all avatars (default: md)
+  - max: Maximum avatars to show before +N (default: 5)
+-->
+
+<div th:fragment="avatarGroup(avatars, size, max)">
+    <div class="flex -space-x-4">
+        <th:block th:each="avatar, iterStat : ${avatars}">
+            <th:block th:if="${iterStat.index < (max ?: 5)}">
+                <th:block th:replace="~{fragments/components/avatar :: avatar(${avatar.src}, ${avatar.alt}, ${avatar.initials}, ${size}, 'circular', true, 'hover:z-10')}"></th:block>
+            </th:block>
+        </th:block>
+
+        <div th:if="${avatars.size() > (max ?: 5)}"
+             th:with="sizeClass=${size == 'xs' ? 'w-6 h-6 text-xs' :
+                                 size == 'sm' ? 'w-8 h-8 text-sm' :
+                                 size == 'lg' ? 'w-14 h-14 text-lg' :
+                                 size == 'xl' ? 'w-20 h-20 text-xl' :
+                                 'w-10 h-10 text-base'}"
+             th:class="'relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gray-700 text-white font-medium ring-2 ring-white ' + ${sizeClass}">
+            <span th:text="'+' + ${avatars.size() - (max ?: 5)}">+5</span>
+        </div>
+    </div>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="small(src, alt, initials)"
+          th:replace="~{fragments/components/avatar :: avatar(${src}, ${alt}, ${initials}, 'sm', 'circular', false, '')}">
+</th:block>
+
+<th:block th:fragment="medium(src, alt, initials)"
+          th:replace="~{fragments/components/avatar :: avatar(${src}, ${alt}, ${initials}, 'md', 'circular', false, '')}">
+</th:block>
+
+<th:block th:fragment="large(src, alt, initials)"
+          th:replace="~{fragments/components/avatar :: avatar(${src}, ${alt}, ${initials}, 'lg', 'circular', false, '')}">
+</th:block>
+
+</body>
+</html>

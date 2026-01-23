@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Accordion Component
+
+  Main Fragment Parameters:
+  - id: Unique ID for the accordion (required)
+  - items: List of accordion items with 'title' and 'content' (required)
+  - alwaysOpen: Allow multiple items open at once (default: false)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="accordion(id, items, alwaysOpen, customClass)"
+     th:id="${id}"
+     th:class="'w-full ' + ${customClass ?: ''}">
+
+    <div th:each="item, iterStat : ${items}"
+         class="border-b border-gray-200">
+
+        <button th:type="button"
+                th:id="${id + '-heading-' + iterStat.index}"
+                th:attr="data-collapse-toggle=${id + '-body-' + iterStat.index}"
+                class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-900 bg-white hover:bg-gray-50 transition-colors duration-200"
+                aria-expanded="false">
+            <span th:text="${item.title}">Accordion Title</span>
+            <svg class="w-6 h-6 shrink-0 transition-transform duration-200"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
+
+        <div th:id="${id + '-body-' + iterStat.index}"
+             class="hidden"
+             th:attr="aria-labelledby=${id + '-heading-' + iterStat.index}">
+            <div class="p-5 bg-gray-50 text-gray-700"
+                 th:utext="${item.content}">
+                Accordion content goes here.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
+  Single Accordion Item Fragment
+
+  Parameters:
+  - parentId: ID of parent accordion (required)
+  - index: Item index (required)
+  - title: Item title (required)
+  - content: Item content HTML (required)
+  - open: Whether item starts open (default: false)
+-->
+
+<div th:fragment="accordionItem(parentId, index, title, content, open)">
+    <div class="border-b border-gray-200">
+        <button type="button"
+                th:id="${parentId + '-heading-' + index}"
+                th:attr="data-collapse-toggle=${parentId + '-body-' + index}"
+                class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-900 bg-white hover:bg-gray-50 transition-colors duration-200"
+                th:aria-expanded="${open ?: false}">
+            <span th:text="${title}">Accordion Title</span>
+            <svg class="w-6 h-6 shrink-0 transition-transform duration-200"
+                 th:class="${open ? 'rotate-180' : ''}"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
+
+        <div th:id="${parentId + '-body-' + index}"
+             th:class="${open ? '' : 'hidden'}"
+             th:attr="aria-labelledby=${parentId + '-heading-' + index}">
+            <div class="p-5 bg-gray-50 text-gray-700" th:utext="${content}">
+                Accordion content goes here.
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

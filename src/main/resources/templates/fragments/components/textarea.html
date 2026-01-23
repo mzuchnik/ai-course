@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Textarea Component
+
+  Main Fragment Parameters:
+  - id: Input ID (required)
+  - name: Input name attribute (required)
+  - label: Label text (required)
+  - placeholder: Placeholder text (optional)
+  - value: Initial value (optional)
+  - rows: Number of rows (default: 4)
+  - required: Whether field is required (default: false)
+  - disabled: Whether field is disabled (default: false)
+  - readonly: Whether field is readonly (default: false)
+  - maxlength: Maximum character length (optional)
+  - resize: Resize behavior - none, vertical, horizontal, both (default: vertical)
+  - error: Error message (optional)
+  - helperText: Helper text below textarea (optional)
+  - showCharCount: Show character count (default: false)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="textarea(id, name, label, placeholder, value, rows, required, disabled, readonly, maxlength, resize, error, helperText, showCharCount, customClass)"
+     th:class="'relative ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        isRequired=${required ?: false},
+        isDisabled=${disabled ?: false},
+        isReadonly=${readonly ?: false},
+        numRows=${rows ?: 4},
+        shouldShowCharCount=${showCharCount ?: false},
+        resizeType=${resize ?: 'vertical'},
+
+        resizeClass=${resizeType == 'none' ? 'resize-none' :
+                     resizeType == 'horizontal' ? 'resize-x' :
+                     resizeType == 'both' ? 'resize' :
+                     'resize-y'}">
+
+        <!-- Label -->
+        <label th:for="${id}"
+               th:class="'block mb-2 text-sm font-medium ' +
+                        (${error != null} ? 'text-red-700' : 'text-gray-900')">
+            <span th:text="${label}">Label</span>
+            <span th:if="${isRequired}" class="text-red-600 ml-1">*</span>
+            <span th:if="${maxlength != null && shouldShowCharCount}"
+                  class="float-right text-xs font-normal text-gray-500">
+                <span th:id="${id + '-count'}" th:text="${value != null ? value.length() : 0}">0</span>
+                / <span th:text="${maxlength}">500</span>
+            </span>
+        </label>
+
+        <!-- Textarea -->
+        <textarea th:id="${id}"
+                  th:name="${name}"
+                  th:placeholder="${placeholder}"
+                  th:rows="${numRows}"
+                  th:required="${isRequired}"
+                  th:disabled="${isDisabled}"
+                  th:readonly="${isReadonly}"
+                  th:maxlength="${maxlength}"
+                  th:oninput="${shouldShowCharCount && maxlength != null} ? 'document.getElementById(\'' + ${id} + '-count\').textContent = this.value.length' : ''"
+                  th:class="'block w-full px-3 py-2 text-sm text-gray-900 bg-white border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 ' +
+                           ${resizeClass} + ' ' +
+                           (${error != null} ?
+                            'border-red-500 placeholder-red-400 focus:ring-red-500 focus:border-red-500' :
+                            'border-gray-300 placeholder-gray-400 focus:ring-primary-500 focus:border-primary-500') +
+                           (${isDisabled} ? ' bg-gray-50 text-gray-500 cursor-not-allowed' : '') +
+                           (${isReadonly} ? ' bg-gray-50 text-gray-600' : '')"
+                  th:text="${value}">
+        </textarea>
+
+        <!-- Helper Text or Error -->
+        <p th:if="${helperText != null && error == null}"
+           class="mt-2 text-xs text-gray-500"
+           th:text="${helperText}">
+            Helper text
+        </p>
+
+        <p th:if="${error != null}"
+           class="mt-2 text-xs text-red-600"
+           th:text="${error}">
+            Error message
+        </p>
+    </th:block>
+</div>
+
+<!--
+  Textarea with Rich Formatting (with toolbar)
+
+  Parameters: Same as textarea + toolbar options
+  - showToolbar: Show formatting toolbar (default: true)
+-->
+
+<div th:fragment="richTextarea(id, name, label, placeholder, value, rows, required, disabled, maxlength, error, helperText, customClass)"
+     th:class="'relative ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        isRequired=${required ?: false},
+        isDisabled=${disabled ?: false},
+        numRows=${rows ?: 6}">
+
+        <!-- Label -->
+        <label th:for="${id}"
+               th:class="'block mb-2 text-sm font-medium ' +
+                        (${error != null} ? 'text-red-700' : 'text-gray-900')">
+            <span th:text="${label}">Label</span>
+            <span th:if="${isRequired}" class="text-red-600 ml-1">*</span>
+        </label>
+
+        <!-- Container with Border -->
+        <div th:class="'border rounded-lg overflow-hidden transition-colors ' +
+                      (${error != null} ? 'border-red-500 focus-within:ring-2 focus-within:ring-red-500' :
+                       'border-gray-300 focus-within:ring-2 focus-within:ring-primary-500')">
+
+            <!-- Formatting Toolbar -->
+            <div class="flex items-center gap-1 px-3 py-2 bg-gray-50 border-b border-gray-200">
+                <button type="button"
+                        class="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
+                        title="Bold"
+                        th:onclick="'document.execCommand(\'bold\', false, null); document.getElementById(\'' + ${id} + '\').focus();'">
+                    <i class="material-icons text-base">format_bold</i>
+                </button>
+
+                <button type="button"
+                        class="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
+                        title="Italic"
+                        th:onclick="'document.execCommand(\'italic\', false, null); document.getElementById(\'' + ${id} + '\').focus();'">
+                    <i class="material-icons text-base">format_italic</i>
+                </button>
+
+                <button type="button"
+                        class="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
+                        title="Underline"
+                        th:onclick="'document.execCommand(\'underline\', false, null); document.getElementById(\'' + ${id} + '\').focus();'">
+                    <i class="material-icons text-base">format_underlined</i>
+                </button>
+
+                <span class="w-px h-5 bg-gray-300 mx-1"></span>
+
+                <button type="button"
+                        class="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
+                        title="Bullet List"
+                        th:onclick="'document.execCommand(\'insertUnorderedList\', false, null); document.getElementById(\'' + ${id} + '\').focus();'">
+                    <i class="material-icons text-base">format_list_bulleted</i>
+                </button>
+
+                <button type="button"
+                        class="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
+                        title="Numbered List"
+                        th:onclick="'document.execCommand(\'insertOrderedList\', false, null); document.getElementById(\'' + ${id} + '\').focus();'">
+                    <i class="material-icons text-base">format_list_numbered</i>
+                </button>
+
+                <span class="w-px h-5 bg-gray-300 mx-1"></span>
+
+                <button type="button"
+                        class="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
+                        title="Link"
+                        th:onclick="'const url = prompt(\'Enter URL:\'); if(url) document.execCommand(\'createLink\', false, url); document.getElementById(\'' + ${id} + '\').focus();'">
+                    <i class="material-icons text-base">link</i>
+                </button>
+            </div>
+
+            <!-- Content Editable Div (acts as rich text area) -->
+            <div th:id="${id}"
+                 contenteditable="true"
+                 th:attr="data-name=${name}"
+                 th:class="'w-full px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none resize-y overflow-auto ' +
+                          (${isDisabled} ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : '')"
+                 th:style="'min-height: ' + (${numRows} * 1.5) + 'rem;'"
+                 th:utext="${value}">
+            </div>
+
+            <!-- Hidden input to store actual value -->
+            <input type="hidden"
+                   th:name="${name}"
+                   th:id="${id + '-input'}"
+                   th:value="${value}">
+        </div>
+
+        <!-- Helper Text or Error -->
+        <p th:if="${helperText != null && error == null}"
+           class="mt-2 text-xs text-gray-500"
+           th:text="${helperText}">
+            Helper text
+        </p>
+
+        <p th:if="${error != null}"
+           class="mt-2 text-xs text-red-600"
+           th:text="${error}">
+            Error message
+        </p>
+
+        <!-- Sync contenteditable to hidden input -->
+        <script th:inline="javascript">
+            document.getElementById([[${id}]]).addEventListener('input', function() {
+                document.getElementById([[${id}]] + '-input').value = this.innerHTML;
+            });
+        </script>
+    </th:block>
+</div>
+
+<!--
+  Auto-Resize Textarea (grows with content)
+
+  Parameters: Same as textarea
+-->
+
+<div th:fragment="autoResizeTextarea(id, name, label, placeholder, value, minRows, maxRows, required, disabled, error, helperText, customClass)"
+     th:class="'relative ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        isRequired=${required ?: false},
+        isDisabled=${disabled ?: false},
+        minR=${minRows ?: 3},
+        maxR=${maxRows ?: 10}">
+
+        <label th:for="${id}"
+               th:class="'block mb-2 text-sm font-medium ' +
+                        (${error != null} ? 'text-red-700' : 'text-gray-900')">
+            <span th:text="${label}">Label</span>
+            <span th:if="${isRequired}" class="text-red-600 ml-1">*</span>
+        </label>
+
+        <textarea th:id="${id}"
+                  th:name="${name}"
+                  th:placeholder="${placeholder}"
+                  th:rows="${minR}"
+                  th:required="${isRequired}"
+                  th:disabled="${isDisabled}"
+                  th:oninput="'this.style.height = \'auto\'; this.style.height = Math.min(this.scrollHeight, ' + ${maxR * 24} + ') + \'px\';'"
+                  th:class="'block w-full px-3 py-2 text-sm text-gray-900 bg-white border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 resize-none overflow-hidden ' +
+                           (${error != null} ?
+                            'border-red-500 placeholder-red-400 focus:ring-red-500 focus:border-red-500' :
+                            'border-gray-300 placeholder-gray-400 focus:ring-primary-500 focus:border-primary-500') +
+                           (${isDisabled} ? ' bg-gray-50 text-gray-500 cursor-not-allowed' : '')"
+                  th:text="${value}">
+        </textarea>
+
+        <p th:if="${helperText != null && error == null}"
+           class="mt-2 text-xs text-gray-500"
+           th:text="${helperText}">
+            Helper text
+        </p>
+
+        <p th:if="${error != null}"
+           class="mt-2 text-xs text-red-600"
+           th:text="${error}">
+            Error message
+        </p>
+    </th:block>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(id, name, label)"
+          th:replace="~{fragments/components/textarea :: textarea(${id}, ${name}, ${label}, null, null, 4, false, false, false, null, 'vertical', null, null, false, '')}">
+</th:block>
+
+<th:block th:fragment="withPlaceholder(id, name, label, placeholder)"
+          th:replace="~{fragments/components/textarea :: textarea(${id}, ${name}, ${label}, ${placeholder}, null, 4, false, false, false, null, 'vertical', null, null, false, '')}">
+</th:block>
+
+<th:block th:fragment="withCharCount(id, name, label, maxlength)"
+          th:replace="~{fragments/components/textarea :: textarea(${id}, ${name}, ${label}, null, null, 4, false, false, false, ${maxlength}, 'vertical', null, null, true, '')}">
+</th:block>
+
+</body>
+</html>

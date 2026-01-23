@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Radio Button Component
+
+  Main Fragment Parameters:
+  - id: Input ID (required)
+  - name: Input name attribute (required)
+  - label: Label text (required)
+  - value: Radio button value (required)
+  - checked: Whether radio is checked (default: false)
+  - disabled: Whether radio is disabled (default: false)
+  - color: Color variant - primary, secondary, success, warning, error (default: primary)
+  - error: Error message (optional)
+  - description: Helper text below label (optional)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="radio(id, name, label, value, checked, disabled, color, error, description, customClass)"
+     th:class="'relative flex items-start ' + ${customClass ?: ''}">
+
+    <div class="flex items-center h-5">
+        <input th:id="${id}"
+               th:name="${name}"
+               type="radio"
+               th:value="${value}"
+               th:checked="${checked ?: false}"
+               th:disabled="${disabled ?: false}"
+               th:class="'w-4 h-4 border-2 focus:ring-2 focus:ring-offset-2 transition-colors ' +
+                        (${error != null} ? 'border-red-500 text-red-600 focus:ring-red-500' :
+                         ${color == 'success'} ? 'border-gray-300 text-green-600 focus:ring-green-500' :
+                         ${color == 'warning'} ? 'border-gray-300 text-yellow-600 focus:ring-yellow-500' :
+                         ${color == 'error'} ? 'border-gray-300 text-red-600 focus:ring-red-500' :
+                         'border-gray-300 text-primary-600 focus:ring-primary-500') +
+                        (${disabled} ? ' opacity-50 cursor-not-allowed' : ' cursor-pointer')">
+    </div>
+
+    <div class="ml-3">
+        <label th:for="${id}"
+               th:class="'text-sm font-medium select-none ' +
+                        (${error != null} ? 'text-red-700' : 'text-gray-700') +
+                        (${disabled} ? ' opacity-50 cursor-not-allowed' : ' cursor-pointer')">
+            <span th:text="${label}">Radio Label</span>
+            <span th:if="${error != null}" class="text-red-600 ml-1">*</span>
+        </label>
+
+        <p th:if="${description != null && error == null}"
+           class="text-xs text-gray-500 mt-0.5"
+           th:text="${description}">
+            Helper text goes here.
+        </p>
+
+        <p th:if="${error != null}"
+           class="text-xs text-red-600 mt-0.5"
+           th:text="${error}">
+            Error message
+        </p>
+    </div>
+</div>
+
+<!--
+  Radio Group
+
+  Parameters:
+  - groupLabel: Label for the entire group (required)
+  - groupName: Name attribute for all radios (required)
+  - options: List of options with 'id', 'label', 'value', 'checked', 'description' (required)
+  - disabled: Disable all radios (default: false)
+  - color: Color variant for all radios (default: primary)
+  - orientation: Layout orientation - vertical, horizontal (default: vertical)
+  - error: Error message for the group (optional)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<fieldset th:fragment="radioGroup(groupLabel, groupName, options, disabled, color, orientation, error, customClass)"
+          th:class="'space-y-3 ' + ${customClass ?: ''}">
+
+    <legend th:class="'text-sm font-semibold mb-3 ' + (${error != null} ? 'text-red-700' : 'text-gray-900')">
+        <span th:text="${groupLabel}">Group Label</span>
+        <span th:if="${error != null}" class="text-red-600 ml-1">*</span>
+    </legend>
+
+    <div th:class="${orientation == 'horizontal'} ? 'flex flex-wrap gap-4' : 'space-y-3'">
+        <th:block th:each="option : ${options}">
+            <th:block th:replace="~{fragments/components/radio :: radio(
+                ${option.id},
+                ${groupName},
+                ${option.label},
+                ${option.value},
+                ${option.checked},
+                ${disabled},
+                ${color},
+                null,
+                ${option.description},
+                ''
+            )}"></th:block>
+        </th:block>
+    </div>
+
+    <p th:if="${error != null}"
+       class="text-xs text-red-600 mt-2"
+       th:text="${error}">
+        Error message
+    </p>
+</fieldset>
+
+<!--
+  Radio with Icon
+
+  Parameters: Same as radio + icon
+  - icon: Material icon name (optional)
+-->
+
+<div th:fragment="radioWithIcon(id, name, label, icon, value, checked, disabled, color, error, customClass)"
+     th:class="'relative flex items-start ' + ${customClass ?: ''}">
+
+    <div class="flex items-center h-5">
+        <input th:id="${id}"
+               th:name="${name}"
+               type="radio"
+               th:value="${value}"
+               th:checked="${checked ?: false}"
+               th:disabled="${disabled ?: false}"
+               th:class="'w-4 h-4 border-2 focus:ring-2 focus:ring-offset-2 transition-colors ' +
+                        (${error != null} ? 'border-red-500 text-red-600 focus:ring-red-500' :
+                         'border-gray-300 text-primary-600 focus:ring-primary-500') +
+                        (${disabled} ? ' opacity-50 cursor-not-allowed' : ' cursor-pointer')">
+    </div>
+
+    <div class="ml-3 flex items-center gap-2">
+        <i th:if="${icon != null}"
+           class="material-icons text-gray-600 text-base"
+           th:text="${icon}">icon</i>
+
+        <label th:for="${id}"
+               th:class="'text-sm font-medium select-none ' +
+                        (${error != null} ? 'text-red-700' : 'text-gray-700') +
+                        (${disabled} ? ' opacity-50 cursor-not-allowed' : ' cursor-pointer')">
+            <span th:text="${label}">Radio Label</span>
+            <span th:if="${error != null}" class="text-red-600 ml-1">*</span>
+        </label>
+    </div>
+</div>
+
+<!--
+  Card Radio (radio button styled as a selectable card)
+
+  Parameters:
+  - id: Input ID (required)
+  - name: Input name (required)
+  - title: Card title (required)
+  - description: Card description (optional)
+  - icon: Material icon name (optional)
+  - value: Radio value (required)
+  - checked: Whether selected (default: false)
+  - disabled: Whether disabled (default: false)
+-->
+
+<label th:fragment="cardRadio(id, name, title, description, icon, value, checked, disabled, customClass)"
+       th:class="'relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none ' +
+                (${checked} ? 'border-primary-600 ring-2 ring-primary-600' : 'border-gray-300') +
+                (${disabled} ? ' opacity-50 cursor-not-allowed' : ' hover:border-gray-400') +
+                ' ' + ${customClass ?: ''}"
+       th:for="${id}">
+
+    <input th:id="${id}"
+           th:name="${name}"
+           type="radio"
+           th:value="${value}"
+           th:checked="${checked ?: false}"
+           th:disabled="${disabled ?: false}"
+           class="sr-only">
+
+    <div class="flex flex-1 items-start gap-3">
+        <!-- Icon -->
+        <div th:if="${icon != null}"
+             th:class="'flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ' +
+                      (${checked} ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-600')">
+            <i class="material-icons text-xl" th:text="${icon}">icon</i>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1">
+            <div class="flex items-center justify-between">
+                <span th:class="'block text-sm font-medium ' + (${checked} ? 'text-primary-900' : 'text-gray-900')"
+                      th:text="${title}">Card Title</span>
+
+                <!-- Check Icon -->
+                <i th:if="${checked}"
+                   class="material-icons text-primary-600 text-xl">check_circle</i>
+            </div>
+
+            <p th:if="${description != null}"
+               class="mt-1 text-sm text-gray-500"
+               th:text="${description}">
+                Card description text
+            </p>
+        </div>
+    </div>
+</label>
+
+<!--
+  Button Radio Group (styled as button group)
+
+  Parameters:
+  - groupName: Name attribute for all radios (required)
+  - options: List of options with 'id', 'label', 'value', 'checked', 'icon' (required)
+  - color: Color variant (default: primary)
+  - size: Size variant - sm, md, lg (default: md)
+-->
+
+<div th:fragment="buttonRadioGroup(groupName, options, color, size, customClass)"
+     th:class="'inline-flex rounded-lg shadow-sm ' + ${customClass ?: ''}"
+     role="group">
+
+    <th:block th:with="
+        colorBase=${color ?: 'primary'},
+        sizeType=${size ?: 'md'},
+
+        sizeClass=${sizeType == 'sm' ? 'px-3 py-1.5 text-xs' :
+                   sizeType == 'lg' ? 'px-5 py-3 text-base' :
+                   'px-4 py-2 text-sm'}">
+
+        <label th:each="option, iterStat : ${options}"
+               th:class="'relative inline-flex items-center gap-2 font-medium border cursor-pointer transition-colors ' +
+                        ${sizeClass} + ' ' +
+                        (${iterStat.first} ? 'rounded-l-lg ' : '') +
+                        (${iterStat.last} ? 'rounded-r-lg ' : '') +
+                        (${!iterStat.first} ? '-ml-px ' : '') +
+                        'peer-checked:bg-primary-600 peer-checked:text-white peer-checked:border-primary-600 peer-checked:z-10 ' +
+                        'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'">
+
+            <input type="radio"
+                   th:id="${option.id}"
+                   th:name="${groupName}"
+                   th:value="${option.value}"
+                   th:checked="${option.checked}"
+                   class="sr-only peer">
+
+            <i th:if="${option.icon != null}"
+               class="material-icons text-base"
+               th:text="${option.icon}">icon</i>
+
+            <span th:text="${option.label}">Option</span>
+        </label>
+    </th:block>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(id, name, label, value)"
+          th:replace="~{fragments/components/radio :: radio(${id}, ${name}, ${label}, ${value}, false, false, 'primary', null, null, '')}">
+</th:block>
+
+<th:block th:fragment="withDescription(id, name, label, value, description)"
+          th:replace="~{fragments/components/radio :: radio(${id}, ${name}, ${label}, ${value}, false, false, 'primary', null, ${description}, '')}">
+</th:block>
+
+</body>
+</html>

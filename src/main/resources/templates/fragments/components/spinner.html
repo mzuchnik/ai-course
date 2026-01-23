@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Spinner/Loader Component
+
+  Main Fragment Parameters:
+  - variant: Spinner variant - border, dots, pulse (default: border)
+  - size: Size variant - sm, md, lg, xl (default: md)
+  - color: Color variant - primary, secondary, success, warning, error, white (default: primary)
+  - label: Loading text (optional)
+  - centered: Center the spinner (default: false)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="spinner(variant, size, color, label, centered, customClass)">
+    <th:block th:with="
+        variantType=${variant ?: 'border'},
+        sizeType=${size ?: 'md'},
+        colorBase=${color ?: 'primary'},
+        isCentered=${centered ?: false}">
+
+        <!-- Border Spinner -->
+        <div th:if="${variantType == 'border'}"
+             th:class="'inline-flex flex-col items-center gap-2 ' +
+                      (${isCentered} ? 'justify-center w-full' : '') + ' ' +
+                      ${customClass ?: ''}">
+
+            <th:block th:with="
+                sizeClass=${sizeType == 'sm' ? 'w-6 h-6 border-2' :
+                           sizeType == 'lg' ? 'w-12 h-12 border-4' :
+                           sizeType == 'xl' ? 'w-16 h-16 border-4' :
+                           'w-8 h-8 border-3'},
+
+                colorClass=${colorBase == 'primary' ? 'border-primary-600 border-t-transparent' :
+                            colorBase == 'secondary' ? 'border-gray-600 border-t-transparent' :
+                            colorBase == 'success' ? 'border-green-600 border-t-transparent' :
+                            colorBase == 'warning' ? 'border-yellow-500 border-t-transparent' :
+                            colorBase == 'error' ? 'border-red-600 border-t-transparent' :
+                            colorBase == 'white' ? 'border-white border-t-transparent' :
+                            'border-gray-400 border-t-transparent'}">
+
+                <div th:class="'rounded-full animate-spin ' + ${sizeClass} + ' ' + ${colorClass}"
+                     role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </th:block>
+
+            <span th:if="${label != null}"
+                  class="text-sm text-gray-600"
+                  th:text="${label}">Loading...</span>
+        </div>
+
+        <!-- Dots Spinner -->
+        <div th:if="${variantType == 'dots'}"
+             th:class="'inline-flex items-center gap-1 ' +
+                      (${isCentered} ? 'justify-center w-full' : '') + ' ' +
+                      ${customClass ?: ''}">
+
+            <th:block th:with="
+                dotSize=${sizeType == 'sm' ? 'w-1.5 h-1.5' :
+                         sizeType == 'lg' ? 'w-3 h-3' :
+                         sizeType == 'xl' ? 'w-4 h-4' :
+                         'w-2 h-2'},
+
+                colorClass=${colorBase == 'primary' ? 'bg-primary-600' :
+                            colorBase == 'success' ? 'bg-green-600' :
+                            colorBase == 'warning' ? 'bg-yellow-500' :
+                            colorBase == 'error' ? 'bg-red-600' :
+                            colorBase == 'white' ? 'bg-white' :
+                            'bg-gray-600'}">
+
+                <span th:class="'rounded-full animate-bounce ' + ${dotSize} + ' ' + ${colorClass}"
+                      style="animation-delay: 0ms;"></span>
+                <span th:class="'rounded-full animate-bounce ' + ${dotSize} + ' ' + ${colorClass}"
+                      style="animation-delay: 150ms;"></span>
+                <span th:class="'rounded-full animate-bounce ' + ${dotSize} + ' ' + ${colorClass}"
+                      style="animation-delay: 300ms;"></span>
+
+                <span th:if="${label != null}"
+                      class="ml-2 text-sm text-gray-600"
+                      th:text="${label}">Loading...</span>
+            </th:block>
+        </div>
+
+        <!-- Pulse Spinner -->
+        <div th:if="${variantType == 'pulse'}"
+             th:class="'inline-flex flex-col items-center gap-2 ' +
+                      (${isCentered} ? 'justify-center w-full' : '') + ' ' +
+                      ${customClass ?: ''}">
+
+            <th:block th:with="
+                sizeClass=${sizeType == 'sm' ? 'w-8 h-8' :
+                           sizeType == 'lg' ? 'w-16 h-16' :
+                           sizeType == 'xl' ? 'w-20 h-20' :
+                           'w-12 h-12'},
+
+                colorClass=${colorBase == 'primary' ? 'bg-primary-600' :
+                            colorBase == 'success' ? 'bg-green-600' :
+                            colorBase == 'warning' ? 'bg-yellow-500' :
+                            colorBase == 'error' ? 'bg-red-600' :
+                            'bg-gray-600'}">
+
+                <div th:class="'rounded-full animate-pulse ' + ${sizeClass} + ' ' + ${colorClass}"
+                     role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </th:block>
+
+            <span th:if="${label != null}"
+                  class="text-sm text-gray-600"
+                  th:text="${label}">Loading...</span>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Button with Spinner (Loading Button)
+
+  Parameters:
+  - text: Button text (required)
+  - loading: Whether button is in loading state (default: false)
+  - disabled: Whether button is disabled (default: false)
+  - color: Button color (default: primary)
+  - variant: Button variant - filled, outlined (default: filled)
+  - size: Button size (default: md)
+  - type: Button type (default: button)
+-->
+
+<button th:fragment="buttonWithSpinner(text, loading, disabled, color, variant, size, type, customClass)"
+        th:type="${type ?: 'button'}"
+        th:disabled="${(loading ?: false) || (disabled ?: false)}"
+        th:with="
+            isLoading=${loading ?: false},
+            colorBase=${color ?: 'primary'},
+            variantType=${variant ?: 'filled'},
+            sizeType=${size ?: 'md'},
+
+            sizeClass=${sizeType == 'sm' ? 'px-3 py-1.5 text-sm' :
+                       sizeType == 'lg' ? 'px-6 py-3 text-base' :
+                       'px-5 py-2.5 text-sm'},
+
+            colorClass=${variantType == 'filled' ?
+                        (${colorBase == 'primary'} ? 'bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-300' :
+                         'bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-300') :
+                        (${colorBase == 'primary'} ? 'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-300' :
+                         'border-2 border-gray-600 text-gray-600 hover:bg-gray-50 focus:ring-gray-300')}"
+        th:class="'inline-flex items-center gap-2 font-medium rounded-lg focus:ring-4 focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed ' +
+                 ${sizeClass} + ' ' + ${colorClass} + ' ' + ${customClass ?: ''}">
+
+    <!-- Spinner -->
+    <th:block th:if="${isLoading}">
+        <th:block th:replace="~{fragments/components/spinner :: spinner('border', 'sm', 'white', null, false, '')}"></th:block>
+    </th:block>
+
+    <span th:text="${isLoading} ? 'Loading...' : ${text}">Button Text</span>
+</button>
+
+<!--
+  Overlay Spinner (Full Page/Container Loading)
+
+  Parameters:
+  - message: Loading message (optional)
+  - transparent: Use transparent background (default: false)
+  - size: Spinner size (default: lg)
+  - color: Spinner color (default: primary)
+-->
+
+<div th:fragment="overlaySpinner(message, transparent, size, color, customClass)"
+     th:class="'fixed inset-0 z-50 flex items-center justify-center ' +
+              (${transparent} ? 'bg-black/30' : 'bg-white') + ' ' +
+              ${customClass ?: ''}">
+
+    <div class="flex flex-col items-center gap-4">
+        <th:block th:replace="~{fragments/components/spinner :: spinner(
+            'border',
+            ${size ?: 'lg'},
+            ${color ?: 'primary'},
+            null,
+            false,
+            ''
+        )}"></th:block>
+
+        <p th:if="${message != null}"
+           th:class="'text-base font-medium ' + (${transparent} ? 'text-white' : 'text-gray-900')"
+           th:text="${message}">
+            Loading...
+        </p>
+    </div>
+</div>
+
+<!--
+  Skeleton Loader (Content Placeholder)
+
+  Parameters:
+  - type: Skeleton type - text, circle, rectangle (default: text)
+  - lines: Number of lines for text skeleton (default: 3)
+  - height: Height for rectangle/circle (optional)
+  - width: Width for rectangle (optional)
+-->
+
+<div th:fragment="skeleton(type, lines, height, width, customClass)"
+     th:class="'animate-pulse ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        skeletonType=${type ?: 'text'},
+        numLines=${lines ?: 3}">
+
+        <!-- Text Skeleton -->
+        <div th:if="${skeletonType == 'text'}"
+             class="space-y-3">
+            <div th:each="i : ${#numbers.sequence(1, numLines)}"
+                 th:class="'h-4 bg-gray-200 rounded ' +
+                          (${i == numLines} ? 'w-3/4' : 'w-full')">
+            </div>
+        </div>
+
+        <!-- Circle Skeleton -->
+        <div th:if="${skeletonType == 'circle'}"
+             th:class="'rounded-full bg-gray-200 ' +
+                      (${height != null} ? '' : 'w-12 h-12')"
+             th:style="${height != null} ? 'width: ' + ${height} + '; height: ' + ${height} : ''">
+        </div>
+
+        <!-- Rectangle Skeleton -->
+        <div th:if="${skeletonType == 'rectangle'}"
+             th:class="'bg-gray-200 rounded ' +
+                      (${height == null && width == null} ? 'w-full h-48' : '')"
+             th:style="(${height != null} ? 'height: ' + ${height} + ';' : '') +
+                      (${width != null} ? 'width: ' + ${width} + ';' : '')">
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Card Skeleton (Full Card Placeholder)
+-->
+
+<div th:fragment="cardSkeleton(customClass)"
+     th:class="'p-6 bg-white rounded-lg shadow animate-pulse ' + ${customClass ?: ''}">
+
+    <div class="flex items-center gap-4 mb-4">
+        <!-- Avatar Skeleton -->
+        <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+
+        <!-- Title/Subtitle Skeleton -->
+        <div class="flex-1 space-y-2">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+        </div>
+    </div>
+
+    <!-- Content Skeleton -->
+    <div class="space-y-2">
+        <div class="h-3 bg-gray-200 rounded"></div>
+        <div class="h-3 bg-gray-200 rounded"></div>
+        <div class="h-3 bg-gray-200 rounded w-5/6"></div>
+    </div>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple()"
+          th:replace="~{fragments/components/spinner :: spinner('border', 'md', 'primary', null, false, '')}">
+</th:block>
+
+<th:block th:fragment="small()"
+          th:replace="~{fragments/components/spinner :: spinner('border', 'sm', 'primary', null, false, '')}">
+</th:block>
+
+<th:block th:fragment="large()"
+          th:replace="~{fragments/components/spinner :: spinner('border', 'lg', 'primary', null, false, '')}">
+</th:block>
+
+<th:block th:fragment="dots()"
+          th:replace="~{fragments/components/spinner :: spinner('dots', 'md', 'primary', null, false, '')}">
+</th:block>
+
+<th:block th:fragment="centered(label)"
+          th:replace="~{fragments/components/spinner :: spinner('border', 'lg', 'primary', ${label}, true, 'py-12')}">
+</th:block>
+
+</body>
+</html>

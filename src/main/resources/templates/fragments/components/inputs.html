@@ -27,7 +27,7 @@
     <div class="relative">
         <!-- Left Icon -->
         <i th:if="${icon != null}"
-           class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-blue-gray-400 text-xl"
+           class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl pointer-events-none z-10"
            th:text="${icon}">email</i>
 
         <!-- Input Field -->
@@ -40,24 +40,30 @@
             th:required="${required ?: false}"
             th:disabled="${disabled ?: false}"
             th:class="
-                'peer w-full h-full bg-transparent font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent text-sm py-2.5 rounded-[7px] ' +
+                'peer w-full bg-white border rounded-lg text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-0 py-2.5 ' +
                 ${(icon != null) ? 'pl-10 pr-3 ' : 'px-3 '} +
                 ${error != null ?
-                    'border-red-500 focus:border-red-500 text-red-900 ' :
-                    'border-blue-gray-200 focus:border-primary-500 text-blue-gray-700 '}"
+                    'border-red-500 text-red-900 focus:ring-red-500 focus:border-red-500' :
+                    'border-gray-300 text-gray-900 focus:ring-primary-500 focus:border-primary-500'} +
+                ${(disabled ?: false) ? ' bg-gray-50 text-gray-500 cursor-not-allowed' : ''}"
         />
 
         <!-- Floating Label -->
         <label
             th:for="${id}"
             th:class="
-                'flex w-full h-full select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate peer-placeholder-shown:text-blue-gray-500 leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[\' \'] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[\' \'] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent ' +
-                ${(icon != null) ? 'peer-placeholder-shown:left-10 left-10 ' : 'peer-placeholder-shown:left-3 left-3 '} +
+                'absolute cursor-text bg-white px-1 text-sm transition-all transform origin-left pointer-events-none ' +
+                ${(icon != null) ? 'left-10 ' : 'left-2.5 '} +
+                'top-2.5 ' +
+                'peer-focus:-top-2 peer-focus:text-xs peer-focus:scale-90 ' +
+                ${(icon != null) ? 'peer-focus:left-10 ' : 'peer-focus:left-2.5 '} +
+                'peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:scale-90 ' +
+                ${(icon != null) ? 'peer-[:not(:placeholder-shown)]:left-10 ' : 'peer-[:not(:placeholder-shown)]:left-2.5 '} +
                 ${error != null ?
-                    'text-red-500 before:border-red-500 after:border-red-500 peer-focus:text-red-500 peer-focus:before:border-red-500 peer-focus:after:border-red-500 ' :
-                    'text-blue-gray-400 before:border-blue-gray-200 after:border-blue-gray-200 peer-focus:text-primary-500 peer-focus:before:border-primary-500 peer-focus:after:border-primary-500 '}"
-            th:text="${label}">
-            Label
+                    'text-red-500 peer-focus:text-red-500' :
+                    'text-slate-400 peer-focus:text-primary-500'}">
+            <span th:text="${label}">Label</span>
+            <span th:if="${required ?: false}" class="text-red-600">*</span>
         </label>
     </div>
 

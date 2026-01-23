@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Slider Component (Range Input)
+
+  Main Fragment Parameters:
+  - id: Input ID (required)
+  - name: Input name attribute (required)
+  - label: Label text (required)
+  - min: Minimum value (default: 0)
+  - max: Maximum value (default: 100)
+  - step: Step increment (default: 1)
+  - value: Current value (default: min)
+  - disabled: Whether slider is disabled (default: false)
+  - color: Color variant - primary, secondary, success, warning, error (default: primary)
+  - showValue: Show current value (default: true)
+  - showMinMax: Show min/max labels (default: false)
+  - helperText: Helper text below slider (optional)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="slider(id, name, label, min, max, step, value, disabled, color, showValue, showMinMax, helperText, customClass)"
+     th:class="'relative ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        minValue=${min ?: 0},
+        maxValue=${max ?: 100},
+        stepValue=${step ?: 1},
+        currentValue=${value ?: minValue},
+        isDisabled=${disabled ?: false},
+        colorBase=${color ?: 'primary'},
+        shouldShowValue=${showValue != null ? showValue : true},
+        shouldShowMinMax=${showMinMax ?: false},
+
+        colorClass=${colorBase == 'primary' ? 'accent-primary-600' :
+                    colorBase == 'success' ? 'accent-green-600' :
+                    colorBase == 'warning' ? 'accent-yellow-500' :
+                    colorBase == 'error' ? 'accent-red-600' :
+                    'accent-primary-600'}">
+
+        <!-- Label and Value -->
+        <div class="flex justify-between items-center mb-2">
+            <label th:for="${id}"
+                   class="block text-sm font-medium text-gray-900"
+                   th:text="${label}">
+                Slider Label
+            </label>
+
+            <span th:if="${shouldShowValue}"
+                  th:id="${id + '-value'}"
+                  class="text-sm font-medium text-gray-700 min-w-[3rem] text-right"
+                  th:text="${currentValue}">
+                0
+            </span>
+        </div>
+
+        <!-- Slider -->
+        <input th:id="${id}"
+               th:name="${name}"
+               type="range"
+               th:min="${minValue}"
+               th:max="${maxValue}"
+               th:step="${stepValue}"
+               th:value="${currentValue}"
+               th:disabled="${isDisabled}"
+               th:oninput="${shouldShowValue} ? 'document.getElementById(\'' + ${id} + '-value\').textContent = this.value' : ''"
+               th:class="'w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer ' +
+                        ${colorClass} +
+                        (${isDisabled} ? ' opacity-50 cursor-not-allowed' : '')">
+
+        <!-- Min/Max Labels -->
+        <div th:if="${shouldShowMinMax}"
+             class="flex justify-between text-xs text-gray-500 mt-1">
+            <span th:text="${minValue}">0</span>
+            <span th:text="${maxValue}">100</span>
+        </div>
+
+        <!-- Helper Text -->
+        <p th:if="${helperText != null}"
+           class="mt-2 text-xs text-gray-500"
+           th:text="${helperText}">
+            Helper text
+        </p>
+    </th:block>
+</div>
+
+<!--
+  Dual Slider (Range with Min and Max)
+
+  Parameters:
+  - id: Base ID for inputs (required)
+  - nameMin: Name for min input (required)
+  - nameMax: Name for max input (required)
+  - label: Label text (required)
+  - min: Minimum value (default: 0)
+  - max: Maximum value (default: 100)
+  - step: Step increment (default: 1)
+  - valueMin: Current min value (default: min)
+  - valueMax: Current max value (default: max)
+  - Other parameters same as slider
+-->
+
+<div th:fragment="dualSlider(id, nameMin, nameMax, label, min, max, step, valueMin, valueMax, disabled, color, showValues, customClass)"
+     th:class="'relative ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        minValue=${min ?: 0},
+        maxValue=${max ?: 100},
+        stepValue=${step ?: 1},
+        currentMin=${valueMin ?: minValue},
+        currentMax=${valueMax ?: maxValue},
+        isDisabled=${disabled ?: false},
+        colorBase=${color ?: 'primary'},
+        shouldShowValues=${showValues != null ? showValues : true}">
+
+        <!-- Label and Values -->
+        <div class="flex justify-between items-center mb-2">
+            <label class="block text-sm font-medium text-gray-900"
+                   th:text="${label}">
+                Range Slider
+            </label>
+
+            <span th:if="${shouldShowValues}"
+                  class="text-sm font-medium text-gray-700">
+                <span th:id="${id + '-min-value'}" th:text="${currentMin}">0</span>
+                -
+                <span th:id="${id + '-max-value'}" th:text="${currentMax}">100</span>
+            </span>
+        </div>
+
+        <!-- Dual Slider Container -->
+        <div class="relative h-2 bg-gray-200 rounded-lg">
+            <!-- Min Slider -->
+            <input th:id="${id + '-min'}"
+                   th:name="${nameMin}"
+                   type="range"
+                   th:min="${minValue}"
+                   th:max="${maxValue}"
+                   th:step="${stepValue}"
+                   th:value="${currentMin}"
+                   th:disabled="${isDisabled}"
+                   th:oninput="
+                       'let minVal = parseInt(this.value);' +
+                       'let maxVal = parseInt(document.getElementById(\'' + ${id} + '-max\').value);' +
+                       'if (minVal > maxVal) { this.value = maxVal; minVal = maxVal; }' +
+                       (${shouldShowValues} ? 'document.getElementById(\'' + ${id} + '-min-value\').textContent = minVal;' : '')"
+                   class="absolute w-full h-2 bg-transparent appearance-none cursor-pointer pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-moz-range-thumb]:pointer-events-auto">
+
+            <!-- Max Slider -->
+            <input th:id="${id + '-max'}"
+                   th:name="${nameMax}"
+                   type="range"
+                   th:min="${minValue}"
+                   th:max="${maxValue}"
+                   th:step="${stepValue}"
+                   th:value="${currentMax}"
+                   th:disabled="${isDisabled}"
+                   th:oninput="
+                       'let maxVal = parseInt(this.value);' +
+                       'let minVal = parseInt(document.getElementById(\'' + ${id} + '-min\').value);' +
+                       'if (maxVal < minVal) { this.value = minVal; maxVal = minVal; }' +
+                       (${shouldShowValues} ? 'document.getElementById(\'' + ${id} + '-max-value\').textContent = maxVal;' : '')"
+                   class="absolute w-full h-2 bg-transparent appearance-none cursor-pointer pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-moz-range-thumb]:pointer-events-auto">
+        </div>
+
+        <!-- Min/Max Labels -->
+        <div class="flex justify-between text-xs text-gray-500 mt-1">
+            <span th:text="${minValue}">0</span>
+            <span th:text="${maxValue}">100</span>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Slider with Steps/Marks
+
+  Parameters: Same as slider + marks
+  - marks: List of mark values to show on slider (optional)
+-->
+
+<div th:fragment="sliderWithMarks(id, name, label, min, max, step, value, marks, disabled, color, showValue, customClass)"
+     th:class="'relative ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        minValue=${min ?: 0},
+        maxValue=${max ?: 100},
+        stepValue=${step ?: 1},
+        currentValue=${value ?: minValue},
+        isDisabled=${disabled ?: false},
+        shouldShowValue=${showValue != null ? showValue : true}">
+
+        <!-- Label and Value -->
+        <div class="flex justify-between items-center mb-2">
+            <label th:for="${id}"
+                   class="block text-sm font-medium text-gray-900"
+                   th:text="${label}">
+                Slider Label
+            </label>
+
+            <span th:if="${shouldShowValue}"
+                  th:id="${id + '-value'}"
+                  class="text-sm font-medium text-gray-700"
+                  th:text="${currentValue}">
+                0
+            </span>
+        </div>
+
+        <!-- Slider -->
+        <th:block th:replace="~{fragments/components/slider :: slider(
+            ${id},
+            ${name},
+            '',
+            ${min},
+            ${max},
+            ${step},
+            ${value},
+            ${disabled},
+            ${color},
+            false,
+            false,
+            null,
+            'mb-6'
+        )}"></th:block>
+
+        <!-- Marks -->
+        <div th:if="${marks != null}"
+             class="relative -mt-4">
+            <div class="flex justify-between">
+                <span th:each="mark : ${marks}"
+                      class="text-xs text-gray-500 flex flex-col items-center"
+                      th:style="'position: absolute; left: ' + (${(mark - minValue) * 100.0 / (maxValue - minValue)}) + '%; transform: translateX(-50%);'">
+                    <span class="w-px h-2 bg-gray-400 mb-1"></span>
+                    <span th:text="${mark}">0</span>
+                </span>
+            </div>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Vertical Slider
+
+  Parameters: Same as slider + height
+  - height: Height in pixels or CSS value (default: 200px)
+-->
+
+<div th:fragment="verticalSlider(id, name, label, min, max, step, value, disabled, color, showValue, height, customClass)"
+     th:class="'flex gap-4 items-center ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        minValue=${min ?: 0},
+        maxValue=${max ?: 100},
+        stepValue=${step ?: 1},
+        currentValue=${value ?: minValue},
+        isDisabled=${disabled ?: false},
+        shouldShowValue=${showValue != null ? showValue : true},
+        sliderHeight=${height ?: '200px'}">
+
+        <!-- Slider -->
+        <input th:id="${id}"
+               th:name="${name}"
+               type="range"
+               th:min="${minValue}"
+               th:max="${maxValue}"
+               th:step="${stepValue}"
+               th:value="${currentValue}"
+               th:disabled="${isDisabled}"
+               th:oninput="${shouldShowValue} ? 'document.getElementById(\'' + ${id} + '-value\').textContent = this.value' : ''"
+               th:style="'height: ' + ${sliderHeight} + '; width: 0.5rem;'"
+               class="appearance-none bg-gray-200 rounded-lg cursor-pointer accent-primary-600"
+               style="writing-mode: bt-lr; -webkit-appearance: slider-vertical;">
+
+        <!-- Label and Value -->
+        <div class="flex flex-col items-start gap-2">
+            <label th:for="${id}"
+                   class="text-sm font-medium text-gray-900"
+                   th:text="${label}">
+                Vertical Slider
+            </label>
+
+            <span th:if="${shouldShowValue}"
+                  th:id="${id + '-value'}"
+                  class="text-sm font-medium text-gray-700"
+                  th:text="${currentValue}">
+                0
+            </span>
+        </div>
+    </th:block>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(id, name, label, min, max)"
+          th:replace="~{fragments/components/slider :: slider(${id}, ${name}, ${label}, ${min}, ${max}, 1, ${min}, false, 'primary', true, false, null, '')}">
+</th:block>
+
+<th:block th:fragment="withMinMax(id, name, label, min, max)"
+          th:replace="~{fragments/components/slider :: slider(${id}, ${name}, ${label}, ${min}, ${max}, 1, ${min}, false, 'primary', true, true, null, '')}">
+</th:block>
+
+</body>
+</html>

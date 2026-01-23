@@ -242,12 +242,38 @@ Używaj named fragments dla dynamicznej treści w komponentach:
 
 | Komponent | Plik | Przykład użycia |
 |-----------|------|-----------------|
-| Button | `buttons.html` | `~{fragments/components/buttons :: button(...)}` |
-| Input | `inputs.html` | `~{fragments/components/inputs :: input(...)}` |
-| Alert | `alerts.html` | `~{fragments/components/alerts :: success('Message', true)}` |
-| Card | `cards.html` | `~{fragments/components/cards :: card(...)}` |
+| **Layout & Navigation** |||
 | Navbar | `navbar.html` | `~{fragments/components/navbar :: navbar}` |
 | Footer | `footer.html` | `~{fragments/components/footer :: footer}` |
+| Breadcrumbs | `breadcrumbs.html` | `~{fragments/components/breadcrumbs :: breadcrumbs(items, '/', '')}` |
+| Tabs | `tabs.html` | `~{fragments/components/tabs :: tabs(id, tabs, 'underline', 'primary', false, '')}` |
+| **Forms & Inputs** |||
+| Button | `buttons.html` | `~{fragments/components/buttons :: button(...)}` |
+| Input | `inputs.html` | `~{fragments/components/inputs :: input(...)}` |
+| Textarea | `textarea.html` | `~{fragments/components/textarea :: textarea(...)}` |
+| Select | `select.html` | `~{fragments/components/select :: select(...)}` |
+| Checkbox | `checkbox.html` | `~{fragments/components/checkbox :: checkbox(...)}` |
+| Radio | `radio.html` | `~{fragments/components/radio :: radio(...)}` |
+| Switch | `switch.html` | `~{fragments/components/switch :: switch(...)}` |
+| Slider | `slider.html` | `~{fragments/components/slider :: slider(...)}` |
+| **Data Display** |||
+| Card | `cards.html` | `~{fragments/components/cards :: card(...)}` |
+| List | `list.html` | `~{fragments/components/list :: list(items, 'simple', '', '')}` |
+| Avatar | `avatar.html` | `~{fragments/components/avatar :: avatar(src, alt, initials, 'md', 'circular', false, '')}` |
+| Badge | `badge.html` | `~{fragments/components/badge :: badge(text, 'primary', 'filled', 'md', false, false, '')}` |
+| Chip | `chip.html` | `~{fragments/components/chip :: chip(text, null, null, 'gray', 'filled', 'md', false, null, '')}` |
+| Accordion | `accordion.html` | `~{fragments/components/accordion :: accordion(id, items, false, '')}` |
+| Tooltip | `tooltip.html` | `~{fragments/components/tooltip :: tooltip(id, text, 'top', 'hover', content, '')}` |
+| Typography | `typography.html` | `~{fragments/components/typography :: h1(text, '')}` |
+| **Feedback** |||
+| Alert | `alerts.html` | `~{fragments/components/alerts :: success('Message', true)}` |
+| Dialog | `dialog.html` | `~{fragments/components/dialog :: dialog(id, title, content, actions, 'md', true, '')}` |
+| Progress | `progress.html` | `~{fragments/components/progress :: progress(value, 100, label, true, 'primary', 'md', false, false, '')}` |
+| Spinner | `spinner.html` | `~{fragments/components/spinner :: spinner('border', 'md', 'primary', null, false, '')}` |
+| Rating | `rating.html` | `~{fragments/components/rating :: rating(value, 5, true, null, 'md', 'yellow', false, 1, '')}` |
+| **Navigation** |||
+| Dropdown | `dropdown.html` | `~{fragments/components/dropdown :: dropdown(id, buttonText, null, items, 'primary', 'filled', 'md', 'left', '')}` |
+| Pagination | `pagination.html` | `~{fragments/components/pagination :: pagination(currentPage, totalPages, baseUrl, 'page', 'numbered', true, 7, '')}` |
 
 ### Button Variants
 
@@ -299,6 +325,358 @@ Używaj named fragments dla dynamicznej treści w komponentach:
 
 <!-- Warning -->
 <div th:replace="~{fragments/components/alerts :: warning('Warning message.', false)}"></div>
+```
+
+### Nowe Komponenty - Przykłady Użycia
+
+#### Accordion
+
+```html
+<!-- Simple accordion -->
+<div th:replace="~{fragments/components/accordion :: accordion('myAccordion', ${items}, false, '')}"></div>
+
+<!-- Where items is a List with objects having 'title' and 'content' -->
+```
+
+#### Avatar
+
+```html
+<!-- Avatar with image -->
+<th:block th:replace="~{fragments/components/avatar :: avatar('/images/user.jpg', 'John Doe', null, 'md', 'circular', false, '')}"></th:block>
+
+<!-- Avatar with initials -->
+<th:block th:replace="~{fragments/components/avatar :: avatar(null, 'John Doe', 'JD', 'md', 'circular', false, '')}"></th:block>
+
+<!-- Avatar with status -->
+<div th:replace="~{fragments/components/avatar :: avatarWithStatus('/images/user.jpg', 'John Doe', null, 'md', 'circular', false, 'online', '')}"></div>
+
+<!-- Avatar group -->
+<div th:replace="~{fragments/components/avatar :: avatarGroup(${users}, 'md', 5)}"></div>
+```
+
+#### Badge
+
+```html
+<!-- Primary badge -->
+<th:block th:replace="~{fragments/components/badge :: badge('New', 'primary', 'filled', 'md', false, false, '')}"></th:block>
+
+<!-- Badge with icon -->
+<span th:replace="~{fragments/components/badge :: badgeWithIcon('3 notifications', 'notifications', 'left', 'error', 'filled', 'md', false, '')}"></span>
+
+<!-- Pill badge -->
+<th:block th:replace="~{fragments/components/badge :: pill('Active', 'success')}"></th:block>
+
+<!-- Dot indicator -->
+<th:block th:replace="~{fragments/components/badge :: dot('online')}"></th:block>
+```
+
+#### Breadcrumbs
+
+```html
+<!-- Basic breadcrumbs -->
+<nav th:replace="~{fragments/components/breadcrumbs :: breadcrumbs(${breadcrumbItems}, 'chevron_right', '')}"></nav>
+
+<!-- With background -->
+<nav th:replace="~{fragments/components/breadcrumbs :: breadcrumbsWithBg(${breadcrumbItems}, 'chevron_right', '')}"></nav>
+
+<!-- Where breadcrumbItems is a List with objects having 'text' and 'url' -->
+```
+
+#### Checkbox
+
+```html
+<!-- Simple checkbox -->
+<div th:replace="~{fragments/components/checkbox :: checkbox('agree', 'agree', 'I agree to terms', 'true', false, false, 'primary', null, null, '')}"></div>
+
+<!-- Checkbox group -->
+<fieldset th:replace="~{fragments/components/checkbox :: checkboxGroup('Select options', 'options', ${checkboxOptions}, false, 'primary', null, '')}"></fieldset>
+
+<!-- Toggle switch styled checkbox -->
+<div th:replace="~{fragments/components/checkbox :: toggle('notifications', 'notifications', 'Enable notifications', false, false, 'primary', 'Get notified about updates', '')}"></div>
+```
+
+#### Chip
+
+```html
+<!-- Simple chip -->
+<th:block th:replace="~{fragments/components/chip :: simple('Technology')}"></th:block>
+
+<!-- Chip with icon -->
+<div th:replace="~{fragments/components/chip :: chip('Favorites', 'star', null, 'primary', 'filled', 'md', false, null, '')}"></div>
+
+<!-- Removable chip -->
+<div th:replace="~{fragments/components/chip :: chip('Filter', null, null, 'gray', 'filled', 'md', true, 'removeChip()', '')}"></div>
+
+<!-- Chip group -->
+<div th:replace="~{fragments/components/chip :: chipGroup(${tags}, 'gray', 'filled', 'md', false, '')}"></div>
+```
+
+#### Dialog/Modal
+
+```html
+<!-- Basic dialog -->
+<div th:replace="~{fragments/components/dialog :: dialog('myDialog', 'Dialog Title', ~{::dialog-content}, ~{::dialog-actions}, 'md', true, '')}">
+    <div th:fragment="dialog-content">
+        <p>Dialog content goes here</p>
+    </div>
+    <div th:fragment="dialog-actions">
+        <th:block th:replace="~{fragments/components/buttons :: primary('Save', null)}"></th:block>
+    </div>
+</div>
+
+<!-- Confirmation dialog -->
+<div th:replace="~{fragments/components/dialog :: confirmDialog('confirmDelete', 'Delete Item', 'Are you sure?', 'Delete', 'Cancel', 'error', 'handleDelete()')}"></div>
+
+<!-- Alert dialog -->
+<div th:replace="~{fragments/components/dialog :: alertDialog('alertDialog', 'Success', 'Operation completed!', 'check_circle', 'text-green-600', 'OK')}"></div>
+```
+
+#### Dropdown
+
+```html
+<!-- Basic dropdown -->
+<div th:replace="~{fragments/components/dropdown :: dropdown('myDropdown', 'Actions', null, ${menuItems}, 'primary', 'filled', 'md', 'left', '')}"></div>
+
+<!-- User dropdown -->
+<div th:replace="~{fragments/components/dropdown :: userDropdown('userMenu', ${userName}, ${userEmail}, ${avatarUrl}, null, ${userMenuItems}, '')}"></div>
+
+<!-- Icon dropdown -->
+<div th:replace="~{fragments/components/dropdown :: iconDropdown('moreMenu', 'more_vert', ${actions}, 'gray', 'right', '')}"></div>
+```
+
+#### List
+
+```html
+<!-- Simple list -->
+<ul th:replace="~{fragments/components/list :: list(${listItems}, 'simple', '', '')}"></ul>
+
+<!-- Bordered list -->
+<ul th:replace="~{fragments/components/list :: bordered(${listItems})}"></ul>
+
+<!-- Selectable list -->
+<ul th:replace="~{fragments/components/list :: selectableList(${items}, 'selectedItems', 'divided', '', '')}"></ul>
+
+<!-- Action list -->
+<ul th:replace="~{fragments/components/list :: actionList(${items}, 'bordered', '', '')}"></ul>
+```
+
+#### Pagination
+
+```html
+<!-- Simple pagination -->
+<nav th:replace="~{fragments/components/pagination :: pagination(${currentPage}, ${totalPages}, '/items', 'page', 'numbered', true, 7, '')}"></nav>
+
+<!-- With page size selector -->
+<div th:replace="~{fragments/components/pagination :: paginationWithSize(${currentPage}, ${totalPages}, '/items', 'page', ${pageSizes}, ${pageSize}, 'size', 'numbered', true, 7, '')}"></div>
+
+<!-- Load more button -->
+<div th:replace="~{fragments/components/pagination :: loadMore(${currentPage}, ${totalPages}, '/items?page=' + ${currentPage + 1}, false, '')}"></div>
+```
+
+#### Progress Bar
+
+```html
+<!-- Simple progress bar -->
+<div th:replace="~{fragments/components/progress :: progress(65, 100, 'Upload progress', true, 'primary', 'md', false, false, '')}"></div>
+
+<!-- Striped and animated -->
+<div th:replace="~{fragments/components/progress :: striped(75, 'Loading')}"></div>
+
+<!-- Circular progress -->
+<div th:replace="~{fragments/components/progress :: circularProgress(80, 100, 80, 8, 'primary', true, null, '')}"></div>
+
+<!-- Indeterminate spinner -->
+<div th:replace="~{fragments/components/progress :: indeterminate('primary', 'md', 'Loading...', '')}"></div>
+
+<!-- Stepped progress -->
+<div th:replace="~{fragments/components/progress :: steppedProgress(${steps}, ${currentStep}, 'primary', '')}"></div>
+```
+
+#### Radio Button
+
+```html
+<!-- Simple radio -->
+<div th:replace="~{fragments/components/radio :: radio('option1', 'choice', 'Option 1', 'value1', false, false, 'primary', null, null, '')}"></div>
+
+<!-- Radio group -->
+<fieldset th:replace="~{fragments/components/radio :: radioGroup('Select an option', 'choice', ${radioOptions}, false, 'primary', 'vertical', null, '')}"></fieldset>
+
+<!-- Card radio -->
+<label th:replace="~{fragments/components/radio :: cardRadio('cardOption1', 'plan', 'Basic Plan', '$9/month', 'account_circle', 'basic', false, false, '')}"></label>
+
+<!-- Button radio group -->
+<div th:replace="~{fragments/components/radio :: buttonRadioGroup('view', ${viewOptions}, 'primary', 'md', '')}"></div>
+```
+
+#### Rating
+
+```html
+<!-- Simple rating (read-only) -->
+<div th:replace="~{fragments/components/rating :: rating(4.5, 5, true, null, 'md', 'yellow', false, 0.5, '')}"></div>
+
+<!-- Rating with reviews count -->
+<div th:replace="~{fragments/components/rating :: ratingWithReviews(4.2, 5, 128, true, 'md', 'yellow', '')}"></div>
+
+<!-- Aggregate rating with distribution -->
+<div th:replace="~{fragments/components/rating :: ratingAggregate(${avgRating}, 5, ${totalRatings}, 'md', true, ${distribution}, '')}"></div>
+
+<!-- Interactive rating -->
+<div th:replace="~{fragments/components/rating :: interactiveRating('rating', 5, 0, 'lg', 'yellow', '')}"></div>
+```
+
+#### Select
+
+```html
+<!-- Basic select -->
+<div th:replace="~{fragments/components/select :: select('country', 'country', 'Country', ${countries}, 'Select country', false, false, 'md', null, null, null, '')}"></div>
+
+<!-- Multi-select -->
+<div th:replace="~{fragments/components/select :: multiSelect('skills', 'skills', 'Skills', ${skillOptions}, true, false, 'md', null, 'Hold Ctrl to select multiple', '')}"></div>
+
+<!-- Grouped select -->
+<div th:replace="~{fragments/components/select :: groupedSelect('category', 'category', 'Category', ${groupedOptions}, 'Select category', false, false, 'md', null, null, '')}"></div>
+```
+
+#### Slider
+
+```html
+<!-- Simple slider -->
+<div th:replace="~{fragments/components/slider :: slider('volume', 'volume', 'Volume', 0, 100, 1, 50, false, 'primary', true, false, null, '')}"></div>
+
+<!-- Slider with min/max labels -->
+<div th:replace="~{fragments/components/slider :: withMinMax('price', 'price', 'Price', 0, 1000)}"></div>
+
+<!-- Dual range slider -->
+<div th:replace="~{fragments/components/slider :: dualSlider('priceRange', 'minPrice', 'maxPrice', 'Price Range', 0, 1000, 10, 100, 800, false, 'primary', true, '')}"></div>
+
+<!-- Slider with marks -->
+<div th:replace="~{fragments/components/slider :: sliderWithMarks('rating', 'rating', 'Rating', 0, 10, 1, 5, ${marks}, false, 'primary', true, '')}"></div>
+```
+
+#### Spinner/Loader
+
+```html
+<!-- Border spinner -->
+<th:block th:replace="~{fragments/components/spinner :: spinner('border', 'md', 'primary', null, false, '')}"></th:block>
+
+<!-- Dots spinner -->
+<th:block th:replace="~{fragments/components/spinner :: dots()}"></th:block>
+
+<!-- Centered with label -->
+<div th:replace="~{fragments/components/spinner :: centered('Loading content...')}"></div>
+
+<!-- Button with spinner -->
+<button th:replace="~{fragments/components/spinner :: buttonWithSpinner('Save', ${isLoading}, false, 'primary', 'filled', 'md', 'submit', '')}"></button>
+
+<!-- Overlay spinner -->
+<div th:replace="~{fragments/components/spinner :: overlaySpinner('Please wait...', false, 'lg', 'primary', '')}"></div>
+
+<!-- Skeleton loader -->
+<div th:replace="~{fragments/components/spinner :: skeleton('text', 3, null, null, '')}"></div>
+```
+
+#### Switch/Toggle
+
+```html
+<!-- Simple switch -->
+<div th:replace="~{fragments/components/switch :: switch('enabled', 'enabled', 'Enable feature', false, false, 'primary', 'md', null, 'left', '')}"></div>
+
+<!-- Switch with description -->
+<div th:replace="~{fragments/components/switch :: withDescription('notifications', 'notifications', 'Push Notifications', 'Receive notifications on your device')}"></div>
+
+<!-- Switch with icons -->
+<div th:replace="~{fragments/components/switch :: switchWithIcon('darkMode', 'darkMode', 'Dark Mode', false, false, 'primary', 'md', 'check', 'close', '')}"></div>
+
+<!-- Compact switch -->
+<label th:replace="~{fragments/components/switch :: compactSwitch('compact', 'compact', 'Compact', false, false, 'primary', '')}"></label>
+```
+
+#### Tabs
+
+```html
+<!-- Underline tabs -->
+<div th:replace="~{fragments/components/tabs :: tabs('myTabs', ${tabItems}, 'underline', 'primary', false, '')}"></div>
+
+<!-- Pills tabs -->
+<div th:replace="~{fragments/components/tabs :: pills('pillTabs', ${tabItems})}"></div>
+
+<!-- Full width tabs -->
+<div th:replace="~{fragments/components/tabs :: fullWidth('fullTabs', ${tabItems})}"></div>
+
+<!-- Vertical tabs -->
+<div th:replace="~{fragments/components/tabs :: verticalTabs('verticalTabs', ${tabItems}, 'primary', '')}"></div>
+
+<!-- Where tabItems is a List with objects having 'id', 'label', 'icon', 'content', 'active' -->
+```
+
+#### Textarea
+
+```html
+<!-- Simple textarea -->
+<div th:replace="~{fragments/components/textarea :: textarea('message', 'message', 'Message', 'Enter your message', null, 4, false, false, false, null, 'vertical', null, null, false, '')}"></div>
+
+<!-- With character count -->
+<div th:replace="~{fragments/components/textarea :: withCharCount('bio', 'bio', 'Biography', 500)}"></div>
+
+<!-- Auto-resize textarea -->
+<div th:replace="~{fragments/components/textarea :: autoResizeTextarea('comment', 'comment', 'Comment', 'Type your comment', null, 3, 10, false, false, null, null, '')}"></div>
+
+<!-- Rich text editor -->
+<div th:replace="~{fragments/components/textarea :: richTextarea('content', 'content', 'Content', 'Enter content', null, 6, false, false, null, null, null, '')}"></div>
+```
+
+#### Tooltip
+
+```html
+<!-- Simple tooltip -->
+<span th:replace="~{fragments/components/tooltip :: tooltip('tip1', 'Helpful information', 'top', 'hover', ~{::tooltip-trigger}, '')}">
+    <span th:fragment="tooltip-trigger">Hover me</span>
+</span>
+
+<!-- Icon with tooltip -->
+<span th:replace="~{fragments/components/tooltip :: iconTooltip('helpTip', 'help_outline', 'This is helpful information', 'top', 'text-gray-600', 'text-base', '')}"></span>
+
+<!-- Help text with tooltip -->
+<span th:replace="~{fragments/components/tooltip :: helpTooltip('help1', 'Field Label', 'Explanation of this field', 'top', '')}"></span>
+
+<!-- Rich tooltip -->
+<div th:replace="~{fragments/components/tooltip :: richTooltip('richTip', 'Tooltip Title', 'Detailed description here', 'top', ~{::trigger}, '')}">
+    <button th:fragment="trigger" class="btn">Hover me</button>
+</div>
+```
+
+#### Typography
+
+```html
+<!-- Headings -->
+<th:block th:replace="~{fragments/components/typography :: h1('Main Title', '')}"></th:block>
+<th:block th:replace="~{fragments/components/typography :: h2('Section Title', '')}"></th:block>
+
+<!-- Paragraph -->
+<p th:replace="~{fragments/components/typography :: paragraph('Lorem ipsum dolor sit amet...', '')}"></p>
+
+<!-- Lead paragraph -->
+<p th:replace="~{fragments/components/typography :: lead('Introduction text...', '')}"></p>
+
+<!-- Links -->
+<a th:replace="~{fragments/components/typography :: link('Click here', '/page', '')}"></a>
+<a th:replace="~{fragments/components/typography :: externalLink('External site', 'https://example.com', '')}"></a>
+
+<!-- Code -->
+<code th:replace="~{fragments/components/typography :: code('const x = 10;', '')}"></code>
+
+<!-- Blockquote -->
+<blockquote th:replace="~{fragments/components/typography :: blockquote('Quote text', 'Author Name', '')}"></blockquote>
+
+<!-- Colored text -->
+<span th:replace="~{fragments/components/typography :: coloredText('Success!', 'success', '')}"></span>
+
+<!-- Gradient text -->
+<span th:replace="~{fragments/components/typography :: gradientText('Premium Feature', 'text-3xl')}"></span>
+
+<!-- Lists -->
+<ul th:replace="~{fragments/components/typography :: ul(${items}, '')}"></ul>
+<ol th:replace="~{fragments/components/typography :: ol(${items}, '')}"></ol>
 ```
 
 ---

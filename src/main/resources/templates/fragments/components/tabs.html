@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Tabs Component
+
+  Main Fragment Parameters:
+  - id: Unique ID for tabs (required)
+  - tabs: List of tab objects with 'id', 'label', 'icon', 'content', 'active' (required)
+  - variant: Style variant - underline, pills, bordered (default: underline)
+  - color: Color variant - primary, secondary (default: primary)
+  - fullWidth: Make tabs full width (default: false)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="tabs(id, tabs, variant, color, fullWidth, customClass)"
+     th:class="'w-full ' + ${customClass ?: ''}"
+     th:attr="data-tabs-id=${id}">
+
+    <th:block th:with="
+        variantType=${variant ?: 'underline'},
+        colorBase=${color ?: 'primary'},
+        isFullWidth=${fullWidth ?: false}">
+
+        <!-- Underline Tabs -->
+        <div th:if="${variantType == 'underline'}">
+            <!-- Tab Headers -->
+            <div th:class="'border-b border-gray-200 ' + (${isFullWidth} ? 'flex' : '')">
+                <ul th:class="'-mb-px flex text-sm font-medium text-center ' +
+                             (${isFullWidth} ? 'w-full' : 'flex-wrap')"
+                    role="tablist">
+
+                    <li th:each="tab, iterStat : ${tabs}"
+                        th:class="${isFullWidth} ? 'flex-1' : ''"
+                        role="presentation">
+
+                        <button th:id="${id + '-tab-' + tab.id}"
+                                th:attr="data-tabs-target='#' + ${id} + '-panel-' + ${tab.id}"
+                                type="button"
+                                role="tab"
+                                th:aria-controls="${id + '-panel-' + tab.id}"
+                                th:aria-selected="${tab.active ?: false}"
+                                th:class="'inline-flex items-center gap-2 p-4 border-b-2 rounded-t-lg transition-colors ' +
+                                         (${tab.active} ?
+                                          (${colorBase == 'primary'} ? 'text-primary-600 border-primary-600' : 'text-gray-900 border-gray-900') :
+                                          'text-gray-500 border-transparent hover:text-gray-600 hover:border-gray-300') +
+                                         (${isFullWidth} ? ' w-full justify-center' : '')">
+
+                            <i th:if="${tab.icon != null}"
+                               class="material-icons text-base"
+                               th:text="${tab.icon}">icon</i>
+
+                            <span th:text="${tab.label}">Tab Label</span>
+
+                            <span th:if="${tab.badge != null}"
+                                  th:class="'inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full ' +
+                                           (${tab.active} ? 'bg-primary-100 text-primary-800' : 'bg-gray-100 text-gray-800')"
+                                  th:text="${tab.badge}">3</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tab Panels -->
+            <div th:each="tab : ${tabs}">
+                <div th:id="${id + '-panel-' + tab.id}"
+                     role="tabpanel"
+                     th:aria-labelledby="${id + '-tab-' + tab.id}"
+                     th:class="'p-4 ' + (${!tab.active} ? 'hidden' : '')">
+
+                    <th:block th:replace="${tab.content}"></th:block>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pills Tabs -->
+        <div th:if="${variantType == 'pills'}">
+            <!-- Tab Headers -->
+            <div th:class="'mb-4 ' + (${isFullWidth} ? 'flex' : '')">
+                <ul th:class="'flex text-sm font-medium text-center ' +
+                             (${isFullWidth} ? 'w-full' : 'flex-wrap gap-2')"
+                    role="tablist">
+
+                    <li th:each="tab, iterStat : ${tabs}"
+                        th:class="${isFullWidth} ? 'flex-1' : ''"
+                        role="presentation">
+
+                        <button th:id="${id + '-tab-' + tab.id}"
+                                th:attr="data-tabs-target='#' + ${id} + '-panel-' + ${tab.id}"
+                                type="button"
+                                role="tab"
+                                th:aria-controls="${id + '-panel-' + tab.id}"
+                                th:aria-selected="${tab.active ?: false}"
+                                th:class="'inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ' +
+                                         (${tab.active} ?
+                                          (${colorBase == 'primary'} ? 'text-white bg-primary-600' : 'text-white bg-gray-900') :
+                                          'text-gray-500 hover:text-gray-700 hover:bg-gray-100') +
+                                         (${isFullWidth} ? ' w-full justify-center' : '')">
+
+                            <i th:if="${tab.icon != null}"
+                               class="material-icons text-base"
+                               th:text="${tab.icon}">icon</i>
+
+                            <span th:text="${tab.label}">Tab Label</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tab Panels -->
+            <div th:each="tab : ${tabs}">
+                <div th:id="${id + '-panel-' + tab.id}"
+                     role="tabpanel"
+                     th:aria-labelledby="${id + '-tab-' + tab.id}"
+                     th:class="'p-4 ' + (${!tab.active} ? 'hidden' : '')">
+
+                    <th:block th:replace="${tab.content}"></th:block>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bordered Tabs -->
+        <div th:if="${variantType == 'bordered'}">
+            <div class="border border-gray-200 rounded-lg">
+                <!-- Tab Headers -->
+                <div th:class="'bg-gray-50 border-b border-gray-200 rounded-t-lg ' + (${isFullWidth} ? 'flex' : '')">
+                    <ul th:class="'flex text-sm font-medium text-center ' +
+                                 (${isFullWidth} ? 'w-full' : 'flex-wrap')"
+                        role="tablist">
+
+                        <li th:each="tab, iterStat : ${tabs}"
+                            th:class="${isFullWidth} ? 'flex-1' : ''"
+                            role="presentation">
+
+                            <button th:id="${id + '-tab-' + tab.id}"
+                                    th:attr="data-tabs-target='#' + ${id} + '-panel-' + ${tab.id}"
+                                    type="button"
+                                    role="tab"
+                                    th:aria-controls="${id + '-panel-' + tab.id}"
+                                    th:aria-selected="${tab.active ?: false}"
+                                    th:class="'inline-flex items-center gap-2 p-4 transition-colors ' +
+                                             (${tab.active} ?
+                                              (${colorBase == 'primary'} ? 'text-primary-600 bg-white border-b-2 border-primary-600' :
+                                               'text-gray-900 bg-white border-b-2 border-gray-900') :
+                                              'text-gray-500 hover:text-gray-700 hover:bg-gray-100') +
+                                             (${iterStat.first} ? ' rounded-tl-lg' : '') +
+                                             (${iterStat.last} ? ' rounded-tr-lg' : '') +
+                                             (${isFullWidth} ? ' w-full justify-center' : '')">
+
+                                <i th:if="${tab.icon != null}"
+                                   class="material-icons text-base"
+                                   th:text="${tab.icon}">icon</i>
+
+                                <span th:text="${tab.label}">Tab Label</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tab Panels -->
+                <div th:each="tab : ${tabs}">
+                    <div th:id="${id + '-panel-' + tab.id}"
+                         role="tabpanel"
+                         th:aria-labelledby="${id + '-tab-' + tab.id}"
+                         th:class="'p-4 ' + (${!tab.active} ? 'hidden' : '')">
+
+                        <th:block th:replace="${tab.content}"></th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Vertical Tabs
+
+  Parameters: Same as tabs
+-->
+
+<div th:fragment="verticalTabs(id, tabs, color, customClass)"
+     th:class="'flex gap-4 ' + ${customClass ?: ''}"
+     th:attr="data-tabs-id=${id}">
+
+    <th:block th:with="colorBase=${color ?: 'primary'}">
+
+        <!-- Tab Headers (Vertical) -->
+        <div class="w-48 flex-shrink-0">
+            <ul class="space-y-2 text-sm font-medium"
+                role="tablist">
+
+                <li th:each="tab : ${tabs}"
+                    role="presentation">
+
+                    <button th:id="${id + '-tab-' + tab.id}"
+                            th:attr="data-tabs-target='#' + ${id} + '-panel-' + ${tab.id}"
+                            type="button"
+                            role="tab"
+                            th:aria-controls="${id + '-panel-' + tab.id}"
+                            th:aria-selected="${tab.active ?: false}"
+                            th:class="'flex items-center gap-2 w-full px-4 py-2 rounded-lg text-left transition-colors ' +
+                                     (${tab.active} ?
+                                      (${colorBase == 'primary'} ? 'text-white bg-primary-600' : 'text-white bg-gray-900') :
+                                      'text-gray-500 hover:text-gray-700 hover:bg-gray-100')">
+
+                        <i th:if="${tab.icon != null}"
+                           class="material-icons text-base"
+                           th:text="${tab.icon}">icon</i>
+
+                        <span th:text="${tab.label}">Tab Label</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Panels -->
+        <div class="flex-1">
+            <div th:each="tab : ${tabs}">
+                <div th:id="${id + '-panel-' + tab.id}"
+                     role="tabpanel"
+                     th:aria-labelledby="${id + '-tab-' + tab.id}"
+                     th:class="'p-4 bg-white rounded-lg border border-gray-200 ' + (${!tab.active} ? 'hidden' : '')">
+
+                    <th:block th:replace="${tab.content}"></th:block>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Scrollable Tabs (for many tabs)
+
+  Parameters: Same as tabs
+-->
+
+<div th:fragment="scrollableTabs(id, tabs, variant, color, customClass)"
+     th:class="'w-full ' + ${customClass ?: ''}"
+     th:attr="data-tabs-id=${id}">
+
+    <th:block th:with="
+        variantType=${variant ?: 'underline'},
+        colorBase=${color ?: 'primary'}">
+
+        <!-- Tab Headers with Scroll -->
+        <div class="border-b border-gray-200 overflow-x-auto">
+            <ul class="-mb-px flex text-sm font-medium text-center whitespace-nowrap"
+                role="tablist">
+
+                <li th:each="tab : ${tabs}"
+                    role="presentation">
+
+                    <button th:id="${id + '-tab-' + tab.id}"
+                            th:attr="data-tabs-target='#' + ${id} + '-panel-' + ${tab.id}"
+                            type="button"
+                            role="tab"
+                            th:aria-controls="${id + '-panel-' + tab.id}"
+                            th:aria-selected="${tab.active ?: false}"
+                            th:class="'inline-flex items-center gap-2 p-4 border-b-2 rounded-t-lg transition-colors ' +
+                                     (${tab.active} ?
+                                      (${colorBase == 'primary'} ? 'text-primary-600 border-primary-600' : 'text-gray-900 border-gray-900') :
+                                      'text-gray-500 border-transparent hover:text-gray-600 hover:border-gray-300')">
+
+                        <i th:if="${tab.icon != null}"
+                           class="material-icons text-base"
+                           th:text="${tab.icon}">icon</i>
+
+                        <span th:text="${tab.label}">Tab Label</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Panels -->
+        <div th:each="tab : ${tabs}">
+            <div th:id="${id + '-panel-' + tab.id}"
+                 role="tabpanel"
+                 th:aria-labelledby="${id + '-tab-' + tab.id}"
+                 th:class="'p-4 ' + (${!tab.active} ? 'hidden' : '')">
+
+                <th:block th:replace="${tab.content}"></th:block>
+            </div>
+        </div>
+    </th:block>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(id, tabs)"
+          th:replace="~{fragments/components/tabs :: tabs(${id}, ${tabs}, 'underline', 'primary', false, '')}">
+</th:block>
+
+<th:block th:fragment="pills(id, tabs)"
+          th:replace="~{fragments/components/tabs :: tabs(${id}, ${tabs}, 'pills', 'primary', false, '')}">
+</th:block>
+
+<th:block th:fragment="fullWidth(id, tabs)"
+          th:replace="~{fragments/components/tabs :: tabs(${id}, ${tabs}, 'underline', 'primary', true, '')}">
+</th:block>
+
+</body>
+</html>

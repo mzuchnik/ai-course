@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Pagination Component
+
+  Main Fragment Parameters:
+  - currentPage: Current page number (1-indexed) (required)
+  - totalPages: Total number of pages (required)
+  - baseUrl: Base URL for page links (required, e.g., "/items")
+  - queryParam: Query parameter name for page number (default: "page")
+  - variant: Style variant - simple, numbered, full (default: numbered)
+  - showFirstLast: Show first/last page buttons (default: true)
+  - maxVisible: Maximum number of visible page buttons (default: 7)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<nav th:fragment="pagination(currentPage, totalPages, baseUrl, queryParam, variant, showFirstLast, maxVisible, customClass)"
+     th:class="'flex items-center justify-center ' + ${customClass ?: ''}"
+     aria-label="Pagination">
+
+    <th:block th:with="
+        current=${currentPage},
+        total=${totalPages},
+        param=${queryParam ?: 'page'},
+        variantType=${variant ?: 'numbered'},
+        showFL=${showFirstLast != null ? showFirstLast : true},
+        maxVis=${maxVisible ?: 7}">
+
+        <ul class="inline-flex items-center -space-x-px text-sm">
+
+            <!-- First Page Button -->
+            <li th:if="${showFL && variantType == 'full'}">
+                <a th:href="${current > 1} ? ${baseUrl + '?' + param + '=1'} : '#'"
+                   th:class="'flex items-center justify-center px-3 h-8 ml-0 leading-tight border border-gray-300 rounded-l-lg ' +
+                            (${current > 1} ? 'text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700' : 'text-gray-300 bg-gray-50 cursor-not-allowed')"
+                   th:aria-disabled="${current <= 1}">
+                    <i class="material-icons text-base">first_page</i>
+                </a>
+            </li>
+
+            <!-- Previous Button -->
+            <li>
+                <a th:href="${current > 1} ? ${baseUrl + '?' + param + '=' + (current - 1)} : '#'"
+                   th:class="'flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 ' +
+                            (${showFL && variantType == 'full'} ? '' : 'rounded-l-lg ml-0 ') +
+                            (${current > 1} ? 'text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700' : 'text-gray-300 bg-gray-50 cursor-not-allowed')"
+                   th:aria-disabled="${current <= 1}">
+                    <i class="material-icons text-base">chevron_left</i>
+                </a>
+            </li>
+
+            <!-- Page Numbers (numbered and full variants) -->
+            <th:block th:if="${variantType == 'numbered' || variantType == 'full'}">
+                <th:block th:with="
+                    startPage=${current - (maxVis / 2) > 1 ? current - (maxVis / 2) : 1},
+                    endPage=${startPage + maxVis - 1 < total ? startPage + maxVis - 1 : total}">
+
+                    <!-- Ellipsis at start -->
+                    <li th:if="${startPage > 1}">
+                        <span class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300">...</span>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    <li th:each="pageNum : ${#numbers.sequence(startPage, endPage)}">
+                        <a th:href="${baseUrl + '?' + param + '=' + pageNum}"
+                           th:class="'flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 ' +
+                                    (${pageNum == current} ?
+                                     'z-10 text-primary-600 bg-primary-50 border-primary-300 hover:bg-primary-100 hover:text-primary-700' :
+                                     'text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700')"
+                           th:aria-current="${pageNum == current ? 'page' : null}"
+                           th:text="${pageNum}">1</a>
+                    </li>
+
+                    <!-- Ellipsis at end -->
+                    <li th:if="${endPage < total}">
+                        <span class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300">...</span>
+                    </li>
+                </th:block>
+            </th:block>
+
+            <!-- Simple variant: just shows "Page X of Y" -->
+            <li th:if="${variantType == 'simple'}">
+                <span class="flex items-center justify-center px-4 h-8 text-gray-700 bg-white border border-gray-300">
+                    Page <span class="font-semibold mx-1" th:text="${current}">1</span> of <span class="font-semibold ml-1" th:text="${total}">10</span>
+                </span>
+            </li>
+
+            <!-- Next Button -->
+            <li>
+                <a th:href="${current < total} ? ${baseUrl + '?' + param + '=' + (current + 1)} : '#'"
+                   th:class="'flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 ' +
+                            (${showFL && variantType == 'full'} ? '' : 'rounded-r-lg ') +
+                            (${current < total} ? 'text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700' : 'text-gray-300 bg-gray-50 cursor-not-allowed')"
+                   th:aria-disabled="${current >= total}">
+                    <i class="material-icons text-base">chevron_right</i>
+                </a>
+            </li>
+
+            <!-- Last Page Button -->
+            <li th:if="${showFL && variantType == 'full'}">
+                <a th:href="${current < total} ? ${baseUrl + '?' + param + '=' + total} : '#'"
+                   th:class="'flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 rounded-r-lg ' +
+                            (${current < total} ? 'text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700' : 'text-gray-300 bg-gray-50 cursor-not-allowed')"
+                   th:aria-disabled="${current >= total}">
+                    <i class="material-icons text-base">last_page</i>
+                </a>
+            </li>
+        </ul>
+    </th:block>
+</nav>
+
+<!--
+  Pagination with Page Size Selector
+
+  Parameters: Same as pagination + pageSizes, currentPageSize
+  - pageSizes: Array of page size options (e.g., [10, 25, 50, 100])
+  - currentPageSize: Currently selected page size
+  - pageSizeParam: Query parameter name for page size (default: "size")
+-->
+
+<div th:fragment="paginationWithSize(currentPage, totalPages, baseUrl, queryParam, pageSizes, currentPageSize, pageSizeParam, variant, showFirstLast, maxVisible, customClass)"
+     th:class="'flex flex-col sm:flex-row items-center justify-between gap-4 ' + ${customClass ?: ''}">
+
+    <!-- Page Size Selector -->
+    <div class="flex items-center gap-2 text-sm text-gray-700">
+        <label th:for="'pageSize'" class="whitespace-nowrap">Items per page:</label>
+        <select th:id="'pageSize'"
+                th:name="${pageSizeParam ?: 'size'}"
+                th:onchange="'window.location.href = \'' + ${baseUrl} + '?' + ${pageSizeParam ?: 'size'} + '=\' + this.value + \'&' + ${queryParam ?: 'page'} + '=1\''"
+                class="border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+            <option th:each="size : ${pageSizes}"
+                    th:value="${size}"
+                    th:selected="${size == currentPageSize}"
+                    th:text="${size}">10</option>
+        </select>
+    </div>
+
+    <!-- Pagination -->
+    <th:block th:replace="~{fragments/components/pagination :: pagination(
+        ${currentPage},
+        ${totalPages},
+        ${baseUrl + '?' + (pageSizeParam ?: 'size') + '=' + currentPageSize},
+        ${queryParam},
+        ${variant},
+        ${showFirstLast},
+        ${maxVisible},
+        ''
+    )}"></th:block>
+
+    <!-- Results Info -->
+    <div th:with="
+        startItem=${(currentPage - 1) * currentPageSize + 1},
+        endItem=${currentPage * currentPageSize < totalPages * currentPageSize ? currentPage * currentPageSize : totalPages * currentPageSize}"
+         class="text-sm text-gray-700 whitespace-nowrap">
+        Showing <span class="font-semibold" th:text="${startItem}">1</span>
+        to <span class="font-semibold" th:text="${endItem}">10</span>
+        of <span class="font-semibold" th:text="${totalPages * currentPageSize}">100</span> results
+    </div>
+</div>
+
+<!--
+  Load More Button (infinite scroll alternative)
+
+  Parameters:
+  - currentPage: Current page (required)
+  - totalPages: Total pages (required)
+  - loadMoreUrl: URL to load more items (required)
+  - loading: Whether currently loading (default: false)
+-->
+
+<div th:fragment="loadMore(currentPage, totalPages, loadMoreUrl, loading, customClass)"
+     th:if="${currentPage < totalPages}"
+     th:class="'flex justify-center py-4 ' + ${customClass ?: ''}">
+
+    <button type="button"
+            th:onclick="'window.location.href=\'' + ${loadMoreUrl} + '\''"
+            th:disabled="${loading}"
+            class="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-primary-600 bg-white border-2 border-primary-600 rounded-lg hover:bg-primary-50 focus:ring-4 focus:ring-primary-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        <span th:if="${!loading}">Load More</span>
+        <span th:if="${loading}">Loading...</span>
+        <i th:if="${!loading}" class="material-icons">expand_more</i>
+    </button>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(currentPage, totalPages, baseUrl)"
+          th:replace="~{fragments/components/pagination :: pagination(${currentPage}, ${totalPages}, ${baseUrl}, 'page', 'numbered', true, 7, '')}">
+</th:block>
+
+<th:block th:fragment="minimal(currentPage, totalPages, baseUrl)"
+          th:replace="~{fragments/components/pagination :: pagination(${currentPage}, ${totalPages}, ${baseUrl}, 'page', 'simple', false, 0, '')}">
+</th:block>
+
+<th:block th:fragment="full(currentPage, totalPages, baseUrl)"
+          th:replace="~{fragments/components/pagination :: pagination(${currentPage}, ${totalPages}, ${baseUrl}, 'page', 'full', true, 7, '')}">
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Checkbox Component
+
+  Main Fragment Parameters:
+  - id: Input ID (required)
+  - name: Input name attribute (required)
+  - label: Label text (required)
+  - value: Checkbox value (default: "true")
+  - checked: Whether checkbox is checked (default: false)
+  - disabled: Whether checkbox is disabled (default: false)
+  - color: Color variant - primary, secondary, success, warning, error (default: primary)
+  - error: Error message (optional)
+  - description: Helper text below label (optional)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="checkbox(id, name, label, value, checked, disabled, color, error, description, customClass)"
+     th:class="'relative flex items-start ' + ${customClass ?: ''}">
+
+    <div class="flex items-center h-5">
+        <input th:id="${id}"
+               th:name="${name}"
+               type="checkbox"
+               th:value="${value ?: 'true'}"
+               th:checked="${checked ?: false}"
+               th:disabled="${disabled ?: false}"
+               th:class="'w-4 h-4 border-2 rounded focus:ring-2 focus:ring-offset-2 transition-colors ' +
+                        (${error != null} ? 'border-red-500 text-red-600 focus:ring-red-500' :
+                         ${color == 'success'} ? 'border-gray-300 text-green-600 focus:ring-green-500' :
+                         ${color == 'warning'} ? 'border-gray-300 text-yellow-600 focus:ring-yellow-500' :
+                         ${color == 'error'} ? 'border-gray-300 text-red-600 focus:ring-red-500' :
+                         'border-gray-300 text-primary-600 focus:ring-primary-500') +
+                        (${disabled} ? ' opacity-50 cursor-not-allowed' : ' cursor-pointer')">
+    </div>
+
+    <div class="ml-3">
+        <label th:for="${id}"
+               th:class="'text-sm font-medium select-none ' +
+                        (${error != null} ? 'text-red-700' : 'text-gray-700') +
+                        (${disabled} ? ' opacity-50 cursor-not-allowed' : ' cursor-pointer')">
+            <span th:text="${label}">Checkbox Label</span>
+            <span th:if="${error != null}" class="text-red-600 ml-1">*</span>
+        </label>
+
+        <p th:if="${description != null && error == null}"
+           class="text-xs text-gray-500 mt-0.5"
+           th:text="${description}">
+            Helper text goes here.
+        </p>
+
+        <p th:if="${error != null}"
+           class="text-xs text-red-600 mt-0.5"
+           th:text="${error}">
+            Error message
+        </p>
+    </div>
+</div>
+
+<!--
+  Checkbox Group
+
+  Parameters:
+  - groupLabel: Label for the entire group (required)
+  - groupName: Name attribute for all checkboxes (required)
+  - options: List of options with 'id', 'label', 'value', 'checked' (required)
+  - disabled: Disable all checkboxes (default: false)
+  - color: Color variant for all checkboxes (default: primary)
+  - error: Error message for the group (optional)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<fieldset th:fragment="checkboxGroup(groupLabel, groupName, options, disabled, color, error, customClass)"
+          th:class="'space-y-3 ' + ${customClass ?: ''}">
+
+    <legend th:class="'text-sm font-semibold mb-3 ' + (${error != null} ? 'text-red-700' : 'text-gray-900')">
+        <span th:text="${groupLabel}">Group Label</span>
+        <span th:if="${error != null}" class="text-red-600 ml-1">*</span>
+    </legend>
+
+    <div th:each="option : ${options}">
+        <th:block th:replace="~{fragments/components/checkbox :: checkbox(
+            ${option.id},
+            ${groupName},
+            ${option.label},
+            ${option.value},
+            ${option.checked},
+            ${disabled},
+            ${color},
+            null,
+            ${option.description},
+            ''
+        )}"></th:block>
+    </div>
+
+    <p th:if="${error != null}"
+       class="text-xs text-red-600 mt-2"
+       th:text="${error}">
+        Error message
+    </p>
+</fieldset>
+
+<!--
+  Checkbox with Icon
+
+  Parameters: Same as checkbox + icon
+  - icon: Material icon name (optional)
+-->
+
+<div th:fragment="checkboxWithIcon(id, name, label, icon, value, checked, disabled, color, error, customClass)"
+     th:class="'relative flex items-start ' + ${customClass ?: ''}">
+
+    <div class="flex items-center h-5">
+        <input th:id="${id}"
+               th:name="${name}"
+               type="checkbox"
+               th:value="${value ?: 'true'}"
+               th:checked="${checked ?: false}"
+               th:disabled="${disabled ?: false}"
+               th:class="'w-4 h-4 border-2 rounded focus:ring-2 focus:ring-offset-2 transition-colors ' +
+                        (${error != null} ? 'border-red-500 text-red-600 focus:ring-red-500' :
+                         'border-gray-300 text-primary-600 focus:ring-primary-500') +
+                        (${disabled} ? ' opacity-50 cursor-not-allowed' : ' cursor-pointer')">
+    </div>
+
+    <div class="ml-3 flex items-center gap-2">
+        <i th:if="${icon != null}"
+           class="material-icons text-gray-600 text-base"
+           th:text="${icon}">icon</i>
+
+        <label th:for="${id}"
+               th:class="'text-sm font-medium select-none ' +
+                        (${error != null} ? 'text-red-700' : 'text-gray-700') +
+                        (${disabled} ? ' opacity-50 cursor-not-allowed' : ' cursor-pointer')">
+            <span th:text="${label}">Checkbox Label</span>
+            <span th:if="${error != null}" class="text-red-600 ml-1">*</span>
+        </label>
+    </div>
+</div>
+
+<!--
+  Toggle Checkbox (looks like a switch)
+
+  Parameters: Same as checkbox
+-->
+
+<div th:fragment="toggle(id, name, label, checked, disabled, color, description, customClass)"
+     th:class="'relative flex items-center justify-between ' + ${customClass ?: ''}">
+
+    <div class="flex flex-col">
+        <label th:for="${id}"
+               th:class="'text-sm font-medium select-none ' +
+                        (${disabled} ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 cursor-pointer')">
+            <span th:text="${label}">Toggle Label</span>
+        </label>
+
+        <p th:if="${description != null}"
+           class="text-xs text-gray-500 mt-0.5"
+           th:text="${description}">
+            Helper text
+        </p>
+    </div>
+
+    <button type="button"
+            th:id="${id}"
+            role="switch"
+            th:aria-checked="${checked ?: false}"
+            th:disabled="${disabled ?: false}"
+            th:class="'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ' +
+                     (${checked} ?
+                      (${color == 'success'} ? 'bg-green-600 focus:ring-green-500' :
+                       ${color == 'warning'} ? 'bg-yellow-600 focus:ring-yellow-500' :
+                       ${color == 'error'} ? 'bg-red-600 focus:ring-red-500' :
+                       'bg-primary-600 focus:ring-primary-500') :
+                      'bg-gray-200 focus:ring-gray-300') +
+                     (${disabled} ? ' opacity-50 cursor-not-allowed' : '')">
+
+        <input type="checkbox"
+               th:name="${name}"
+               th:checked="${checked ?: false}"
+               th:disabled="${disabled ?: false}"
+               class="sr-only">
+
+        <span th:class="'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ' +
+                       (${checked} ? 'translate-x-5' : 'translate-x-0')">
+        </span>
+    </button>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(id, name, label)"
+          th:replace="~{fragments/components/checkbox :: checkbox(${id}, ${name}, ${label}, 'true', false, false, 'primary', null, null, '')}">
+</th:block>
+
+<th:block th:fragment="withDescription(id, name, label, description)"
+          th:replace="~{fragments/components/checkbox :: checkbox(${id}, ${name}, ${label}, 'true', false, false, 'primary', null, ${description}, '')}">
+</th:block>
+
+</body>
+</html>

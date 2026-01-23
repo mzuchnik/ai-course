@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Chip Component (similar to badge but for tags/filters)
+
+  Main Fragment Parameters:
+  - text: Chip text (required)
+  - icon: Material icon name (optional)
+  - avatar: Avatar URL (optional)
+  - color: Color variant - primary, secondary, success, warning, error, info (default: gray)
+  - variant: Style variant - filled, outlined (default: filled)
+  - size: Size variant - sm, md, lg (default: md)
+  - dismissible: Show close button (default: false)
+  - onDismiss: JavaScript function for dismiss (optional)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="chip(text, icon, avatar, color, variant, size, dismissible, onDismiss, customClass)">
+    <th:block th:with="
+        colorBase=${color ?: 'gray'},
+        variantType=${variant ?: 'filled'},
+        sizeType=${size ?: 'md'},
+        isDismissible=${dismissible ?: false},
+
+        sizeClass=${sizeType == 'sm' ? 'text-xs py-1 px-2' :
+                   sizeType == 'lg' ? 'text-base py-2 px-4' :
+                   'text-sm py-1.5 px-3'},
+
+        iconSize=${sizeType == 'sm' ? 'text-sm' :
+                  sizeType == 'lg' ? 'text-lg' :
+                  'text-base'},
+
+        colorClass=${variantType == 'filled' ?
+                    (colorBase == 'primary' ? 'bg-primary-100 text-primary-800 border-primary-200' :
+                     colorBase == 'secondary' ? 'bg-gray-100 text-gray-800 border-gray-200' :
+                     colorBase == 'success' ? 'bg-green-100 text-green-800 border-green-200' :
+                     colorBase == 'warning' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                     colorBase == 'error' ? 'bg-red-100 text-red-800 border-red-200' :
+                     colorBase == 'info' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                     'bg-gray-100 text-gray-800 border-gray-200') :
+                    (colorBase == 'primary' ? 'bg-white border-2 border-primary-300 text-primary-800' :
+                     colorBase == 'success' ? 'bg-white border-2 border-green-300 text-green-800' :
+                     colorBase == 'warning' ? 'bg-white border-2 border-yellow-300 text-yellow-800' :
+                     colorBase == 'error' ? 'bg-white border-2 border-red-300 text-red-800' :
+                     'bg-white border-2 border-gray-300 text-gray-800')}">
+
+        <span th:class="'inline-flex items-center gap-1.5 font-medium rounded-full ' + ${sizeClass} + ' ' + ${colorClass} + ' ' + ${customClass ?: ''}">
+            <!-- Avatar -->
+            <img th:if="${avatar != null}"
+                 th:src="${avatar}"
+                 th:class="'rounded-full object-cover ' + (${sizeType == 'sm'} ? 'w-4 h-4 -ml-0.5' : ${sizeType == 'lg'} ? 'w-6 h-6 -ml-1' : 'w-5 h-5 -ml-0.5')"
+                 alt="">
+
+            <!-- Icon -->
+            <i th:if="${icon != null && avatar == null}"
+               th:class="'material-icons ' + ${iconSize}"
+               th:text="${icon}">icon</i>
+
+            <!-- Text -->
+            <span th:text="${text}">Chip</span>
+
+            <!-- Dismiss Button -->
+            <button th:if="${isDismissible}"
+                    type="button"
+                    th:onclick="${onDismiss}"
+                    th:class="'ml-0.5 inline-flex items-center justify-center rounded-full hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-offset-1 transition-colors ' +
+                             (${sizeType == 'sm'} ? 'w-3 h-3' : ${sizeType == 'lg'} ? 'w-5 h-5' : 'w-4 h-4')"
+                    aria-label="Remove">
+                <i th:class="'material-icons ' + (${sizeType == 'sm'} ? 'text-xs' : ${sizeType == 'lg'} ? 'text-base' : 'text-sm')">close</i>
+            </button>
+        </span>
+    </th:block>
+</div>
+
+<!--
+  Chip Group
+
+  Parameters:
+  - chips: List of chip objects with text, icon, avatar, etc. (required)
+  - color: Default color for all chips (default: gray)
+  - variant: Default variant for all chips (default: filled)
+  - size: Size for all chips (default: md)
+  - dismissible: Make all chips dismissible (default: false)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="chipGroup(chips, color, variant, size, dismissible, customClass)"
+     th:class="'flex flex-wrap gap-2 ' + ${customClass ?: ''}">
+
+    <th:block th:each="chip : ${chips}">
+        <th:block th:replace="~{fragments/components/chip :: chip(
+            ${chip.text},
+            ${chip.icon},
+            ${chip.avatar},
+            ${chip.color ?: color},
+            ${chip.variant ?: variant},
+            ${chip.size ?: size},
+            ${chip.dismissible ?: dismissible},
+            ${chip.onDismiss},
+            ''
+        )}"></th:block>
+    </th:block>
+</div>
+
+<!--
+  Selectable Chip (acts like checkbox/radio)
+
+  Parameters: Same as chip + selected, name, value
+  - selected: Whether chip is selected (default: false)
+  - name: Input name for form submission (optional)
+  - value: Input value (optional)
+-->
+
+<label th:fragment="selectableChip(text, icon, color, size, selected, name, value, customClass)">
+    <th:block th:with="
+        colorBase=${color ?: 'gray'},
+        sizeType=${size ?: 'md'},
+        isSelected=${selected ?: false},
+
+        sizeClass=${sizeType == 'sm' ? 'text-xs py-1 px-2' :
+                   sizeType == 'lg' ? 'text-base py-2 px-4' :
+                   'text-sm py-1.5 px-3'},
+
+        iconSize=${sizeType == 'sm' ? 'text-sm' :
+                  sizeType == 'lg' ? 'text-lg' :
+                  'text-base'},
+
+        colorClass=${isSelected ?
+                    (colorBase == 'primary' ? 'bg-primary-600 text-white border-primary-600' :
+                     colorBase == 'success' ? 'bg-green-600 text-white border-green-600' :
+                     'bg-gray-600 text-white border-gray-600') :
+                    'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50'}">
+
+        <input th:if="${name != null}"
+               type="checkbox"
+               th:name="${name}"
+               th:value="${value}"
+               th:checked="${isSelected}"
+               class="sr-only peer">
+
+        <span th:class="'inline-flex items-center gap-1.5 font-medium rounded-full cursor-pointer transition-all ' + ${sizeClass} + ' ' + ${colorClass} + ' ' + ${customClass ?: ''}">
+            <i th:if="${icon != null}"
+               th:class="'material-icons ' + ${iconSize}"
+               th:text="${icon}">icon</i>
+
+            <span th:text="${text}">Chip</span>
+
+            <i th:if="${isSelected}"
+               th:class="'material-icons ' + ${iconSize}">check</i>
+        </span>
+    </th:block>
+</label>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(text)"
+          th:replace="~{fragments/components/chip :: chip(${text}, null, null, 'gray', 'filled', 'md', false, null, '')}">
+</th:block>
+
+<th:block th:fragment="withIcon(text, icon)"
+          th:replace="~{fragments/components/chip :: chip(${text}, ${icon}, null, 'gray', 'filled', 'md', false, null, '')}">
+</th:block>
+
+<th:block th:fragment="primary(text)"
+          th:replace="~{fragments/components/chip :: chip(${text}, null, null, 'primary', 'filled', 'md', false, null, '')}">
+</th:block>
+
+<th:block th:fragment="removable(text, onDismiss)"
+          th:replace="~{fragments/components/chip :: chip(${text}, null, null, 'gray', 'filled', 'md', true, ${onDismiss}, '')}">
+</th:block>
+
+</body>
+</html>

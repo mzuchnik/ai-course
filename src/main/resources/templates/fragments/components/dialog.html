@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Dialog/Modal Component
+
+  Main Fragment Parameters:
+  - id: Unique ID for the dialog (required)
+  - title: Dialog title (required)
+  - content: Dialog content fragment (required)
+  - actions: Dialog action buttons fragment (optional)
+  - size: Size variant - sm, md, lg, xl, full (default: md)
+  - dismissible: Show close button and allow backdrop click to close (default: true)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="dialog(id, title, content, actions, size, dismissible, customClass)">
+    <th:block th:with="
+        isDismissible=${dismissible != null ? dismissible : true},
+        sizeClass=${size == 'sm' ? 'max-w-md' :
+                   size == 'lg' ? 'max-w-4xl' :
+                   size == 'xl' ? 'max-w-6xl' :
+                   size == 'full' ? 'max-w-full mx-4' :
+                   'max-w-2xl'}">
+
+        <!-- Backdrop -->
+        <div th:id="${id}"
+             th:attr="data-modal-backdrop=${isDismissible ? 'dynamic' : 'static'}"
+             tabindex="-1"
+             aria-hidden="true"
+             class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full max-h-full bg-gray-900 bg-opacity-50">
+
+            <!-- Dialog -->
+            <div th:class="'relative p-4 w-full ' + ${sizeClass} + ' max-h-full'">
+                <!-- Dialog Content -->
+                <div th:class="'relative bg-white rounded-lg shadow ' + ${customClass ?: ''}">
+
+                    <!-- Header -->
+                    <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                        <h3 class="text-xl font-semibold text-gray-900"
+                            th:text="${title}">
+                            Dialog Title
+                        </h3>
+
+                        <button th:if="${isDismissible}"
+                                type="button"
+                                th:attr="data-modal-hide=${id}"
+                                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center transition-colors"
+                                aria-label="Close">
+                            <i class="material-icons">close</i>
+                        </button>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="p-4 md:p-5 space-y-4">
+                        <th:block th:replace="${content}"></th:block>
+                    </div>
+
+                    <!-- Footer (Actions) -->
+                    <div th:if="${actions != null}"
+                         class="flex items-center gap-3 p-4 md:p-5 border-t border-gray-200 rounded-b">
+                        <th:block th:replace="${actions}"></th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Confirmation Dialog
+
+  Parameters:
+  - id: Unique ID (required)
+  - title: Dialog title (required)
+  - message: Confirmation message (required)
+  - confirmText: Confirm button text (default: "Confirm")
+  - cancelText: Cancel button text (default: "Cancel")
+  - confirmColor: Confirm button color - primary, success, error (default: primary)
+  - onConfirm: JavaScript function to call on confirm (optional)
+-->
+
+<div th:fragment="confirmDialog(id, title, message, confirmText, cancelText, confirmColor, onConfirm)">
+    <div th:replace="~{fragments/components/dialog :: dialog(
+        ${id},
+        ${title},
+        ~{::confirm-content},
+        ~{::confirm-actions},
+        'sm',
+        true,
+        ''
+    )}">
+
+        <div th:fragment="confirm-content">
+            <p class="text-base text-gray-600" th:text="${message}">
+                Are you sure you want to proceed?
+            </p>
+        </div>
+
+        <div th:fragment="confirm-actions">
+            <th:block th:replace="~{fragments/components/buttons :: button(
+                ${cancelText ?: 'Cancel'},
+                'button',
+                'outlined',
+                'secondary',
+                'md',
+                false,
+                false,
+                null,
+                'left',
+                '',
+                'closeModal(\'' + ${id} + '\')'
+            )}"></th:block>
+
+            <th:block th:replace="~{fragments/components/buttons :: button(
+                ${confirmText ?: 'Confirm'},
+                'button',
+                'filled',
+                ${confirmColor ?: 'primary'},
+                'md',
+                false,
+                false,
+                null,
+                'left',
+                'ml-auto',
+                ${onConfirm}
+            )}"></th:block>
+        </div>
+    </div>
+</div>
+
+<!--
+  Alert Dialog
+
+  Parameters:
+  - id: Unique ID (required)
+  - title: Dialog title (required)
+  - message: Alert message (required)
+  - icon: Material icon name (optional)
+  - iconColor: Icon color class (default: text-gray-600)
+  - buttonText: Button text (default: "OK")
+-->
+
+<div th:fragment="alertDialog(id, title, message, icon, iconColor, buttonText)">
+    <div th:replace="~{fragments/components/dialog :: dialog(
+        ${id},
+        ${title},
+        ~{::alert-content},
+        ~{::alert-actions},
+        'sm',
+        true,
+        ''
+    )}">
+
+        <div th:fragment="alert-content">
+            <div class="flex items-start gap-4">
+                <div th:if="${icon != null}"
+                     th:class="'flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ' +
+                              (${iconColor == 'text-red-600'} ? 'bg-red-100' :
+                               ${iconColor == 'text-yellow-600'} ? 'bg-yellow-100' :
+                               ${iconColor == 'text-green-600'} ? 'bg-green-100' :
+                               'bg-gray-100')">
+                    <i th:class="'material-icons text-2xl ' + ${iconColor ?: 'text-gray-600'}"
+                       th:text="${icon}">info</i>
+                </div>
+
+                <p class="text-base text-gray-600 flex-1" th:text="${message}">
+                    Alert message
+                </p>
+            </div>
+        </div>
+
+        <div th:fragment="alert-actions">
+            <th:block th:replace="~{fragments/components/buttons :: button(
+                ${buttonText ?: 'OK'},
+                'button',
+                'filled',
+                'primary',
+                'md',
+                true,
+                false,
+                null,
+                'left',
+                '',
+                'closeModal(\'' + ${id} + '\')'
+            )}"></th:block>
+        </div>
+    </div>
+</div>
+
+<!--
+  Form Dialog
+
+  Parameters:
+  - id: Unique ID (required)
+  - title: Dialog title (required)
+  - formContent: Form fields fragment (required)
+  - submitText: Submit button text (default: "Submit")
+  - cancelText: Cancel button text (default: "Cancel")
+  - formAction: Form action URL (optional)
+  - formMethod: Form method (default: POST)
+-->
+
+<div th:fragment="formDialog(id, title, formContent, submitText, cancelText, formAction, formMethod)">
+    <div th:replace="~{fragments/components/dialog :: dialog(
+        ${id},
+        ${title},
+        ~{::form-content},
+        ~{::form-actions},
+        'md',
+        true,
+        ''
+    )}">
+
+        <form th:fragment="form-content"
+              th:action="${formAction}"
+              th:method="${formMethod ?: 'POST'}"
+              th:id="${id + '-form'}">
+            <th:block th:replace="${formContent}"></th:block>
+        </form>
+
+        <div th:fragment="form-actions">
+            <th:block th:replace="~{fragments/components/buttons :: button(
+                ${cancelText ?: 'Cancel'},
+                'button',
+                'outlined',
+                'secondary',
+                'md',
+                false,
+                false,
+                null,
+                'left',
+                '',
+                'closeModal(\'' + ${id} + '\')'
+            )}"></th:block>
+
+            <th:block th:replace="~{fragments/components/buttons :: button(
+                ${submitText ?: 'Submit'},
+                'submit',
+                'filled',
+                'primary',
+                'md',
+                false,
+                false,
+                null,
+                'left',
+                'ml-auto',
+                'document.getElementById(\'' + ${id} + '-form\').submit()'
+            )}"></th:block>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

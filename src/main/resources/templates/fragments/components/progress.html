@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Progress Bar Component
+
+  Main Fragment Parameters:
+  - value: Current progress value (0-100) (required)
+  - max: Maximum value (default: 100)
+  - label: Label text above progress bar (optional)
+  - showValue: Show percentage value (default: true)
+  - color: Color variant - primary, secondary, success, warning, error (default: primary)
+  - size: Size variant - sm, md, lg (default: md)
+  - striped: Show striped pattern (default: false)
+  - animated: Animate stripes (requires striped: true) (default: false)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="progress(value, max, label, showValue, color, size, striped, animated, customClass)"
+     th:class="'w-full ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        currentValue=${value},
+        maxValue=${max ?: 100},
+        percentage=${(currentValue * 100.0 / maxValue)},
+        colorBase=${color ?: 'primary'},
+        sizeType=${size ?: 'md'},
+        isStriped=${striped ?: false},
+        isAnimated=${animated ?: false},
+        shouldShowValue=${showValue != null ? showValue : true},
+
+        heightClass=${sizeType == 'sm' ? 'h-1.5' :
+                     sizeType == 'lg' ? 'h-4' :
+                     'h-2.5'},
+
+        colorClass=${colorBase == 'primary' ? 'bg-primary-600' :
+                    colorBase == 'secondary' ? 'bg-gray-600' :
+                    colorBase == 'success' ? 'bg-green-600' :
+                    colorBase == 'warning' ? 'bg-yellow-500' :
+                    colorBase == 'error' ? 'bg-red-600' :
+                    'bg-primary-600'}">
+
+        <!-- Label and Value -->
+        <div th:if="${label != null || shouldShowValue}"
+             class="flex justify-between items-center mb-1">
+            <span th:if="${label != null}"
+                  class="text-sm font-medium text-gray-700"
+                  th:text="${label}">Progress</span>
+
+            <span th:if="${shouldShowValue}"
+                  class="text-sm font-medium text-gray-700"
+                  th:text="${#numbers.formatDecimal(percentage, 1, 1)} + '%'">0%</span>
+        </div>
+
+        <!-- Progress Bar Container -->
+        <div th:class="'w-full bg-gray-200 rounded-full overflow-hidden ' + ${heightClass}">
+            <!-- Progress Bar Fill -->
+            <div th:class="'h-full transition-all duration-300 ease-in-out rounded-full ' +
+                          ${colorClass} +
+                          (${isStriped} ? ' bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:2rem_100%]' : '') +
+                          (${isAnimated} ? ' animate-progress-stripes' : '')"
+                 th:style="'width: ' + ${percentage} + '%'"
+                 role="progressbar"
+                 th:aria-valuenow="${currentValue}"
+                 th:aria-valuemin="0"
+                 th:aria-valuemax="${maxValue}">
+            </div>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Progress Bar with Label Inside
+
+  Parameters: Same as progress
+-->
+
+<div th:fragment="progressWithInnerLabel(value, max, label, color, size, customClass)"
+     th:class="'w-full ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        currentValue=${value},
+        maxValue=${max ?: 100},
+        percentage=${(currentValue * 100.0 / maxValue)},
+        colorBase=${color ?: 'primary'},
+        sizeType=${size ?: 'md'},
+
+        heightClass=${sizeType == 'sm' ? 'h-6' :
+                     sizeType == 'lg' ? 'h-10' :
+                     'h-8'},
+
+        colorClass=${colorBase == 'primary' ? 'bg-primary-600' :
+                    colorBase == 'success' ? 'bg-green-600' :
+                    colorBase == 'warning' ? 'bg-yellow-500' :
+                    colorBase == 'error' ? 'bg-red-600' :
+                    'bg-primary-600'}">
+
+        <!-- Progress Bar Container -->
+        <div th:class="'relative w-full bg-gray-200 rounded-full overflow-hidden ' + ${heightClass}">
+            <!-- Progress Bar Fill -->
+            <div th:class="'h-full transition-all duration-300 ease-in-out rounded-full ' + ${colorClass}"
+                 th:style="'width: ' + ${percentage} + '%'"
+                 role="progressbar"
+                 th:aria-valuenow="${currentValue}"
+                 th:aria-valuemin="0"
+                 th:aria-valuemax="${maxValue}">
+            </div>
+
+            <!-- Inner Label -->
+            <div class="absolute inset-0 flex items-center justify-center">
+                <span class="text-xs font-semibold text-white drop-shadow-md"
+                      th:text="${label ?: (#numbers.formatDecimal(percentage, 1, 1) + '%')}">
+                    50%
+                </span>
+            </div>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Circular Progress
+
+  Parameters:
+  - value: Current progress value (0-100) (required)
+  - max: Maximum value (default: 100)
+  - size: Size in pixels (default: 80)
+  - strokeWidth: Stroke width in pixels (default: 8)
+  - color: Color variant (default: primary)
+  - showValue: Show percentage in center (default: true)
+  - label: Label below percentage (optional)
+-->
+
+<div th:fragment="circularProgress(value, max, size, strokeWidth, color, showValue, label, customClass)"
+     th:class="'inline-flex flex-col items-center ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        currentValue=${value},
+        maxValue=${max ?: 100},
+        percentage=${(currentValue * 100.0 / maxValue)},
+        circleSize=${size ?: 80},
+        stroke=${strokeWidth ?: 8},
+        colorBase=${color ?: 'primary'},
+        shouldShowValue=${showValue != null ? showValue : true},
+        radius=${(circleSize - stroke) / 2},
+        circumference=${2 * 3.14159 * radius},
+        offset=${circumference - (percentage / 100 * circumference)},
+
+        colorClass=${colorBase == 'primary' ? 'text-primary-600' :
+                    colorBase == 'success' ? 'text-green-600' :
+                    colorBase == 'warning' ? 'text-yellow-500' :
+                    colorBase == 'error' ? 'text-red-600' :
+                    'text-primary-600'}">
+
+        <div class="relative inline-flex items-center justify-center">
+            <!-- SVG Circle -->
+            <svg th:width="${circleSize}"
+                 th:height="${circleSize}"
+                 class="transform -rotate-90">
+                <!-- Background Circle -->
+                <circle th:cx="${circleSize / 2}"
+                        th:cy="${circleSize / 2}"
+                        th:r="${radius}"
+                        th:stroke-width="${stroke}"
+                        class="stroke-gray-200"
+                        fill="none"/>
+
+                <!-- Progress Circle -->
+                <circle th:cx="${circleSize / 2}"
+                        th:cy="${circleSize / 2}"
+                        th:r="${radius}"
+                        th:stroke-width="${stroke}"
+                        th:class="'transition-all duration-300 ease-in-out ' + ${colorClass}"
+                        th:style="'stroke-dasharray: ' + ${circumference} + '; stroke-dashoffset: ' + ${offset}"
+                        fill="none"
+                        stroke-linecap="round"/>
+            </svg>
+
+            <!-- Center Value -->
+            <div th:if="${shouldShowValue}"
+                 class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-xl font-bold text-gray-900"
+                      th:text="${#numbers.formatDecimal(percentage, 1, 0)} + '%'">0%</span>
+                <span th:if="${label != null}"
+                      class="text-xs text-gray-500"
+                      th:text="${label}">Label</span>
+            </div>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Indeterminate Progress (loading spinner)
+
+  Parameters:
+  - color: Color variant (default: primary)
+  - size: Size variant - sm, md, lg (default: md)
+  - label: Loading text (optional)
+-->
+
+<div th:fragment="indeterminate(color, size, label, customClass)"
+     th:class="'inline-flex flex-col items-center gap-2 ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        colorBase=${color ?: 'primary'},
+        sizeType=${size ?: 'md'},
+
+        sizeClass=${sizeType == 'sm' ? 'w-8 h-8 border-2' :
+                   sizeType == 'lg' ? 'w-12 h-12 border-4' :
+                   'w-10 h-10 border-3'},
+
+        colorClass=${colorBase == 'primary' ? 'border-primary-600 border-t-transparent' :
+                    colorBase == 'success' ? 'border-green-600 border-t-transparent' :
+                    colorBase == 'warning' ? 'border-yellow-500 border-t-transparent' :
+                    colorBase == 'error' ? 'border-red-600 border-t-transparent' :
+                    'border-gray-600 border-t-transparent'}">
+
+        <div th:class="'rounded-full animate-spin ' + ${sizeClass} + ' ' + ${colorClass}"
+             role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+
+        <span th:if="${label != null}"
+              class="text-sm text-gray-600"
+              th:text="${label}">Loading...</span>
+    </th:block>
+</div>
+
+<!--
+  Stepped Progress (multi-step indicator)
+
+  Parameters:
+  - steps: List of step objects with 'title', 'description', 'completed' (required)
+  - currentStep: Current step index (0-based) (required)
+  - color: Color variant (default: primary)
+-->
+
+<div th:fragment="steppedProgress(steps, currentStep, color, customClass)"
+     th:class="'w-full ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        colorBase=${color ?: 'primary'},
+        current=${currentStep},
+
+        activeColor=${colorBase == 'primary' ? 'bg-primary-600 border-primary-600 text-white' :
+                     'bg-green-600 border-green-600 text-white'},
+        completedColor=${colorBase == 'primary' ? 'bg-primary-600 border-primary-600' :
+                        'bg-green-600 border-green-600'}">
+
+        <ol class="flex items-center w-full">
+            <li th:each="step, iterStat : ${steps}"
+                th:class="'flex items-center ' +
+                         (${!iterStat.last} ? 'w-full' : '') +
+                         (${iterStat.index <= current} ? ' text-primary-600' : ' text-gray-500')">
+
+                <!-- Step Circle -->
+                <div class="flex flex-col items-center">
+                    <span th:class="'flex items-center justify-center w-10 h-10 rounded-full border-2 shrink-0 ' +
+                                   (${iterStat.index < current} ? ${completedColor} + ' text-white' :
+                                    ${iterStat.index == current} ? ${activeColor} :
+                                    'border-gray-300 bg-white text-gray-500')">
+                        <i th:if="${iterStat.index < current}"
+                           class="material-icons text-base">check</i>
+                        <span th:if="${iterStat.index >= current}"
+                              th:text="${iterStat.index + 1}">1</span>
+                    </span>
+
+                    <!-- Step Label -->
+                    <div class="mt-2 text-center">
+                        <div class="text-sm font-medium"
+                             th:text="${step.title}">Step</div>
+                        <div th:if="${step.description != null}"
+                             class="text-xs text-gray-500"
+                             th:text="${step.description}">Description</div>
+                    </div>
+                </div>
+
+                <!-- Connector Line -->
+                <div th:if="${!iterStat.last}"
+                     th:class="'w-full h-0.5 mx-2 ' +
+                              (${iterStat.index < current} ? ${completedColor} : 'bg-gray-200')">
+                </div>
+            </li>
+        </ol>
+    </th:block>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(value, label)"
+          th:replace="~{fragments/components/progress :: progress(${value}, 100, ${label}, true, 'primary', 'md', false, false, '')}">
+</th:block>
+
+<th:block th:fragment="striped(value, label)"
+          th:replace="~{fragments/components/progress :: progress(${value}, 100, ${label}, true, 'primary', 'md', true, true, '')}">
+</th:block>
+
+<th:block th:fragment="circular(value)"
+          th:replace="~{fragments/components/progress :: circularProgress(${value}, 100, 80, 8, 'primary', true, null, '')}">
+</th:block>
+
+<th:block th:fragment="loading(label)"
+          th:replace="~{fragments/components/progress :: indeterminate('primary', 'md', ${label}, '')}">
+</th:block>
+
+</body>
+</html>

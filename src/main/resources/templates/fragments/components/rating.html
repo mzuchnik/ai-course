@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Rating Component (Star Rating)
+
+  Main Fragment Parameters:
+  - value: Current rating value (0-max) (required)
+  - max: Maximum rating (default: 5)
+  - readonly: Whether rating is readonly (default: false)
+  - name: Input name for form submission (optional)
+  - size: Size variant - sm, md, lg, xl (default: md)
+  - color: Color variant - yellow, red, blue, green (default: yellow)
+  - showValue: Show numeric value (default: false)
+  - precision: Rating precision - 1 (full star), 0.5 (half star) (default: 1)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="rating(value, max, readonly, name, size, color, showValue, precision, customClass)"
+     th:class="'inline-flex items-center gap-2 ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        currentValue=${value ?: 0},
+        maxValue=${max ?: 5},
+        isReadonly=${readonly ?: false},
+        sizeType=${size ?: 'md'},
+        colorBase=${color ?: 'yellow'},
+        shouldShowValue=${showValue ?: false},
+        prec=${precision ?: 1},
+
+        iconSize=${sizeType == 'sm' ? 'text-base' :
+                  sizeType == 'lg' ? 'text-3xl' :
+                  sizeType == 'xl' ? 'text-4xl' :
+                  'text-2xl'},
+
+        filledColor=${colorBase == 'yellow' ? 'text-yellow-400' :
+                     colorBase == 'red' ? 'text-red-500' :
+                     colorBase == 'blue' ? 'text-blue-500' :
+                     colorBase == 'green' ? 'text-green-500' :
+                     'text-yellow-400'},
+
+        emptyColor='text-gray-300'">
+
+        <div th:class="'inline-flex items-center gap-0.5 ' + (${isReadonly} ? '' : 'cursor-pointer')">
+            <th:block th:each="i : ${#numbers.sequence(1, maxValue)}">
+                <span th:class="'relative inline-block ' + ${iconSize}">
+                    <!-- Empty Star Background -->
+                    <i th:class="'material-icons ' + ${emptyColor}"
+                       th:text="'star'">star</i>
+
+                    <!-- Filled Star Overlay -->
+                    <span th:if="${i <= currentValue}"
+                          th:class="'absolute inset-0 overflow-hidden ' +
+                                   (${i <= currentValue && (currentValue - i) < 1} ?
+                                    'w-1/2' : 'w-full')">
+                        <i th:class="'material-icons ' + ${filledColor}"
+                           th:text="'star'">star</i>
+                    </span>
+
+                    <!-- Hidden Input for Form Submission -->
+                    <input th:if="${!isReadonly && name != null}"
+                           type="radio"
+                           th:name="${name}"
+                           th:value="${i}"
+                           th:checked="${i == currentValue}"
+                           class="sr-only">
+                </span>
+            </th:block>
+        </div>
+
+        <!-- Numeric Value -->
+        <span th:if="${shouldShowValue}"
+              class="text-sm font-medium text-gray-700"
+              th:text="${#numbers.formatDecimal(currentValue, 1, 1)} + ' / ' + ${maxValue}">
+            0.0 / 5
+        </span>
+    </th:block>
+</div>
+
+<!--
+  Rating with Reviews Count
+
+  Parameters: Same as rating + reviewsCount
+  - reviewsCount: Number of reviews (optional)
+-->
+
+<div th:fragment="ratingWithReviews(value, max, reviewsCount, readonly, size, color, customClass)"
+     th:class="'inline-flex items-center gap-2 ' + ${customClass ?: ''}">
+
+    <th:block th:replace="~{fragments/components/rating :: rating(
+        ${value},
+        ${max},
+        ${readonly},
+        null,
+        ${size},
+        ${color},
+        true,
+        1,
+        ''
+    )}"></th:block>
+
+    <span th:if="${reviewsCount != null}"
+          class="text-sm text-gray-500"
+          th:text="'(' + ${reviewsCount} + ' reviews)'">
+        (0 reviews)
+    </span>
+</div>
+
+<!--
+  Rating with Average and Count
+
+  Parameters:
+  - average: Average rating value (required)
+  - max: Maximum rating (default: 5)
+  - count: Number of ratings (required)
+  - size: Size variant (default: md)
+  - showBar: Show rating distribution bars (default: false)
+  - distribution: List of counts for each rating level (optional, for bars)
+-->
+
+<div th:fragment="ratingAggregate(average, max, count, size, showBar, distribution, customClass)"
+     th:class="'flex flex-col gap-2 ' + ${customClass ?: ''}">
+
+    <!-- Stars and Average -->
+    <div class="flex items-center gap-3">
+        <th:block th:replace="~{fragments/components/rating :: rating(
+            ${average},
+            ${max},
+            true,
+            null,
+            ${size},
+            'yellow',
+            false,
+            0.5,
+            ''
+        )}"></th:block>
+
+        <div class="flex items-baseline gap-1">
+            <span class="text-2xl font-bold text-gray-900"
+                  th:text="${#numbers.formatDecimal(average, 1, 1)}">0.0</span>
+            <span class="text-sm text-gray-500"
+                  th:text="'out of ' + ${max ?: 5}">out of 5</span>
+        </div>
+
+        <span class="text-sm text-gray-500"
+              th:text="'(' + ${#numbers.formatInteger(count, 0, 'COMMA')} + ' ratings)'">
+            (0 ratings)
+        </span>
+    </div>
+
+    <!-- Rating Distribution Bars -->
+    <div th:if="${showBar && distribution != null}"
+         class="space-y-1 w-full max-w-md">
+
+        <div th:each="rating, iterStat : ${distribution}"
+             class="flex items-center gap-2">
+            <span class="text-sm text-gray-600 w-8"
+                  th:text="${(distribution.size() - iterStat.index)} + ' ★'">5 ★</span>
+
+            <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div th:if="${count > 0}"
+                     th:with="percentage=${(rating * 100.0) / count}"
+                     th:style="'width: ' + ${percentage} + '%'"
+                     class="bg-yellow-400 h-full transition-all duration-300">
+                </div>
+            </div>
+
+            <span class="text-xs text-gray-500 w-12 text-right"
+                  th:text="${#numbers.formatInteger(rating, 0, 'COMMA')}">0</span>
+        </div>
+    </div>
+</div>
+
+<!--
+  Interactive Rating (with hover effects)
+
+  Parameters: Same as rating
+-->
+
+<div th:fragment="interactiveRating(name, max, defaultValue, size, color, customClass)"
+     th:class="'inline-flex flex-col gap-1 ' + ${customClass ?: ''}"
+     x-data="{ rating: ${defaultValue ?: 0}, hoverRating: 0 }">
+
+    <th:block th:with="
+        maxValue=${max ?: 5},
+        sizeType=${size ?: 'md'},
+        colorBase=${color ?: 'yellow'},
+
+        iconSize=${sizeType == 'sm' ? 'text-base' :
+                  sizeType == 'lg' ? 'text-3xl' :
+                  sizeType == 'xl' ? 'text-4xl' :
+                  'text-2xl'},
+
+        filledColor=${colorBase == 'yellow' ? 'text-yellow-400' :
+                     'text-yellow-400'}">
+
+        <div class="inline-flex items-center gap-0.5">
+            <th:block th:each="i : ${#numbers.sequence(1, maxValue)}">
+                <button type="button"
+                        th:attr="@click='rating = ' + ${i}, @mouseenter='hoverRating = ' + ${i}, @mouseleave='hoverRating = 0'"
+                        th:class="'transition-all duration-150 hover:scale-110 ' + ${iconSize}">
+                    <i class="material-icons"
+                       th:attr=":class='(hoverRating >= ' + ${i} + ' || (hoverRating === 0 && rating >= ' + ${i} + ')) ? \'${filledColor}\' : \'text-gray-300\''">
+                        star
+                    </i>
+                </button>
+
+                <input type="radio"
+                       th:name="${name}"
+                       th:value="${i}"
+                       x-model="rating"
+                       class="sr-only">
+            </th:block>
+        </div>
+
+        <span class="text-xs text-center text-gray-500"
+              x-show="hoverRating > 0 || rating > 0"
+              x-text="(hoverRating || rating) + ' out of ' + ${maxValue}">
+        </span>
+    </th:block>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(value)"
+          th:replace="~{fragments/components/rating :: rating(${value}, 5, true, null, 'md', 'yellow', false, 1, '')}">
+</th:block>
+
+<th:block th:fragment="withValue(value, max)"
+          th:replace="~{fragments/components/rating :: rating(${value}, ${max}, true, null, 'md', 'yellow', true, 1, '')}">
+</th:block>
+
+<th:block th:fragment="large(value)"
+          th:replace="~{fragments/components/rating :: rating(${value}, 5, true, null, 'lg', 'yellow', false, 1, '')}">
+</th:block>
+
+</body>
+</html>

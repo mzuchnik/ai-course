@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  List Component
+
+  Main Fragment Parameters:
+  - items: List of item objects with 'title', 'subtitle', 'icon', 'avatar', 'url' (required)
+  - variant: Style variant - simple, bordered, divided (default: simple)
+  - itemClass: Additional CSS classes for each item (optional)
+  - customClass: Additional CSS classes for list container (optional)
+-->
+
+<ul th:fragment="list(items, variant, itemClass, customClass)"
+    th:class="'w-full ' +
+             (${variant == 'bordered'} ? 'border border-gray-200 rounded-lg ' :
+              ${variant == 'divided'} ? 'divide-y divide-gray-200 ' : '') +
+             ${customClass ?: ''}">
+
+    <li th:each="item, iterStat : ${items}"
+        th:class="'py-3 px-4 hover:bg-gray-50 transition-colors ' +
+                 (${variant == 'bordered'} && !${iterStat.last} ? 'border-b border-gray-200 ' : '') +
+                 (${iterStat.first} && ${variant == 'bordered'} ? 'rounded-t-lg ' : '') +
+                 (${iterStat.last} && ${variant == 'bordered'} ? 'rounded-b-lg ' : '') +
+                 ${itemClass ?: ''}">
+
+        <a th:if="${item.url != null}"
+           th:href="${item.url}"
+           class="flex items-center gap-3 text-gray-900">
+
+            <!-- Avatar -->
+            <th:block th:if="${item.avatar != null}">
+                <th:block th:replace="~{fragments/components/avatar :: avatar(${item.avatar}, ${item.title}, ${item.initials}, 'md', 'circular', false, 'flex-shrink-0')}"></th:block>
+            </th:block>
+
+            <!-- Icon -->
+            <i th:if="${item.icon != null && item.avatar == null}"
+               class="material-icons text-gray-600 text-2xl flex-shrink-0"
+               th:text="${item.icon}">icon</i>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-900 truncate"
+                   th:text="${item.title}">List Item Title</p>
+                <p th:if="${item.subtitle != null}"
+                   class="text-sm text-gray-500 truncate"
+                   th:text="${item.subtitle}">Subtitle</p>
+            </div>
+
+            <!-- Trailing -->
+            <div th:if="${item.trailing != null}"
+                 class="flex-shrink-0 text-gray-400"
+                 th:utext="${item.trailing}">
+            </div>
+
+            <!-- Chevron -->
+            <i th:if="${item.chevron}"
+               class="material-icons text-gray-400 flex-shrink-0">chevron_right</i>
+        </a>
+
+        <div th:if="${item.url == null}"
+             class="flex items-center gap-3">
+
+            <th:block th:if="${item.avatar != null}">
+                <th:block th:replace="~{fragments/components/avatar :: avatar(${item.avatar}, ${item.title}, ${item.initials}, 'md', 'circular', false, 'flex-shrink-0')}"></th:block>
+            </th:block>
+
+            <i th:if="${item.icon != null && item.avatar == null}"
+               class="material-icons text-gray-600 text-2xl flex-shrink-0"
+               th:text="${item.icon}">icon</i>
+
+            <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-900 truncate"
+                   th:text="${item.title}">List Item Title</p>
+                <p th:if="${item.subtitle != null}"
+                   class="text-sm text-gray-500 truncate"
+                   th:text="${item.subtitle}">Subtitle</p>
+            </div>
+
+            <div th:if="${item.trailing != null}"
+                 class="flex-shrink-0 text-gray-400"
+                 th:utext="${item.trailing}">
+            </div>
+        </div>
+    </li>
+</ul>
+
+<!--
+  Interactive List (with checkboxes)
+
+  Parameters: Same as list + selectable
+  - selectable: Make items selectable with checkboxes (default: false)
+  - name: Input name for checkboxes (optional)
+-->
+
+<ul th:fragment="selectableList(items, name, variant, itemClass, customClass)"
+    th:class="'w-full ' +
+             (${variant == 'bordered'} ? 'border border-gray-200 rounded-lg ' :
+              ${variant == 'divided'} ? 'divide-y divide-gray-200 ' : '') +
+             ${customClass ?: ''}">
+
+    <li th:each="item, iterStat : ${items}"
+        th:class="'py-3 px-4 hover:bg-gray-50 transition-colors ' +
+                 (${variant == 'bordered'} && !${iterStat.last} ? 'border-b border-gray-200 ' : '') +
+                 ${itemClass ?: ''}">
+
+        <label class="flex items-center gap-3 cursor-pointer">
+            <!-- Checkbox -->
+            <input type="checkbox"
+                   th:name="${name}"
+                   th:value="${item.value ?: item.title}"
+                   th:checked="${item.selected}"
+                   class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2">
+
+            <!-- Avatar -->
+            <th:block th:if="${item.avatar != null}">
+                <th:block th:replace="~{fragments/components/avatar :: avatar(${item.avatar}, ${item.title}, ${item.initials}, 'md', 'circular', false, 'flex-shrink-0')}"></th:block>
+            </th:block>
+
+            <!-- Icon -->
+            <i th:if="${item.icon != null && item.avatar == null}"
+               class="material-icons text-gray-600 text-2xl flex-shrink-0"
+               th:text="${item.icon}">icon</i>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-900 truncate"
+                   th:text="${item.title}">List Item Title</p>
+                <p th:if="${item.subtitle != null}"
+                   class="text-sm text-gray-500 truncate"
+                   th:text="${item.subtitle}">Subtitle</p>
+            </div>
+
+            <!-- Trailing -->
+            <div th:if="${item.trailing != null}"
+                 class="flex-shrink-0 text-gray-400"
+                 th:utext="${item.trailing}">
+            </div>
+        </label>
+    </li>
+</ul>
+
+<!--
+  Ordered List (numbered)
+
+  Parameters: Same as list
+-->
+
+<ol th:fragment="orderedList(items, variant, itemClass, customClass)"
+    th:class="'w-full ' +
+             (${variant == 'bordered'} ? 'border border-gray-200 rounded-lg ' :
+              ${variant == 'divided'} ? 'divide-y divide-gray-200 ' : '') +
+             ${customClass ?: ''}">
+
+    <li th:each="item, iterStat : ${items}"
+        th:class="'py-3 px-4 hover:bg-gray-50 transition-colors ' +
+                 (${variant == 'bordered'} && !${iterStat.last} ? 'border-b border-gray-200 ' : '') +
+                 ${itemClass ?: ''}">
+
+        <div class="flex items-center gap-3">
+            <!-- Number -->
+            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 text-primary-600 font-bold text-sm flex-shrink-0"
+                  th:text="${iterStat.count}">1</span>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-900"
+                   th:text="${item.title}">List Item Title</p>
+                <p th:if="${item.subtitle != null}"
+                   class="text-sm text-gray-500"
+                   th:text="${item.subtitle}">Subtitle</p>
+            </div>
+
+            <!-- Trailing -->
+            <div th:if="${item.trailing != null}"
+                 class="flex-shrink-0"
+                 th:utext="${item.trailing}">
+            </div>
+        </div>
+    </li>
+</ol>
+
+<!--
+  Action List (with buttons/actions on the right)
+
+  Parameters: Same as list + actions
+  - Each item should have 'actions' array with action objects
+-->
+
+<ul th:fragment="actionList(items, variant, itemClass, customClass)"
+    th:class="'w-full ' +
+             (${variant == 'bordered'} ? 'border border-gray-200 rounded-lg ' :
+              ${variant == 'divided'} ? 'divide-y divide-gray-200 ' : '') +
+             ${customClass ?: ''}">
+
+    <li th:each="item, iterStat : ${items}"
+        th:class="'py-3 px-4 hover:bg-gray-50 transition-colors ' +
+                 (${variant == 'bordered'} && !${iterStat.last} ? 'border-b border-gray-200 ' : '') +
+                 ${itemClass ?: ''}">
+
+        <div class="flex items-center gap-3">
+            <!-- Icon/Avatar -->
+            <th:block th:if="${item.avatar != null}">
+                <th:block th:replace="~{fragments/components/avatar :: avatar(${item.avatar}, ${item.title}, ${item.initials}, 'md', 'circular', false, 'flex-shrink-0')}"></th:block>
+            </th:block>
+
+            <i th:if="${item.icon != null && item.avatar == null}"
+               class="material-icons text-gray-600 text-2xl flex-shrink-0"
+               th:text="${item.icon}">icon</i>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-900 truncate"
+                   th:text="${item.title}">List Item Title</p>
+                <p th:if="${item.subtitle != null}"
+                   class="text-sm text-gray-500 truncate"
+                   th:text="${item.subtitle}">Subtitle</p>
+            </div>
+
+            <!-- Actions -->
+            <div th:if="${item.actions != null}"
+                 class="flex items-center gap-2 flex-shrink-0">
+                <button th:each="action : ${item.actions}"
+                        type="button"
+                        th:onclick="${action.onclick}"
+                        th:title="${action.title}"
+                        class="p-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors">
+                    <i class="material-icons text-lg" th:text="${action.icon}">icon</i>
+                </button>
+            </div>
+        </div>
+    </li>
+</ul>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(items)"
+          th:replace="~{fragments/components/list :: list(${items}, 'simple', '', '')}">
+</th:block>
+
+<th:block th:fragment="bordered(items)"
+          th:replace="~{fragments/components/list :: list(${items}, 'bordered', '', '')}">
+</th:block>
+
+<th:block th:fragment="divided(items)"
+          th:replace="~{fragments/components/list :: list(${items}, 'divided', '', '')}">
+</th:block>
+
+</body>
+</html>

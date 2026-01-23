@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Breadcrumbs Component
+
+  Main Fragment Parameters:
+  - items: List of breadcrumb items with 'text' and 'url' (required)
+  - separator: Separator icon name or text (default: chevron_right)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<nav th:fragment="breadcrumbs(items, separator, customClass)"
+     th:class="'flex ' + ${customClass ?: ''}"
+     aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li th:each="item, iterStat : ${items}"
+            th:class="${iterStat.last ? 'inline-flex items-center' : 'inline-flex items-center'}">
+
+            <!-- Home icon for first item -->
+            <a th:if="${iterStat.first && item.url != null}"
+               th:href="${item.url}"
+               class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors duration-200">
+                <i class="material-icons text-base mr-1">home</i>
+                <span th:text="${item.text}">Home</span>
+            </a>
+
+            <!-- Regular items -->
+            <th:block th:if="${!iterStat.first}">
+                <!-- Separator -->
+                <i th:if="${separator != null && separator.length() <= 30}"
+                   class="material-icons text-gray-400 mx-1"
+                   th:text="${separator}">chevron_right</i>
+                <span th:if="${separator == null || separator.length() > 30}"
+                      class="text-gray-400 mx-2">/</span>
+
+                <!-- Link -->
+                <a th:if="${item.url != null && !iterStat.last}"
+                   th:href="${item.url}"
+                   class="text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors duration-200"
+                   th:text="${item.text}">
+                    Page
+                </a>
+
+                <!-- Current page (last item) -->
+                <span th:if="${iterStat.last}"
+                      class="text-sm font-medium text-gray-500"
+                      aria-current="page"
+                      th:text="${item.text}">
+                    Current Page
+                </span>
+            </th:block>
+        </li>
+    </ol>
+</nav>
+
+<!--
+  Breadcrumbs with Background
+
+  Parameters: Same as breadcrumbs
+-->
+
+<nav th:fragment="breadcrumbsWithBg(items, separator, customClass)"
+     th:class="'flex bg-gray-50 px-5 py-3 rounded-lg ' + ${customClass ?: ''}"
+     aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li th:each="item, iterStat : ${items}"
+            th:class="${iterStat.last ? 'inline-flex items-center' : 'inline-flex items-center'}">
+
+            <a th:if="${iterStat.first && item.url != null}"
+               th:href="${item.url}"
+               class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors duration-200">
+                <i class="material-icons text-base mr-1">home</i>
+                <span th:text="${item.text}">Home</span>
+            </a>
+
+            <th:block th:if="${!iterStat.first}">
+                <i th:if="${separator != null && separator.length() <= 30}"
+                   class="material-icons text-gray-400 mx-1"
+                   th:text="${separator}">chevron_right</i>
+                <span th:if="${separator == null || separator.length() > 30}"
+                      class="text-gray-400 mx-2">/</span>
+
+                <a th:if="${item.url != null && !iterStat.last}"
+                   th:href="${item.url}"
+                   class="text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors duration-200"
+                   th:text="${item.text}">
+                    Page
+                </a>
+
+                <span th:if="${iterStat.last}"
+                      class="text-sm font-medium text-gray-500"
+                      aria-current="page"
+                      th:text="${item.text}">
+                    Current Page
+                </span>
+            </th:block>
+        </li>
+    </ol>
+</nav>
+
+<!--
+  Breadcrumbs Collapsed (with ellipsis for long paths)
+
+  Parameters: Same as breadcrumbs + maxItems
+  - maxItems: Maximum items to show before collapsing (default: 3)
+-->
+
+<nav th:fragment="breadcrumbsCollapsed(items, separator, maxItems, customClass)"
+     th:class="'flex ' + ${customClass ?: ''}"
+     aria-label="Breadcrumb">
+    <th:block th:with="max=${maxItems ?: 3}">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <!-- First item (always shown) -->
+            <li th:if="${items.size() > 0}" class="inline-flex items-center">
+                <a th:href="${items[0].url}"
+                   class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors duration-200">
+                    <i class="material-icons text-base mr-1">home</i>
+                    <span th:text="${items[0].text}">Home</span>
+                </a>
+            </li>
+
+            <!-- Ellipsis if collapsed -->
+            <li th:if="${items.size() > max}" class="inline-flex items-center">
+                <i class="material-icons text-gray-400 mx-1" th:text="${separator ?: 'chevron_right'}">chevron_right</i>
+                <span class="text-sm font-medium text-gray-500">...</span>
+            </li>
+
+            <!-- Last few items -->
+            <li th:each="item, iterStat : ${items}"
+                th:if="${iterStat.index > 0 && (items.size() <= max || iterStat.index >= items.size() - (max - 1))}"
+                class="inline-flex items-center">
+
+                <i class="material-icons text-gray-400 mx-1" th:text="${separator ?: 'chevron_right'}">chevron_right</i>
+
+                <a th:if="${item.url != null && !iterStat.last}"
+                   th:href="${item.url}"
+                   class="text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors duration-200"
+                   th:text="${item.text}">
+                    Page
+                </a>
+
+                <span th:if="${iterStat.last}"
+                      class="text-sm font-medium text-gray-500"
+                      aria-current="page"
+                      th:text="${item.text}">
+                    Current Page
+                </span>
+            </li>
+        </ol>
+    </th:block>
+</nav>
+
+</body>
+</html>

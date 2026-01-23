@@ -93,12 +93,13 @@
                             </div>
 
                             <!-- Message -->
-                            <div class="relative w-full min-w-[200px]">
+                            <div class="relative w-full">
                                 <textarea id="message" name="message" rows="6" required
                                           placeholder=" "
-                                          class="peer w-full h-full bg-transparent font-sans font-normal outline outline-0 focus:outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 border focus:border-2 border-blue-gray-200 focus:border-primary-500 text-sm px-3 py-2.5 rounded-[7px] text-blue-gray-700 resize-none"></textarea>
-                                <label for="message" class="flex w-full h-full select-none pointer-events-none absolute left-3 font-normal leading-tight peer-placeholder-shown:text-blue-gray-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] text-blue-gray-400 peer-focus:text-primary-500">
-                                    Wiadomość
+                                          class="peer w-full bg-white border border-gray-300 rounded-lg text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-primary-500 focus:border-primary-500 text-gray-900 px-3 py-2.5 resize-none"></textarea>
+                                <label for="message" class="absolute cursor-text bg-white px-1 left-2.5 top-2.5 text-slate-400 text-sm transition-all transform origin-left pointer-events-none peer-focus:-top-2 peer-focus:left-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-focus:scale-90 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:left-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:scale-90">
+                                    <span>Wiadomość</span>
+                                    <span class="text-red-600">*</span>
                                 </label>
                             </div>
 

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Switch/Toggle Component
+
+  Main Fragment Parameters:
+  - id: Input ID (required)
+  - name: Input name attribute (required)
+  - label: Label text (required)
+  - checked: Whether switch is checked (default: false)
+  - disabled: Whether switch is disabled (default: false)
+  - color: Color variant - primary, secondary, success, warning, error (default: primary)
+  - size: Size variant - sm, md, lg (default: md)
+  - description: Helper text below label (optional)
+  - labelPosition: Label position - left, right (default: left)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="switch(id, name, label, checked, disabled, color, size, description, labelPosition, customClass)"
+     th:class="'relative flex items-center ' +
+              (${labelPosition == 'right'} ? 'flex-row-reverse justify-between' : 'justify-between') + ' ' +
+              ${customClass ?: ''}">
+
+    <th:block th:with="
+        isChecked=${checked ?: false},
+        isDisabled=${disabled ?: false},
+        colorBase=${color ?: 'primary'},
+        sizeType=${size ?: 'md'},
+        position=${labelPosition ?: 'left'},
+
+        switchSize=${sizeType == 'sm' ? 'h-5 w-9' :
+                    sizeType == 'lg' ? 'h-7 w-14' :
+                    'h-6 w-11'},
+
+        thumbSize=${sizeType == 'sm' ? 'h-4 w-4' :
+                   sizeType == 'lg' ? 'h-6 w-6' :
+                   'h-5 w-5'},
+
+        thumbTranslate=${sizeType == 'sm' ? 'translate-x-4' :
+                        sizeType == 'lg' ? 'translate-x-7' :
+                        'translate-x-5'},
+
+        colorClass=${colorBase == 'primary' ? 'bg-primary-600 focus:ring-primary-500' :
+                    colorBase == 'secondary' ? 'bg-gray-600 focus:ring-gray-500' :
+                    colorBase == 'success' ? 'bg-green-600 focus:ring-green-500' :
+                    colorBase == 'warning' ? 'bg-yellow-600 focus:ring-yellow-500' :
+                    colorBase == 'error' ? 'bg-red-600 focus:ring-red-500' :
+                    'bg-primary-600 focus:ring-primary-500'}">
+
+        <!-- Label -->
+        <div th:class="'flex flex-col ' + (${position == 'right'} ? 'ml-3' : 'mr-3')">
+            <label th:for="${id}"
+                   th:class="'text-sm font-medium select-none ' +
+                            (${isDisabled} ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 cursor-pointer')"
+                   th:text="${label}">
+                Toggle Label
+            </label>
+
+            <p th:if="${description != null}"
+               class="text-xs text-gray-500 mt-0.5"
+               th:text="${description}">
+                Helper text
+            </p>
+        </div>
+
+        <!-- Switch -->
+        <button type="button"
+                th:id="${id}"
+                role="switch"
+                th:aria-checked="${isChecked}"
+                th:disabled="${isDisabled}"
+                th:class="'relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ' +
+                         ${switchSize} + ' ' +
+                         (${isChecked} ? ${colorClass} : 'bg-gray-200 focus:ring-gray-300') +
+                         (${isDisabled} ? ' opacity-50 cursor-not-allowed' : '')">
+
+            <input type="checkbox"
+                   th:name="${name}"
+                   th:checked="${isChecked}"
+                   th:disabled="${isDisabled}"
+                   class="sr-only">
+
+            <span th:class="'pointer-events-none inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ' +
+                           ${thumbSize} +
+                           (${isChecked} ? ' ' + ${thumbTranslate} : ' translate-x-0')">
+            </span>
+        </button>
+    </th:block>
+</div>
+
+<!--
+  Switch with Icon
+
+  Parameters: Same as switch + icons
+  - checkedIcon: Material icon name when checked (optional)
+  - uncheckedIcon: Material icon name when unchecked (optional)
+-->
+
+<div th:fragment="switchWithIcon(id, name, label, checked, disabled, color, size, checkedIcon, uncheckedIcon, customClass)"
+     th:class="'relative flex items-center justify-between ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        isChecked=${checked ?: false},
+        isDisabled=${disabled ?: false},
+        colorBase=${color ?: 'primary'},
+        sizeType=${size ?: 'md'},
+
+        switchSize=${sizeType == 'sm' ? 'h-5 w-9' :
+                    sizeType == 'lg' ? 'h-7 w-14' :
+                    'h-6 w-11'},
+
+        thumbSize=${sizeType == 'sm' ? 'h-4 w-4' :
+                   sizeType == 'lg' ? 'h-6 w-6' :
+                   'h-5 w-5'},
+
+        iconSize=${sizeType == 'sm' ? 'text-xs' :
+                  sizeType == 'lg' ? 'text-base' :
+                  'text-sm'},
+
+        thumbTranslate=${sizeType == 'sm' ? 'translate-x-4' :
+                        sizeType == 'lg' ? 'translate-x-7' :
+                        'translate-x-5'},
+
+        colorClass=${colorBase == 'primary' ? 'bg-primary-600 focus:ring-primary-500' :
+                    'bg-green-600 focus:ring-green-500'}">
+
+        <!-- Label -->
+        <label th:for="${id}"
+               th:class="'text-sm font-medium select-none ' +
+                        (${isDisabled} ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 cursor-pointer')"
+               th:text="${label}">
+            Toggle Label
+        </label>
+
+        <!-- Switch with Icons -->
+        <button type="button"
+                th:id="${id}"
+                role="switch"
+                th:aria-checked="${isChecked}"
+                th:disabled="${isDisabled}"
+                th:class="'relative inline-flex flex-shrink-0 items-center cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ' +
+                         ${switchSize} + ' ' +
+                         (${isChecked} ? ${colorClass} : 'bg-gray-200 focus:ring-gray-300') +
+                         (${isDisabled} ? ' opacity-50 cursor-not-allowed' : '')">
+
+            <input type="checkbox"
+                   th:name="${name}"
+                   th:checked="${isChecked}"
+                   th:disabled="${isDisabled}"
+                   class="sr-only">
+
+            <!-- Icons inside switch track -->
+            <i th:if="${uncheckedIcon != null && !isChecked}"
+               th:class="'material-icons absolute left-1 text-gray-400 ' + ${iconSize}"
+               th:text="${uncheckedIcon}">close</i>
+
+            <i th:if="${checkedIcon != null && isChecked}"
+               th:class="'material-icons absolute right-1 text-white ' + ${iconSize}"
+               th:text="${checkedIcon}">check</i>
+
+            <!-- Thumb -->
+            <span th:class="'pointer-events-none inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ' +
+                           ${thumbSize} +
+                           (${isChecked} ? ' ' + ${thumbTranslate} : ' translate-x-0')">
+            </span>
+        </button>
+    </th:block>
+</div>
+
+<!--
+  Switch Group
+
+  Parameters:
+  - groupLabel: Label for the entire group (required)
+  - switches: List of switch objects with 'id', 'name', 'label', 'checked', 'description' (required)
+  - disabled: Disable all switches (default: false)
+  - color: Color variant for all switches (default: primary)
+  - size: Size for all switches (default: md)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<fieldset th:fragment="switchGroup(groupLabel, switches, disabled, color, size, customClass)"
+          th:class="'space-y-4 ' + ${customClass ?: ''}">
+
+    <legend class="text-sm font-semibold text-gray-900 mb-4"
+            th:text="${groupLabel}">
+        Group Label
+    </legend>
+
+    <div th:each="switchItem : ${switches}">
+        <th:block th:replace="~{fragments/components/switch :: switch(
+            ${switchItem.id},
+            ${switchItem.name},
+            ${switchItem.label},
+            ${switchItem.checked},
+            ${disabled},
+            ${color},
+            ${size},
+            ${switchItem.description},
+            'left',
+            ''
+        )}"></th:block>
+    </div>
+</fieldset>
+
+<!--
+  Compact Switch (smaller, inline variant)
+
+  Parameters: Same as switch but optimized for inline use
+-->
+
+<label th:fragment="compactSwitch(id, name, label, checked, disabled, color, customClass)"
+       th:class="'inline-flex items-center gap-2 cursor-pointer ' + ${customClass ?: ''}"
+       th:for="${id}">
+
+    <th:block th:with="
+        isChecked=${checked ?: false},
+        isDisabled=${disabled ?: false},
+        colorBase=${color ?: 'primary'},
+
+        colorClass=${colorBase == 'primary' ? 'bg-primary-600' :
+                    'bg-green-600'}">
+
+        <div class="relative">
+            <input th:id="${id}"
+                   th:name="${name}"
+                   type="checkbox"
+                   th:checked="${isChecked}"
+                   th:disabled="${isDisabled}"
+                   class="sr-only peer">
+
+            <div th:class="'w-9 h-5 bg-gray-200 rounded-full peer peer-checked:' + ${colorClass} +
+                          ' peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-primary-500 transition-colors ' +
+                          (${isDisabled} ? 'opacity-50 cursor-not-allowed' : '')">
+            </div>
+
+            <div class="absolute left-0.5 top-0.5 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-4">
+            </div>
+        </div>
+
+        <span th:class="'text-sm font-medium select-none ' +
+                       (${isDisabled} ? 'text-gray-400' : 'text-gray-700')"
+              th:text="${label}">
+            Label
+        </span>
+    </th:block>
+</label>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(id, name, label)"
+          th:replace="~{fragments/components/switch :: switch(${id}, ${name}, ${label}, false, false, 'primary', 'md', null, 'left', '')}">
+</th:block>
+
+<th:block th:fragment="withDescription(id, name, label, description)"
+          th:replace="~{fragments/components/switch :: switch(${id}, ${name}, ${label}, false, false, 'primary', 'md', ${description}, 'left', '')}">
+</th:block>
+
+<th:block th:fragment="small(id, name, label)"
+          th:replace="~{fragments/components/switch :: switch(${id}, ${name}, ${label}, false, false, 'primary', 'sm', null, 'left', '')}">
+</th:block>
+
+<th:block th:fragment="large(id, name, label)"
+          th:replace="~{fragments/components/switch :: switch(${id}, ${name}, ${label}, false, false, 'primary', 'lg', null, 'left', '')}">
+</th:block>
+
+</body>
+</html>

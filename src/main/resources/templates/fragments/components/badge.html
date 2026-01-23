@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Badge Component
+
+  Main Fragment Parameters:
+  - text: Badge text/number (required)
+  - color: Color variant - primary, secondary, success, warning, error, info, gray (default: primary)
+  - variant: Style variant - filled, outlined, ghost (default: filled)
+  - size: Size variant - sm, md, lg (default: md)
+  - pill: Make badge pill-shaped (default: false)
+  - dot: Show only dot without text (default: false)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<span th:fragment="badge(text, color, variant, size, pill, dot, customClass)">
+    <th:block th:with="
+        colorBase=${color ?: 'primary'},
+        variantType=${variant ?: 'filled'},
+        sizeType=${size ?: 'md'},
+        isPill=${pill ?: false},
+        isDot=${dot ?: false},
+
+        sizeClass=${sizeType == 'sm' ? 'text-xs px-2 py-0.5' :
+                   sizeType == 'lg' ? 'text-sm px-3 py-1' :
+                   'text-xs px-2.5 py-0.5'},
+
+        roundedClass=${isPill ? 'rounded-full' : 'rounded-md'},
+
+        dotClass=${isDot ? 'w-2 h-2 rounded-full p-0' : ''},
+
+        colorClass=${variantType == 'filled' ?
+                    (colorBase == 'primary' ? 'bg-primary-600 text-white' :
+                     colorBase == 'secondary' ? 'bg-gray-600 text-white' :
+                     colorBase == 'success' ? 'bg-green-600 text-white' :
+                     colorBase == 'warning' ? 'bg-yellow-500 text-white' :
+                     colorBase == 'error' ? 'bg-red-600 text-white' :
+                     colorBase == 'info' ? 'bg-blue-600 text-white' :
+                     'bg-gray-500 text-white') :
+                    variantType == 'outlined' ?
+                    (colorBase == 'primary' ? 'border border-primary-600 text-primary-600 bg-white' :
+                     colorBase == 'secondary' ? 'border border-gray-600 text-gray-600 bg-white' :
+                     colorBase == 'success' ? 'border border-green-600 text-green-600 bg-white' :
+                     colorBase == 'warning' ? 'border border-yellow-500 text-yellow-600 bg-white' :
+                     colorBase == 'error' ? 'border border-red-600 text-red-600 bg-white' :
+                     colorBase == 'info' ? 'border border-blue-600 text-blue-600 bg-white' :
+                     'border border-gray-500 text-gray-600 bg-white') :
+                    (colorBase == 'primary' ? 'bg-primary-50 text-primary-700' :
+                     colorBase == 'secondary' ? 'bg-gray-100 text-gray-700' :
+                     colorBase == 'success' ? 'bg-green-50 text-green-700' :
+                     colorBase == 'warning' ? 'bg-yellow-50 text-yellow-700' :
+                     colorBase == 'error' ? 'bg-red-50 text-red-700' :
+                     colorBase == 'info' ? 'bg-blue-50 text-blue-700' :
+                     'bg-gray-100 text-gray-700')}">
+
+        <span th:class="'inline-flex items-center justify-center font-medium ' + ${sizeClass} + ' ' + ${roundedClass} + ' ' + ${colorClass} + ' ' + ${dotClass} + ' ' + ${customClass ?: ''}">
+            <span th:if="${!isDot}" th:text="${text}">Badge</span>
+        </span>
+    </th:block>
+</span>
+
+<!--
+  Badge with Icon
+
+  Parameters: Same as badge + icon
+  - icon: Material icon name (optional)
+  - iconPosition: left or right (default: left)
+-->
+
+<span th:fragment="badgeWithIcon(text, icon, iconPosition, color, variant, size, pill, customClass)">
+    <th:block th:with="
+        colorBase=${color ?: 'primary'},
+        variantType=${variant ?: 'filled'},
+        sizeType=${size ?: 'md'},
+        isPill=${pill ?: false},
+        position=${iconPosition ?: 'left'},
+
+        sizeClass=${sizeType == 'sm' ? 'text-xs px-2 py-0.5' :
+                   sizeType == 'lg' ? 'text-sm px-3 py-1' :
+                   'text-xs px-2.5 py-0.5'},
+
+        iconSize=${sizeType == 'sm' ? 'text-xs' :
+                  sizeType == 'lg' ? 'text-base' :
+                  'text-sm'},
+
+        roundedClass=${isPill ? 'rounded-full' : 'rounded-md'},
+
+        colorClass=${variantType == 'filled' ?
+                    (colorBase == 'primary' ? 'bg-primary-600 text-white' :
+                     colorBase == 'success' ? 'bg-green-600 text-white' :
+                     colorBase == 'warning' ? 'bg-yellow-500 text-white' :
+                     colorBase == 'error' ? 'bg-red-600 text-white' :
+                     'bg-gray-500 text-white') :
+                    variantType == 'outlined' ?
+                    (colorBase == 'primary' ? 'border border-primary-600 text-primary-600 bg-white' :
+                     colorBase == 'success' ? 'border border-green-600 text-green-600 bg-white' :
+                     'border border-gray-500 text-gray-600 bg-white') :
+                    (colorBase == 'primary' ? 'bg-primary-50 text-primary-700' :
+                     'bg-gray-100 text-gray-700')}">
+
+        <span th:class="'inline-flex items-center gap-1 font-medium ' + ${sizeClass} + ' ' + ${roundedClass} + ' ' + ${colorClass} + ' ' + ${customClass ?: ''}">
+            <i th:if="${icon != null && position == 'left'}"
+               th:class="'material-icons ' + ${iconSize}"
+               th:text="${icon}">icon</i>
+            <span th:text="${text}">Badge</span>
+            <i th:if="${icon != null && position == 'right'}"
+               th:class="'material-icons ' + ${iconSize}"
+               th:text="${icon}">icon</i>
+        </span>
+    </th:block>
+</span>
+
+<!--
+  Badge with Dismiss Button
+
+  Parameters: Same as badge + onDismiss
+  - onDismiss: JavaScript function name to call on dismiss (optional)
+-->
+
+<span th:fragment="dismissible(text, color, variant, size, pill, onDismiss, customClass)">
+    <th:block th:with="
+        sizeType=${size ?: 'md'},
+        sizeClass=${sizeType == 'sm' ? 'text-xs px-2 py-0.5' :
+                   sizeType == 'lg' ? 'text-sm px-3 py-1' :
+                   'text-xs px-2.5 py-0.5'}">
+
+        <th:block th:replace="~{fragments/components/badge :: badgeWithIcon(
+            ${text},
+            'close',
+            'right',
+            ${color},
+            ${variant},
+            ${size},
+            ${pill},
+            ${customClass})}">
+        </th:block>
+    </th:block>
+</span>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="primary(text)"
+          th:replace="~{fragments/components/badge :: badge(${text}, 'primary', 'filled', 'md', false, false, '')}">
+</th:block>
+
+<th:block th:fragment="success(text)"
+          th:replace="~{fragments/components/badge :: badge(${text}, 'success', 'filled', 'md', false, false, '')}">
+</th:block>
+
+<th:block th:fragment="warning(text)"
+          th:replace="~{fragments/components/badge :: badge(${text}, 'warning', 'filled', 'md', false, false, '')}">
+</th:block>
+
+<th:block th:fragment="error(text)"
+          th:replace="~{fragments/components/badge :: badge(${text}, 'error', 'filled', 'md', false, false, '')}">
+</th:block>
+
+<th:block th:fragment="pill(text, color)"
+          th:replace="~{fragments/components/badge :: badge(${text}, ${color ?: 'primary'}, 'filled', 'md', true, false, '')}">
+</th:block>
+
+<th:block th:fragment="dot(color)"
+          th:replace="~{fragments/components/badge :: badge('', ${color ?: 'primary'}, 'filled', 'sm', false, true, '')}">
+</th:block>
+
+</body>
+</html>

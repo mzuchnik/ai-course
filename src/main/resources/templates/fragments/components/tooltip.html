@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Tooltip Component
+
+  Main Fragment Parameters:
+  - id: Unique ID for tooltip (required)
+  - text: Tooltip text (required)
+  - position: Tooltip position - top, bottom, left, right (default: top)
+  - trigger: Trigger type - hover, click (default: hover)
+  - content: Element content that triggers tooltip (required as fragment)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="tooltip(id, text, position, trigger, content, customClass)"
+     th:class="'relative inline-block ' + ${customClass ?: ''}">
+
+    <th:block th:with="
+        positionType=${position ?: 'top'},
+        triggerType=${trigger ?: 'hover'}">
+
+        <!-- Tooltip Trigger Element -->
+        <div th:attr="data-tooltip-target=${id},
+                     data-tooltip-trigger=${triggerType},
+                     data-tooltip-placement=${positionType}">
+            <th:block th:replace="${content}"></th:block>
+        </div>
+
+        <!-- Tooltip -->
+        <div th:id="${id}"
+             role="tooltip"
+             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip transition-opacity duration-300">
+            <span th:text="${text}">Tooltip text</span>
+
+            <!-- Arrow -->
+            <div class="tooltip-arrow"
+                 th:attr="data-popper-arrow"></div>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Icon with Tooltip
+
+  Parameters:
+  - icon: Material icon name (required)
+  - text: Tooltip text (required)
+  - position: Tooltip position (default: top)
+  - iconColor: Icon color class (default: text-gray-600)
+  - iconSize: Icon size class (default: text-base)
+-->
+
+<span th:fragment="iconTooltip(id, icon, text, position, iconColor, iconSize, customClass)">
+    <div th:replace="~{fragments/components/tooltip :: tooltip(
+        ${id},
+        ${text},
+        ${position},
+        'hover',
+        ~{::tooltip-content},
+        ${customClass}
+    )}">
+
+        <i th:fragment="tooltip-content"
+           th:class="'material-icons cursor-help ' +
+                    (${iconColor ?: 'text-gray-600'}) + ' ' +
+                    (${iconSize ?: 'text-base'})"
+           th:text="${icon}">info</i>
+    </div>
+</span>
+
+<!--
+  Button with Tooltip
+
+  Parameters:
+  - buttonText: Button text (required)
+  - tooltipText: Tooltip text (required)
+  - position: Tooltip position (default: top)
+  - buttonVariant: Button variant - filled, outlined, text (default: filled)
+  - buttonColor: Button color (default: primary)
+-->
+
+<span th:fragment="buttonTooltip(id, buttonText, tooltipText, position, buttonVariant, buttonColor, customClass)">
+    <div th:replace="~{fragments/components/tooltip :: tooltip(
+        ${id},
+        ${tooltipText},
+        ${position},
+        'hover',
+        ~{::tooltip-content},
+        ${customClass}
+    )}">
+
+        <th:block th:fragment="tooltip-content">
+            <th:block th:replace="~{fragments/components/buttons :: button(
+                ${buttonText},
+                'button',
+                ${buttonVariant ?: 'filled'},
+                ${buttonColor ?: 'primary'},
+                'md',
+                false,
+                false,
+                null,
+                'left',
+                '',
+                null
+            )}"></th:block>
+        </th:block>
+    </div>
+</span>
+
+<!--
+  Rich Tooltip (with HTML content)
+
+  Parameters:
+  - id: Unique ID (required)
+  - title: Tooltip title (optional)
+  - description: Tooltip description (required)
+  - position: Position (default: top)
+  - content: Trigger element fragment (required)
+-->
+
+<div th:fragment="richTooltip(id, title, description, position, content, customClass)"
+     th:class="'relative inline-block ' + ${customClass ?: ''}">
+
+    <th:block th:with="positionType=${position ?: 'top'}">
+
+        <!-- Tooltip Trigger Element -->
+        <div th:attr="data-tooltip-target=${id},
+                     data-tooltip-trigger='hover',
+                     data-tooltip-placement=${positionType}">
+            <th:block th:replace="${content}"></th:block>
+        </div>
+
+        <!-- Rich Tooltip -->
+        <div th:id="${id}"
+             role="tooltip"
+             class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 tooltip transition-opacity duration-300">
+
+            <div class="p-3">
+                <div th:if="${title != null}"
+                     class="font-semibold text-gray-900 mb-1"
+                     th:text="${title}">
+                    Tooltip Title
+                </div>
+
+                <div class="text-gray-600"
+                     th:text="${description}">
+                    Tooltip description text
+                </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="tooltip-arrow"
+                 th:attr="data-popper-arrow"></div>
+        </div>
+    </th:block>
+</div>
+
+<!--
+  Badge with Tooltip
+
+  Parameters:
+  - badgeText: Badge text (required)
+  - tooltipText: Tooltip text (required)
+  - badgeColor: Badge color (default: primary)
+  - position: Tooltip position (default: top)
+-->
+
+<span th:fragment="badgeTooltip(id, badgeText, tooltipText, badgeColor, position, customClass)">
+    <div th:replace="~{fragments/components/tooltip :: tooltip(
+        ${id},
+        ${tooltipText},
+        ${position},
+        'hover',
+        ~{::tooltip-content},
+        ${customClass}
+    )}">
+
+        <span th:fragment="tooltip-content">
+            <th:block th:replace="~{fragments/components/badge :: badge(
+                ${badgeText},
+                ${badgeColor ?: 'primary'},
+                'filled',
+                'md',
+                false,
+                false,
+                'cursor-help'
+            )}"></th:block>
+        </span>
+    </div>
+</span>
+
+<!--
+  Avatar with Tooltip (User Info)
+
+  Parameters:
+  - src: Avatar image URL (optional)
+  - initials: Avatar initials (optional)
+  - name: User name (required)
+  - email: User email (optional)
+  - position: Tooltip position (default: top)
+-->
+
+<span th:fragment="avatarTooltip(id, src, initials, name, email, position, customClass)">
+    <div th:replace="~{fragments/components/tooltip :: richTooltip(
+        ${id},
+        ${name},
+        ${email},
+        ${position},
+        ~{::tooltip-content},
+        ${customClass}
+    )}">
+
+        <span th:fragment="tooltip-content" class="cursor-help">
+            <th:block th:replace="~{fragments/components/avatar :: avatar(
+                ${src},
+                ${name},
+                ${initials},
+                'md',
+                'circular',
+                false,
+                ''
+            )}"></th:block>
+        </span>
+    </div>
+</span>
+
+<!--
+  Help Text with Tooltip
+
+  Parameters:
+  - label: Label/text to show (required)
+  - helpText: Help text in tooltip (required)
+  - position: Tooltip position (default: top)
+-->
+
+<span th:fragment="helpTooltip(id, label, helpText, position, customClass)"
+      th:class="'inline-flex items-center gap-1 ' + ${customClass ?: ''}">
+
+    <span class="text-sm text-gray-700" th:text="${label}">Label</span>
+
+    <div th:replace="~{fragments/components/tooltip :: tooltip(
+        ${id},
+        ${helpText},
+        ${position},
+        'hover',
+        ~{::tooltip-content},
+        ''
+    )}">
+
+        <i th:fragment="tooltip-content"
+           class="material-icons text-gray-400 text-base cursor-help">
+            help_outline
+        </i>
+    </div>
+</span>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(id, text, content)"
+          th:replace="~{fragments/components/tooltip :: tooltip(${id}, ${text}, 'top', 'hover', ${content}, '')}">
+</th:block>
+
+<th:block th:fragment="help(id, label, helpText)"
+          th:replace="~{fragments/components/tooltip :: helpTooltip(${id}, ${label}, ${helpText}, 'top', '')}">
+</th:block>
+
+</body>
+</html>

@@ -34,12 +34,28 @@
               (size == 'lg') ? 'text-sm py-3.5 px-7 ' :
               'text-xs py-3 px-6 '} +
             ${(variant == 'outlined') ?
-                'border-2 border-' + (color ?: 'blue') + '-500 text-' + (color ?: 'blue') + '-500 hover:opacity-75 ' :
+                ((color == 'primary') ? 'border-2 border-primary-500 text-primary-500 hover:opacity-75 ' :
+                 (color == 'burgundy') ? 'border-2 border-burgundy-500 text-burgundy-500 hover:opacity-75 ' :
+                 (color == 'red') ? 'border-2 border-red-500 text-red-500 hover:opacity-75 ' :
+                 (color == 'green') ? 'border-2 border-green-500 text-green-500 hover:opacity-75 ' :
+                 'border-2 border-blue-500 text-blue-500 hover:opacity-75 ') :
               (variant == 'text') ?
-                'text-' + (color ?: 'blue') + '-500 hover:bg-' + (color ?: 'blue') + '-500/10 ' :
+                ((color == 'primary') ? 'text-primary-500 hover:bg-primary-500/10 ' :
+                 (color == 'burgundy') ? 'text-burgundy-500 hover:bg-burgundy-500/10 ' :
+                 (color == 'red') ? 'text-red-500 hover:bg-red-500/10 ' :
+                 (color == 'green') ? 'text-green-500 hover:bg-green-500/10 ' :
+                 'text-blue-500 hover:bg-blue-500/10 ') :
               (variant == 'gradient') ?
-                'bg-gradient-to-tr from-' + (color ?: 'blue') + '-600 to-' + (color ?: 'blue') + '-400 text-white shadow-md hover:shadow-lg ' :
-              'bg-' + (color ?: 'blue') + '-500 text-white shadow-md hover:shadow-lg '}"
+                ((color == 'primary') ? 'bg-gradient-to-tr from-primary-600 to-primary-400 text-white shadow-md hover:shadow-lg ' :
+                 (color == 'burgundy') ? 'bg-gradient-to-tr from-burgundy-600 to-burgundy-400 text-white shadow-md hover:shadow-lg ' :
+                 (color == 'red') ? 'bg-gradient-to-tr from-red-600 to-red-400 text-white shadow-md hover:shadow-lg ' :
+                 (color == 'green') ? 'bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-md hover:shadow-lg ' :
+                 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md hover:shadow-lg ') :
+                ((color == 'primary') ? 'bg-primary-500 text-white shadow-md hover:shadow-lg ' :
+                 (color == 'burgundy') ? 'bg-burgundy-500 text-white shadow-md hover:shadow-lg ' :
+                 (color == 'red') ? 'bg-red-500 text-white shadow-md hover:shadow-lg ' :
+                 (color == 'green') ? 'bg-green-500 text-white shadow-md hover:shadow-lg ' :
+                 'bg-blue-500 text-white shadow-md hover:shadow-lg ')}"
         th:attr="data-ripple-light=${variant != 'text'}">
 
     <!-- Icon Left -->
