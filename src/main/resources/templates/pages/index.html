@@ -7,89 +7,293 @@
 <body>
 
 <div th:fragment="content">
-    <!-- Hero Section -->
+    <!-- Section 1: Enhanced Hero -->
     <section class="bg-gradient-to-br from-primary-600 to-primary-400 py-20">
         <div class="container mx-auto px-4">
-            <div class="max-w-3xl mx-auto text-center text-white">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">
-                    Witaj w Lexpage
-                </h1>
-                <p class="text-xl text-white/90 mb-8">
-                    Professional legal services you can trust
-                </p>
-                <div class="flex gap-4 justify-center">
-                    <th:block th:replace="~{fragments/components/buttons :: button('Dowiedz się więcej', 'button', 'filled', 'white', 'lg', false, false, 'arrow_forward', 'right', 'text-primary-600', null)}"></th:block>
-                    <th:block th:replace="~{fragments/components/buttons :: button('Kontakt', 'button', 'outlined', 'white', 'lg', false, false, 'phone', 'left', '', null)}"></th:block>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Left: Text content -->
+                <div class="text-white">
+                    <p class="text-sm uppercase tracking-wider mb-2 text-white/80" th:text="${heroEyebrow}">Eyebrow</p>
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4" th:text="${heroTitle}">Hero Title</h1>
+                    <p class="text-xl text-white/90 mb-8" th:text="${heroSubtitle}">Subtitle</p>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <th:block
+                                th:replace="~{fragments/components/buttons :: button('Bezpłatna konsultacja', 'button', 'filled', 'white', 'lg', false, false, 'calendar_today', 'left', '', null)}"></th:block>
+                        <th:block
+                                th:replace="~{fragments/components/buttons :: button('Zadzwoń: +48 12 345 678', 'button', 'outlined', 'white', 'lg', false, false, 'phone', 'left', '', null)}"></th:block>
+                    </div>
+                </div>
+
+                <!-- Right: Lawyer photo -->
+                <div class="hidden lg:block">
+                    <img th:src="${heroImage}"
+                         alt="Profesjonalny prawnik"
+                         class="rounded-2xl shadow-2xl w-full h-auto aspect-[3/4] object-cover">
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Services Section -->
-    <section class="py-16 bg-white">
+    <!-- Section 3: Services (Enhanced - 6 services)-->
+    <section class="bg-white py-20">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12">Nasze usługi</h2>
+            <h2 class="text-3xl font-bold text-center mb-4">Zakres usług</h2>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                Kompleksowa obsługa prawna w kluczowych dziedzinach prawa
+            </p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Service Card 1 -->
-                <div th:replace="~{fragments/components/cards :: card(
-                    'Prawo cywilne',
-                    'Kompleksowa obsługa spraw cywilnych',
-                    ~{::card1-content},
-                    ~{::card1-actions},
-                    '')}">
+                <div th:each="service : ${services}"
+                     th:class="'bg-white rounded-lg shadow-md p-6 flex flex-col ' +
+                              (${service.category() == 'civil'} ? 'border-l-4 border-primary-600' : 'border-l-4 border-burgundy-600')">
 
-                    <div th:fragment="card1-content">
-                        <p class="text-gray-700">
-                            Reprezentacja w sprawach rozwodowych, spadkowych, kontraktowych i innych.
-                        </p>
+                    <h3 class="text-xl font-bold mb-2" th:text="${service.title()}">Service Title</h3>
+                    <p class="text-gray-600 mb-4" th:text="${service.description()}">Service Description</p>
+
+                    <div class="flex-grow mb-4">
+                        <ul class="space-y-1">
+                            <li th:each="example : ${service.examples()}"
+                                class="text-gray-700 text-sm flex items-start gap-2">
+                                <i class="material-icons text-base text-primary-600">check_circle</i>
+                                <span th:text="${example}">Example</span>
+                            </li>
+                        </ul>
                     </div>
 
-                    <div th:fragment="card1-actions">
-                        <th:block th:replace="~{fragments/components/buttons :: button('Więcej', 'button', 'text', 'primary', 'sm', false, false, 'arrow_forward', 'right', '', null)}"></th:block>
-                    </div>
-                </div>
-
-                <!-- Service Card 2 -->
-                <div th:replace="~{fragments/components/cards :: card(
-                    'Prawo karne',
-                    'Obrona w sprawach karnych',
-                    ~{::card2-content},
-                    ~{::card2-actions},
-                    '')}">
-
-                    <div th:fragment="card2-content">
-                        <p class="text-gray-700">
-                            Profesjonalna obrona w postępowaniach karnych i wykroczeniowych.
-                        </p>
-                    </div>
-
-                    <div th:fragment="card2-actions">
-                        <th:block th:replace="~{fragments/components/buttons :: button('Więcej', 'button', 'text', 'burgundy', 'sm', false, false, 'arrow_forward', 'right', '', null)}"></th:block>
-                    </div>
-                </div>
-
-                <!-- Service Card 3 -->
-                <div th:replace="~{fragments/components/cards :: card(
-                    'Prawo gospodarcze',
-                    'Wsparcie dla firm',
-                    ~{::card3-content},
-                    ~{::card3-actions},
-                    '')}">
-
-                    <div th:fragment="card3-content">
-                        <p class="text-gray-700">
-                            Doradztwo prawne dla przedsiębiorców i podmiotów gospodarczych.
-                        </p>
-                    </div>
-
-                    <div th:fragment="card3-actions">
-                        <th:block th:replace="~{fragments/components/buttons :: button('Więcej', 'button', 'text', 'primary', 'sm', false, false, 'arrow_forward', 'right', '', null)}"></th:block>
+                    <div class="mt-auto">
+                        <th:block
+                                th:replace="~{fragments/components/buttons :: button('Więcej', 'button', 'text', ${service.category() == 'civil' ? 'primary' : 'burgundy'}, 'sm', false, false, 'arrow_forward', 'right', '', null)}"></th:block>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Section 4: Value Proposition -->
+    <section class="bg-gradient-to-br from-gray-50 to-white py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Dlaczego warto nam zaufać?</h2>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                Profesjonalizm, doświadczenie i zaangażowanie na najwyższym poziomie
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div th:each="prop : ${valueProps}" class="text-center p-6">
+                    <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="material-icons text-3xl text-primary-600" th:text="${prop.icon()}">icon</i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" th:text="${prop.title()}">Title</h3>
+                    <p class="text-gray-600" th:text="${prop.description()}">Description</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Process -->
+    <section class="bg-white py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Jak wygląda współpraca?</h2>
+            <p class="text-center text-gray-600 mb-12">Proste 3 kroki do rozwiązania sprawy</p>
+
+            <!-- Desktop: horizontal -->
+            <div class="hidden md:flex justify-between items-start gap-8 max-w-4xl mx-auto relative">
+                <div th:each="step, iterStat : ${processSteps}" class="flex-1 relative">
+                    <div class="flex flex-col items-center">
+                        <div class="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold z-10">
+                            [[${iterStat.index + 1}]]
+                        </div>
+                        <i class="material-icons text-4xl text-primary-600 mb-2" th:text="${step.icon()}">icon</i>
+                        <h3 class="font-bold text-lg text-center mb-2" th:text="${step.title()}">Title</h3>
+                        <p class="text-gray-600 text-sm text-center" th:text="${step.description()}">Description</p>
+                    </div>
+
+                    <!-- Arrow between steps -->
+                    <div th:if="${!iterStat.last}"
+                         class="absolute top-6 left-full w-8 flex items-center justify-center -ml-4 z-0">
+                        <i class="material-icons text-gray-300 text-3xl">arrow_forward</i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile: vertical timeline -->
+            <div class="md:hidden space-y-6 max-w-md mx-auto">
+                <div th:each="step, iterStat : ${processSteps}" class="flex gap-4">
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            [[${iterStat.index + 1}]]
+                        </div>
+                        <div th:if="${!iterStat.last}" class="w-0.5 flex-1 bg-gray-300 mt-2 min-h-[60px]"></div>
+                    </div>
+
+                    <div class="flex-1 pb-6">
+                        <i class="material-icons text-3xl text-primary-600 mb-2" th:text="${step.icon()}">icon</i>
+                        <h3 class="font-bold text-lg mb-1" th:text="${step.title()}">Title</h3>
+                        <p class="text-gray-600 text-sm" th:text="${step.description()}">Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Team -->
+    <section class="bg-gray-50 py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Nasz zespół</h2>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                Doświadczeni prawnicy z empatią i profesjonalizmem
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div th:each="lawyer : ${teamMembers}">
+                    <th:block th:replace="~{fragments/components/team-member :: teamCard(
+                          ${lawyer.name()},
+                          ${lawyer.role()},
+                          ${lawyer.photo()},
+                          ${lawyer.bio()},
+                          ${lawyer.specializations()}
+                        )}"></th:block>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 7: Testimonials -->
+    <section class="bg-white py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Co mówią nasi klienci?</h2>
+            <p class="text-center text-gray-600 mb-12">Prawdziwe opinie od prawdziwych klientów</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div th:each="testimonial : ${testimonials}">
+                    <th:block th:replace="~{fragments/components/testimonial :: testimonialCard(
+                          ${testimonial.quote()},
+                          ${testimonial.author()},
+                          ${testimonial.role()},
+                          ${testimonial.rating()}
+                        )}"></th:block>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 8: FAQ -->
+    <section class="bg-gray-50 py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-4">Najczęściej zadawane pytania</h2>
+                <p class="text-center text-gray-600 mb-12">Znajdź odpowiedzi na popularne pytania</p>
+                <th:block
+                        th:replace="~{fragments/components/accordion :: accordion('faq-accordion', ${faqItems}, false, '')}"></th:block>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Logo Bar -->
+    <section class="bg-gray-50 py-16">
+        <div class="container mx-auto px-4">
+            <th:block th:replace="~{fragments/components/logo-bar :: simple(${trustLogos}, 'Zaufali nam:')}"></th:block>
+        </div>
+    </section>
+
+    <!-- Section 9: Final CTA + Contact -->
+    <section class="bg-gradient-to-br from-primary-600 to-primary-400 py-20">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Left: CTA & Contact Info -->
+                <div class="text-white">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Potrzebujesz pomocy prawnej?</h2>
+                    <p class="text-white/90 text-lg mb-8">
+                        Skontaktuj się z nami już dziś. Pierwsza konsultacja jest bezpłatna.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                            <i class="material-icons text-3xl">phone</i>
+                            <div>
+                                <p class="text-sm text-white/70">Telefon</p>
+                                <a href="tel:+48221234567" class="font-semibold hover:underline">+48 22 123 45 67</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                            <i class="material-icons text-3xl">email</i>
+                            <div>
+                                <p class="text-sm text-white/70">Email</p>
+                                <a href="mailto:kontakt@lexpage.pl" class="font-semibold hover:underline">kontakt@lexpage.pl</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                            <i class="material-icons text-3xl">location_on</i>
+                            <div>
+                                <p class="text-sm text-white/70">Adres</p>
+                                <p class="font-semibold">ul. Marszałkowska 123, 00-001 Warszawa</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                            <i class="material-icons text-3xl">schedule</i>
+                            <div>
+                                <p class="text-sm text-white/70">Godziny otwarcia</p>
+                                <p class="font-semibold">Pon-Pt 8:00-20:00, Sob 10:00-14:00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEO: Schema.org Structured Data -->
+    <script type="application/ld+json" th:inline="javascript">
+        {
+            "@context": "https://schema.org",
+            "@type": "LegalService",
+            "name": "Kancelaria Prawna Lexpage",
+            "image": "/images/hero-lawyer.jpg",
+            "description": "Profesjonalna kancelaria prawna z 15-letnim doświadczeniem. Prawo cywilne, karne, gospodarcze.",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "ul. Marszałkowska 123",
+                "addressLocality": "Warszawa",
+                "postalCode": "00-001",
+                "addressCountry": "PL"
+            },
+            "telephone": "+48221234567",
+            "email": "kontakt@lexpage.pl",
+            "url": "https://lexpage.pl",
+            "openingHoursSpecification": [
+                {
+                    "@type": "OpeningHoursSpecification",
+                    "dayOfWeek": [
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday"
+                    ],
+                    "opens": "08:00",
+                    "closes": "20:00"
+                },
+                {
+                    "@type": "OpeningHoursSpecification",
+                    "dayOfWeek": "Saturday",
+                    "opens": "10:00",
+                    "closes": "14:00"
+                }
+            ],
+            "priceRange": "$$",
+            "areaServed": {
+                "@type": "Country",
+                "name": "Poland"
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.9",
+                "reviewCount": "127"
+            }
+        }
+    </script>
 
 </div>
 

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: layout(~{::content})}">
+<head>
+    <title th:text="${pageTitle}">Test</title>
+</head>
+<body>
+
+<div th:fragment="content">
+    <section class="py-20">
+        <div class="container mx-auto px-4">
+            <h1 th:text="${testMessage}">Test</h1>
+
+            <!-- Test accordion with simple data -->
+            <div class="mt-8">
+                <h2>Test Accordion:</h2>
+                <th:block th:with="testItems=${#lists.toList({
+                    new pl.klastbit.lexpage.infrastructure.web.dto.homepage.HomepageDtos.FaqItemDto('Question 1', '<p>Answer 1</p>'),
+                    new pl.klastbit.lexpage.infrastructure.web.dto.homepage.HomepageDtos.FaqItemDto('Question 2', '<p>Answer 2</p>')
+                })}">
+                    <th:block th:replace="~{fragments/components/accordion :: accordion('test-accordion', ${testItems}, false, '')}"></th:block>
+                </th:block>
+            </div>
+        </div>
+    </section>
+</div>
+
+</body>
+</html>

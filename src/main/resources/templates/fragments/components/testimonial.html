@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Testimonial Component
+
+  Main Fragment Parameters:
+  - quote: The testimonial text (required)
+  - author: Client name/initials (e.g., "A.K.") (required)
+  - role: Client role/case type (e.g., "Klient - Sprawa rozwodowa") (required)
+  - rating: Rating value (0.0 to 5.0) (required)
+  - variant: Style variant - card, minimal (default: card)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="testimonial(quote, author, role, rating, variant, customClass)"
+     th:class="'bg-white rounded-xl shadow-md p-6 flex flex-col ' + ${customClass ?: ''}">
+
+    <!-- Quote Icon -->
+    <i class="material-icons text-4xl text-primary-200 mb-2">format_quote</i>
+
+    <!-- Quote Text -->
+    <p class="text-gray-700 italic mb-4 flex-grow"
+       th:text="'&quot;' + ${quote} + '&quot;'">
+        "Quote text"
+    </p>
+
+    <!-- Rating -->
+    <div class="mb-4">
+        <th:block th:replace="~{fragments/components/rating :: rating(${rating}, 5, true, null, 'sm', 'yellow', false, 0.5, '')}"></th:block>
+    </div>
+
+    <!-- Author Info -->
+    <div class="flex items-center gap-3">
+        <!-- Avatar with initials -->
+        <th:block th:replace="~{fragments/components/avatar :: avatar(null, ${author}, ${author}, 'md', 'circular', false, '')}"></th:block>
+
+        <div>
+            <p class="font-semibold text-gray-900 text-sm" th:text="${author}">A.K.</p>
+            <p class="text-xs text-gray-600" th:text="${role}">Klient</p>
+        </div>
+    </div>
+</div>
+
+<!--
+  Testimonial Minimal (without card styling)
+
+  Parameters: Same as testimonial
+-->
+
+<div th:fragment="testimonialMinimal(quote, author, role, rating, customClass)"
+     th:class="'flex flex-col ' + ${customClass ?: ''}">
+
+    <!-- Quote Icon -->
+    <i class="material-icons text-3xl text-primary-400 mb-2">format_quote</i>
+
+    <!-- Quote Text -->
+    <p class="text-gray-800 italic mb-3"
+       th:text="'&quot;' + ${quote} + '&quot;'">
+        "Quote text"
+    </p>
+
+    <!-- Rating -->
+    <div class="mb-3">
+        <th:block th:replace="~{fragments/components/rating :: rating(${rating}, 5, true, null, 'sm', 'yellow', false, 0.5, '')}"></th:block>
+    </div>
+
+    <!-- Author -->
+    <div class="flex items-center gap-2">
+        <span class="font-semibold text-gray-900 text-sm" th:text="${author}">A.K.</span>
+        <span class="text-gray-400">•</span>
+        <span class="text-xs text-gray-600" th:text="${role}">Klient</span>
+    </div>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="testimonialCard(quote, author, role, rating)"
+          th:replace="~{fragments/components/testimonial :: testimonial(${quote}, ${author}, ${role}, ${rating}, 'card', '')}">
+</th:block>
+
+<th:block th:fragment="simple(quote, author, rating)"
+          th:replace="~{fragments/components/testimonial :: testimonialMinimal(${quote}, ${author}, 'Klient', ${rating}, '')}">
+</th:block>
+
+</body>
+</html>

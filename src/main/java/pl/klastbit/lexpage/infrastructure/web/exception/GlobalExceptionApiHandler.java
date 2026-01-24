@@ -6,6 +6,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import pl.klastbit.lexpage.domain.contact.exception.RateLimitExceededException;
 
 import java.net.URI;
@@ -29,8 +30,8 @@ public class GlobalExceptionApiHandler {
         log.warn("Rate limit exceeded: {}", ex.getMessage());
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-            HttpStatus.TOO_MANY_REQUESTS,
-            "Osiągnięto limit wiadomości. Spróbuj ponownie za godzinę."
+                HttpStatus.TOO_MANY_REQUESTS,
+                "Osiągnięto limit wiadomości. Spróbuj ponownie za godzinę."
         );
 
         problemDetail.setTitle("Rate Limit Exceeded");
@@ -51,28 +52,28 @@ public class GlobalExceptionApiHandler {
         log.warn("Validation error: {}", ex.getMessage());
 
         String errorMessage = ex.getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .map(error -> error.getField() + ": " + error.getDefaultMessage())
-            .collect(Collectors.joining(", "));
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-            HttpStatus.BAD_REQUEST,
-            errorMessage
+                HttpStatus.BAD_REQUEST,
+                errorMessage
         );
 
         problemDetail.setTitle("Validation Error");
         problemDetail.setType(URI.create("https://klastbit.pl/errors/validation-error"));
         problemDetail.setProperty("timestamp", Instant.now());
         problemDetail.setProperty("fieldErrors", ex.getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .map(error -> new FieldError(
-                error.getField(),
-                error.getDefaultMessage(),
-                error.getRejectedValue()
-            ))
-            .collect(Collectors.toList())
+                .getFieldErrors()
+                .stream()
+                .map(error -> new FieldError(
+                        error.getField(),
+                        error.getDefaultMessage(),
+                        error.getRejectedValue()
+                ))
+                .collect(Collectors.toList())
         );
 
         return problemDetail;
@@ -87,12 +88,24 @@ public class GlobalExceptionApiHandler {
         log.warn("Invalid argument: {}", ex.getMessage());
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-            HttpStatus.BAD_REQUEST,
-            ex.getMessage()
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
         );
 
         problemDetail.setTitle("Invalid Request");
         problemDetail.setType(URI.create("https://klastbit.pl/errors/invalid-request"));
+        problemDetail.setProperty("timestamp", Instant.now());
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ProblemDetail handleNoResourceFoundException(NoResourceFoundException ex) {
+        log.info(ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
         problemDetail.setProperty("timestamp", Instant.now());
 
         return problemDetail;
@@ -107,8 +120,8 @@ public class GlobalExceptionApiHandler {
         log.error("Unexpected error occurred", ex);
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-            HttpStatus.INTERNAL_SERVER_ERROR,
-            "Wystąpił nieoczekiwany błąd. Spróbuj ponownie lub zadzwoń."
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Wystąpił nieoczekiwany błąd. Spróbuj ponownie lub zadzwoń."
         );
 
         problemDetail.setTitle("Internal Server Error");
@@ -122,8 +135,9 @@ public class GlobalExceptionApiHandler {
      * Record for field error details in validation responses.
      */
     private record FieldError(
-        String field,
-        String message,
-        Object rejectedValue
-    ) {}
+            String field,
+            String message,
+            Object rejectedValue
+    ) {
+    }
 }

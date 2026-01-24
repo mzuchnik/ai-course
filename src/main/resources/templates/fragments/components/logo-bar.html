@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Logo Bar Component (Trust Badges)
+
+  Main Fragment Parameters:
+  - logos: List of LogoItemDto (src, alt, url) (required)
+  - title: Optional title text above logos (optional)
+  - grayscale: Apply grayscale filter with hover effect (default: true)
+  - customClass: Additional CSS classes (optional)
+-->
+
+<div th:fragment="logoBar(logos, title, grayscale, customClass)"
+     th:class="'py-12 ' + ${customClass ?: ''}">
+
+    <!-- Optional Title -->
+    <h3 th:if="${title != null && !title.isEmpty()}"
+        class="text-center text-gray-600 text-sm uppercase tracking-wider mb-8"
+        th:text="${title}">
+        Trusted By
+    </h3>
+
+    <!-- Logo Grid: All logos in one row -->
+    <div class="flex flex-wrap items-center justify-center gap-8">
+        <div th:each="logo : ${logos}">
+            <a th:href="${logo.url() != null ? logo.url() : '#'}"
+               th:target="${logo.url() != null && logo.url() != '#' ? '_blank' : null}"
+               th:rel="${logo.url() != null && logo.url() != '#' ? 'noopener noreferrer' : null}"
+               class="opacity-60 hover:opacity-100 transition-opacity duration-300 block">
+                <img th:src="${logo.src()}"
+                     th:alt="${logo.alt()}"
+                     th:class="'h-12 w-auto object-contain ' + ${(grayscale ?: true) ? 'grayscale hover:grayscale-0 transition-all duration-300' : ''}"
+                     loading="lazy">
+            </a>
+        </div>
+    </div>
+</div>
+
+<!--
+  Logo Bar Compact (smaller height, fewer columns)
+
+  Parameters: Same as logoBar
+-->
+
+<div th:fragment="logoBarCompact(logos, title, grayscale, customClass)"
+     th:class="'py-8 ' + ${customClass ?: ''}">
+
+    <!-- Optional Title -->
+    <h4 th:if="${title != null && !title.isEmpty()}"
+        class="text-center text-gray-500 text-xs uppercase tracking-wider mb-6"
+        th:text="${title}">
+        Partners
+    </h4>
+
+    <!-- Logo Row: All logos in one row -->
+    <div class="flex flex-wrap items-center justify-center gap-6">
+        <div th:each="logo : ${logos}">
+            <a th:href="${logo.url() != null ? logo.url() : '#'}"
+               th:target="${logo.url() != null && logo.url() != '#' ? '_blank' : null}"
+               class="opacity-50 hover:opacity-100 transition-opacity duration-300 block">
+                <img th:src="${logo.src()}"
+                     th:alt="${logo.alt()}"
+                     th:class="'h-8 w-auto object-contain ' + ${(grayscale ?: true) ? 'grayscale hover:grayscale-0 transition-all duration-300' : ''}"
+                     loading="lazy">
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Convenience Shortcuts -->
+
+<th:block th:fragment="simple(logos, title)"
+          th:replace="~{fragments/components/logo-bar :: logoBar(${logos}, ${title}, true, '')}">
+</th:block>
+
+<th:block th:fragment="noGrayscale(logos, title)"
+          th:replace="~{fragments/components/logo-bar :: logoBar(${logos}, ${title}, false, '')}">
+</th:block>
+
+<th:block th:fragment="compact(logos)"
+          th:replace="~{fragments/components/logo-bar :: logoBarCompact(${logos}, null, true, '')}">
+</th:block>
+
+</body>
+</html>

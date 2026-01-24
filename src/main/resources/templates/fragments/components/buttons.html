@@ -9,7 +9,7 @@
   - text: Tekst przycisku (wymagany)
   - type: Typ przycisku (default: 'button', opcje: 'button', 'submit', 'reset')
   - variant: Wariant (default: 'filled', opcje: 'filled', 'outlined', 'text', 'gradient')
-  - color: Kolor (default: 'blue', opcje: 'blue', 'red', 'green', 'primary', 'burgundy')
+  - color: Kolor (default: 'blue', opcje: 'blue', 'red', 'green', 'primary', 'burgundy', 'white')
   - size: Rozmiar (default: 'md', opcje: 'sm', 'md', 'lg')
   - fullWidth: Pełna szerokość (default: false)
   - disabled: Wyłączony (default: false)
@@ -38,23 +38,27 @@
                  (color == 'burgundy') ? 'border-2 border-burgundy-500 text-burgundy-500 hover:opacity-75 ' :
                  (color == 'red') ? 'border-2 border-red-500 text-red-500 hover:opacity-75 ' :
                  (color == 'green') ? 'border-2 border-green-500 text-green-500 hover:opacity-75 ' :
+                 (color == 'white') ? 'border-2 border-white text-white hover:opacity-75 ' :
                  'border-2 border-blue-500 text-blue-500 hover:opacity-75 ') :
               (variant == 'text') ?
                 ((color == 'primary') ? 'text-primary-500 hover:bg-primary-500/10 ' :
                  (color == 'burgundy') ? 'text-burgundy-500 hover:bg-burgundy-500/10 ' :
                  (color == 'red') ? 'text-red-500 hover:bg-red-500/10 ' :
                  (color == 'green') ? 'text-green-500 hover:bg-green-500/10 ' :
+                 (color == 'white') ? 'text-white hover:bg-white/10 ' :
                  'text-blue-500 hover:bg-blue-500/10 ') :
               (variant == 'gradient') ?
                 ((color == 'primary') ? 'bg-gradient-to-tr from-primary-600 to-primary-400 text-white shadow-md hover:shadow-lg ' :
                  (color == 'burgundy') ? 'bg-gradient-to-tr from-burgundy-600 to-burgundy-400 text-white shadow-md hover:shadow-lg ' :
                  (color == 'red') ? 'bg-gradient-to-tr from-red-600 to-red-400 text-white shadow-md hover:shadow-lg ' :
                  (color == 'green') ? 'bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-md hover:shadow-lg ' :
+                 (color == 'white') ? 'bg-gradient-to-tr from-white to-gray-100 text-primary-600 shadow-md hover:shadow-lg ' :
                  'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md hover:shadow-lg ') :
                 ((color == 'primary') ? 'bg-primary-500 text-white shadow-md hover:shadow-lg ' :
                  (color == 'burgundy') ? 'bg-burgundy-500 text-white shadow-md hover:shadow-lg ' :
                  (color == 'red') ? 'bg-red-500 text-white shadow-md hover:shadow-lg ' :
                  (color == 'green') ? 'bg-green-500 text-white shadow-md hover:shadow-lg ' :
+                 (color == 'white') ? 'bg-white text-primary-600 shadow-md hover:shadow-lg ' :
                  'bg-blue-500 text-white shadow-md hover:shadow-lg ')}"
         th:attr="data-ripple-light=${variant != 'text'}">
 
