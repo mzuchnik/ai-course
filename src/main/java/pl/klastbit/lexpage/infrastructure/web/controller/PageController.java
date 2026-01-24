@@ -66,7 +66,7 @@ public class PageController {
         // === SECTION 5: Process Steps (3 steps) ===
         List<ProcessStepDto> processSteps = List.of(
                 new ProcessStepDto("calendar_today", "Bezpłatna konsultacja", "Poznajemy sprawę i oceniamy szanse powodzenia"),
-                new ProcessStepDto("strategy", "Plan działania", "Opracowujemy strategię i przedstawiamy ofertę"),
+                new ProcessStepDto("pending", "Plan działania", "Opracowujemy strategię i przedstawiamy ofertę"),
                 new ProcessStepDto("verified_user", "Realizacja i sukces", "Prowadzimy sprawę do końca")
         );
         model.addAttribute("processSteps", processSteps);
