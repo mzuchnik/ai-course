@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="11-migrate-enums-to-varchar" author="system">
+        <comment>Migrate PostgreSQL custom ENUM types to VARCHAR for better portability and flexibility</comment>
+
+        <!-- Articles table: status column -->
+        <sql>
+            ALTER TABLE articles
+            ALTER COLUMN status TYPE VARCHAR(50) USING status::text;
+        </sql>
+
+        <!-- Services table: category column -->
+        <sql>
+            ALTER TABLE services
+            ALTER COLUMN category TYPE VARCHAR(50) USING category::text;
+        </sql>
+
+        <!-- Contact messages table: category and status columns -->
+        <sql>
+            ALTER TABLE contact_messages
+            ALTER COLUMN category TYPE VARCHAR(50) USING category::text;
+        </sql>
+
+        <sql>
+            ALTER TABLE contact_messages
+            ALTER COLUMN status TYPE VARCHAR(50) USING status::text;
+        </sql>
+
+        <!-- AI generations table: status column -->
+        <sql>
+            ALTER TABLE ai_generations
+            ALTER COLUMN status TYPE VARCHAR(50) USING status::text;
+        </sql>
+
+        <!-- Drop old ENUM types (CASCADE will drop dependencies) -->
+        <sql>
+            DROP TYPE IF EXISTS article_status_enum CASCADE;
+        </sql>
+
+        <sql>
+            DROP TYPE IF EXISTS service_category_enum CASCADE;
+        </sql>
+
+        <sql>
+            DROP TYPE IF EXISTS message_category_enum CASCADE;
+        </sql>
+
+        <sql>
+            DROP TYPE IF EXISTS message_status_enum CASCADE;
+        </sql>
+
+        <sql>
+            DROP TYPE IF EXISTS generation_status_enum CASCADE;
+        </sql>
+
+        <rollback>
+            <!-- Recreate ENUM types -->
+            <sql>
+                CREATE TYPE article_status_enum AS ENUM ('DRAFT', 'PUBLISHED', 'ARCHIVED');
+            </sql>
+            <sql>
+                CREATE TYPE service_category_enum AS ENUM ('CIVIL_LAW', 'CRIMINAL_LAW');
+            </sql>
+            <sql>
+                CREATE TYPE message_category_enum AS ENUM ('CIVIL_LAW', 'CRIMINAL_LAW', 'GENERAL', 'OTHER');
+            </sql>
+            <sql>
+                CREATE TYPE message_status_enum AS ENUM ('NEW', 'READ', 'REPLIED', 'ARCHIVED');
+            </sql>
+            <sql>
+                CREATE TYPE generation_status_enum AS ENUM ('SUCCESS', 'FAILED', 'TIMEOUT');
+            </sql>
+
+            <!-- Revert columns to ENUM types -->
+            <sql>
+                ALTER TABLE articles ALTER COLUMN status TYPE article_status_enum USING status::article_status_enum;
+            </sql>
+            <sql>
+                ALTER TABLE services ALTER COLUMN category TYPE service_category_enum USING category::service_category_enum;
+            </sql>
+            <sql>
+                ALTER TABLE contact_messages ALTER COLUMN category TYPE message_category_enum USING category::message_category_enum;
+            </sql>
+            <sql>
+                ALTER TABLE contact_messages ALTER COLUMN status TYPE message_status_enum USING status::message_status_enum;
+            </sql>
+            <sql>
+                ALTER TABLE ai_generations ALTER COLUMN status TYPE generation_status_enum USING status::generation_status_enum;
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

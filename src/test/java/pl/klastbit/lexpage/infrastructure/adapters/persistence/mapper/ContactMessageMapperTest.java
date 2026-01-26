@@ -5,6 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import pl.klastbit.lexpage.domain.contact.ContactMessage;
+import pl.klastbit.lexpage.domain.contact.MessageCategory;
+import pl.klastbit.lexpage.domain.contact.MessageStatus;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ContactMessageEntity;
 
 import java.math.BigDecimal;
@@ -88,7 +90,7 @@ class ContactMessageMapperTest {
         void shouldConvertEntityStatusToDomainStatus() {
             // given
             ContactMessageEntity entity = createMinimalContactMessageEntity();
-            entity.setStatus(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageStatus.READ);
+            entity.setStatus(MessageStatus.READ);
 
             // when
             ContactMessage result = mapper.toDomain(entity);
@@ -102,7 +104,7 @@ class ContactMessageMapperTest {
         void shouldConvertEntityCategoryToDomainCategory() {
             // given
             ContactMessageEntity entity = createMinimalContactMessageEntity();
-            entity.setCategory(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageCategory.CIVIL_LAW);
+            entity.setCategory(MessageCategory.CIVIL_LAW);
 
             // when
             ContactMessage result = mapper.toDomain(entity);
@@ -170,9 +172,9 @@ class ContactMessageMapperTest {
             assertThat(result.getLastName()).isEqualTo("Doe");
             assertThat(result.getEmail()).isEqualTo("john.doe@example.com");
             assertThat(result.getPhone()).isEqualTo("+48123456789");
-            assertThat(result.getCategory()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageCategory.GENERAL);
+            assertThat(result.getCategory()).isEqualTo(MessageCategory.GENERAL);
             assertThat(result.getMessage()).isEqualTo("Test message content");
-            assertThat(result.getStatus()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageStatus.NEW);
+            assertThat(result.getStatus()).isEqualTo(MessageStatus.NEW);
             assertThat(result.getRecaptchaScore()).isEqualByComparingTo(new BigDecimal("0.9"));
             assertThat(result.getIpAddress()).isEqualTo("192.168.1.1");
             assertThat(result.getUserAgent()).isEqualTo("Mozilla/5.0");
@@ -235,7 +237,7 @@ class ContactMessageMapperTest {
             ContactMessageEntity result = mapper.toEntity(domain);
 
             // then
-            assertThat(result.getStatus()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageStatus.REPLIED);
+            assertThat(result.getStatus()).isEqualTo(MessageStatus.REPLIED);
         }
 
         @Test
@@ -264,7 +266,7 @@ class ContactMessageMapperTest {
             ContactMessageEntity result = mapper.toEntity(domainWithDifferentCategory);
 
             // then
-            assertThat(result.getCategory()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageCategory.CRIMINAL_LAW);
+            assertThat(result.getCategory()).isEqualTo(MessageCategory.CRIMINAL_LAW);
         }
 
         @Test
@@ -377,9 +379,9 @@ class ContactMessageMapperTest {
             assertThat(entity.getLastName()).isEqualTo("Smith");
             assertThat(entity.getEmail()).isEqualTo("jane.smith@example.com");
             assertThat(entity.getPhone()).isEqualTo("+48987654321");
-            assertThat(entity.getCategory()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageCategory.CRIMINAL_LAW);
+            assertThat(entity.getCategory()).isEqualTo(MessageCategory.CRIMINAL_LAW);
             assertThat(entity.getMessage()).isEqualTo("Updated message content");
-            assertThat(entity.getStatus()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageStatus.READ);
+            assertThat(entity.getStatus()).isEqualTo(MessageStatus.READ);
             assertThat(entity.getRecaptchaScore()).isEqualByComparingTo(new BigDecimal("0.8"));
             assertThat(entity.getIpAddress()).isEqualTo("10.0.0.1");
             assertThat(entity.getUserAgent()).isEqualTo("Chrome/96.0");
@@ -478,9 +480,9 @@ class ContactMessageMapperTest {
         entity.setFirstName("John");
         entity.setLastName("Doe");
         entity.setEmail("john.doe@example.com");
-        entity.setCategory(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageCategory.GENERAL);
+        entity.setCategory(MessageCategory.GENERAL);
         entity.setMessage("Test message content");
-        entity.setStatus(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageStatus.NEW);
+        entity.setStatus(MessageStatus.NEW);
         entity.setCreatedAt(LocalDateTime.now());
         entity.setUpdatedAt(LocalDateTime.now());
         return entity;

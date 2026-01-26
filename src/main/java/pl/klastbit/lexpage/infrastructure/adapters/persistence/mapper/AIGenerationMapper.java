@@ -38,7 +38,7 @@ public class AIGenerationMapper {
             entity.getModel(),
             entity.getTokensUsed(),
             entity.getGenerationTimeMs(),
-            toDomainStatus(entity.getStatus()),
+            entity.getStatus(),
             entity.getErrorMessage(),
             getArticleId(entity),
             entity.getCreatedAt()
@@ -65,7 +65,7 @@ public class AIGenerationMapper {
         entity.setModel(domain.getModel());
         entity.setTokensUsed(domain.getTokensUsed());
         entity.setGenerationTimeMs(domain.getGenerationTimeMs());
-        entity.setStatus(toEntityStatus(domain.getStatus()));
+        entity.setStatus(domain.getStatus());
         entity.setErrorMessage(domain.getErrorMessage());
         entity.setCreatedAt(domain.getCreatedAt());
 
@@ -94,7 +94,7 @@ public class AIGenerationMapper {
         entity.setModel(domain.getModel());
         entity.setTokensUsed(domain.getTokensUsed());
         entity.setGenerationTimeMs(domain.getGenerationTimeMs());
-        entity.setStatus(toEntityStatus(domain.getStatus()));
+        entity.setStatus(domain.getStatus());
         entity.setErrorMessage(domain.getErrorMessage());
         entity.setCreatedAt(domain.getCreatedAt());
     }
@@ -151,25 +151,4 @@ public class AIGenerationMapper {
 
     // Private helper methods for enum conversion
 
-    /**
-     * Converts domain GenerationStatus to entity GenerationStatus.
-     */
-    private pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.GenerationStatus toEntityStatus(
-            pl.klastbit.lexpage.domain.ai.GenerationStatus domainStatus) {
-        if (domainStatus == null) {
-            return null;
-        }
-        return pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.GenerationStatus.valueOf(domainStatus.name());
-    }
-
-    /**
-     * Converts entity GenerationStatus to domain GenerationStatus.
-     */
-    private pl.klastbit.lexpage.domain.ai.GenerationStatus toDomainStatus(
-            pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.GenerationStatus entityStatus) {
-        if (entityStatus == null) {
-            return null;
-        }
-        return pl.klastbit.lexpage.domain.ai.GenerationStatus.valueOf(entityStatus.name());
-    }
 }

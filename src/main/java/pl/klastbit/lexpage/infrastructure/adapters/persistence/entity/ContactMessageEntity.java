@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.klastbit.lexpage.domain.contact.MessageCategory;
+import pl.klastbit.lexpage.domain.contact.MessageStatus;
 
 import java.math.BigDecimal;
 
@@ -35,14 +37,14 @@ public class ContactMessageEntity extends BaseEntity {
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "category", nullable = false, columnDefinition = "message_category_enum")
+    @Column(name = "category", nullable = false, length = 50)
     private MessageCategory category;
 
     @Column(name = "message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "message_status_enum")
+    @Column(name = "status", nullable = false, length = 50)
     private MessageStatus status = MessageStatus.NEW;
 
     @Column(name = "recaptcha_score", precision = 3, scale = 2)

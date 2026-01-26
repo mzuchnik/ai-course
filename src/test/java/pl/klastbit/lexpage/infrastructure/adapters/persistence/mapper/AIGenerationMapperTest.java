@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import pl.klastbit.lexpage.domain.ai.AIGeneration;
+import pl.klastbit.lexpage.domain.ai.GenerationStatus;
 import pl.klastbit.lexpage.domain.user.UserId;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.AIGenerationEntity;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleEntity;
@@ -70,7 +71,7 @@ class AIGenerationMapperTest {
         void shouldMapFailedGenerationWithErrorMessage() {
             // given
             AIGenerationEntity entity = createMinimalAIGenerationEntity();
-            entity.setStatus(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.GenerationStatus.FAILED);
+            entity.setStatus(GenerationStatus.FAILED);
             entity.setErrorMessage("API error occurred");
             entity.setGeneratedContent(null);
 
@@ -142,7 +143,7 @@ class AIGenerationMapperTest {
         void shouldConvertEntityStatusToDomainStatus() {
             // given
             AIGenerationEntity entity = createMinimalAIGenerationEntity();
-            entity.setStatus(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.GenerationStatus.FAILED);
+            entity.setStatus(GenerationStatus.FAILED);
 
             // when
             AIGeneration result = mapper.toDomain(entity);
@@ -199,7 +200,7 @@ class AIGenerationMapperTest {
             assertThat(result.getModel()).isEqualTo("gpt-4");
             assertThat(result.getTokensUsed()).isEqualTo(1000);
             assertThat(result.getGenerationTimeMs()).isEqualTo(5000);
-            assertThat(result.getStatus()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.GenerationStatus.SUCCESS);
+            assertThat(result.getStatus()).isEqualTo(GenerationStatus.SUCCESS);
             assertThat(result.getErrorMessage()).isNull();
             assertThat(result.getCreatedAt()).isNotNull();
         }
@@ -273,7 +274,7 @@ class AIGenerationMapperTest {
             AIGenerationEntity result = mapper.toEntity(domain);
 
             // then
-            assertThat(result.getStatus()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.GenerationStatus.TIMEOUT);
+            assertThat(result.getStatus()).isEqualTo(GenerationStatus.TIMEOUT);
         }
 
         @Test
@@ -361,7 +362,7 @@ class AIGenerationMapperTest {
             assertThat(entity.getModel()).isEqualTo("gpt-4-turbo");
             assertThat(entity.getTokensUsed()).isEqualTo(2000);
             assertThat(entity.getGenerationTimeMs()).isEqualTo(10000);
-            assertThat(entity.getStatus()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.GenerationStatus.FAILED);
+            assertThat(entity.getStatus()).isEqualTo(GenerationStatus.FAILED);
             assertThat(entity.getErrorMessage()).isEqualTo("New error");
             assertThat(entity.getCreatedAt()).isEqualTo(newCreatedAt);
         }
@@ -626,7 +627,7 @@ class AIGenerationMapperTest {
         entity.setWordCount(500);
         entity.setGeneratedContent("Generated content here...");
         entity.setModel("gpt-4");
-        entity.setStatus(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.GenerationStatus.SUCCESS);
+        entity.setStatus(GenerationStatus.SUCCESS);
         entity.setCreatedAt(LocalDateTime.now());
 
         UserEntity user = createUserEntity(UUID.randomUUID(), "user@example.com");

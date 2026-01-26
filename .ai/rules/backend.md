@@ -118,6 +118,140 @@ public record Money(BigDecimal amount, Currency currency) {
 - **Klasy wymagające dziedziczenia** - Records są final
 - **Klasy z dużą ilością logiki** - lepiej użyć zwykłej klasy
 
+## JPA i Mapowanie Enumów
+
+### Zasada: Enumy jako VARCHAR, NIE jako Custom PostgreSQL ENUMs
+
+**KRYTYCZNA ZASADA**: W encjach JPA enumy ZAWSZE mapujemy jako stringi (VARCHAR), NIE używamy niestandardowych typów enum PostgreSQL!
+
+### Dlaczego unikać Custom PostgreSQL ENUMs?
+
+❌ **Problemy z Custom ENUM Types:**
+- Trudności z migracjami (dodawanie/usuwanie wartości wymaga ALTER TYPE)
+- Brak kompatybilności między środowiskami (różne wersje typu)
+- Problemy z rollback'ami migracji
+- Ograniczona przenośność (vendor lock-in)
+- Komplikacje przy testach (H2, Testcontainers)
+- Trudniejsze zarządzanie zmianami w wartościach enum
+
+✅ **Zalety VARCHAR dla Enumów:**
+- Łatwe dodawanie/usuwanie wartości enum
+- Prosty rollback migracji
+- Pełna przenośność między bazami danych
+- Prostsze testy z H2 lub innymi bazami
+- Zachowanie type safety w Javie
+
+### Jak Mapować Enumy w JPA
+
+**DOBRZE - EnumType.STRING z VARCHAR:**
+
+```java
+// Encja JPA
+@Entity
+@Table(name = "articles")
+@Getter
+@Setter
+@NoArgsConstructor
+public class ArticleEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 50)
+    private ArticleStatus status = ArticleStatus.DRAFT;
+}
+
+// Java Enum
+public enum ArticleStatus {
+    DRAFT,
+    PUBLISHED,
+    ARCHIVED
+}
+```
+
+**ŹLE - Custom PostgreSQL ENUM Type:**
+
+```java
+// ŹLE! NIE używaj columnDefinition z custom type!
+@Enumerated(EnumType.STRING)
+@Column(name = "status", nullable = false, columnDefinition = "article_status_enum")
+private ArticleStatus status;
+```
+
+### Liquibase Migrations dla Enumów
+
+**DOBRZE - VARCHAR kolumna:**
+
+```xml
+<changeSet id="create-articles-table" author="system">
+    <createTable tableName="articles">
+        <column name="status" type="VARCHAR(50)" defaultValue="DRAFT">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+</changeSet>
+```
+
+**ŹLE - Custom ENUM type:**
+
+```xml
+<!-- ŹLE! NIE twórz custom enum types! -->
+<changeSet id="create-enum-types" author="system">
+    <sql>
+        CREATE TYPE article_status_enum AS ENUM ('DRAFT', 'PUBLISHED', 'ARCHIVED');
+    </sql>
+</changeSet>
+```
+
+### Migracja z Custom ENUM na VARCHAR
+
+Jeśli masz już custom ENUM types, migracja jest prosta:
+
+```xml
+<changeSet id="migrate-enums-to-varchar" author="system">
+    <comment>Migrate custom ENUM to VARCHAR</comment>
+
+    <!-- Zmień typ kolumny na VARCHAR -->
+    <sql>
+        ALTER TABLE articles
+        ALTER COLUMN status TYPE VARCHAR(50) USING status::text;
+    </sql>
+
+    <!-- Usuń stary typ ENUM -->
+    <sql>
+        DROP TYPE IF EXISTS article_status_enum CASCADE;
+    </sql>
+</changeSet>
+```
+
+### Walidacja Wartości Enum
+
+Walidację wartości enum zapewnia:
+1. **Java enum** - type safety na poziomie aplikacji
+2. **@Enumerated(EnumType.STRING)** - automatyczna konwersja przez Hibernate
+3. **Opcjonalnie: CHECK constraint** - walidacja na poziomie bazy danych
+
+```xml
+<!-- Opcjonalny CHECK constraint dla dodatkowej walidacji -->
+<changeSet id="add-status-check-constraint" author="system">
+    <sql>
+        ALTER TABLE articles ADD CONSTRAINT chk_article_status
+        CHECK (status IN ('DRAFT', 'PUBLISHED', 'ARCHIVED'));
+    </sql>
+</changeSet>
+```
+
+**Uwaga**: CHECK constraint nie jest wymagany, ponieważ Hibernate już zapewnia type safety.
+
+### Podsumowanie Zasad
+
+1. **ZAWSZE** używaj `@Enumerated(EnumType.STRING)` w encjach JPA
+2. **ZAWSZE** używaj `VARCHAR(50)` w Liquibase migrations
+3. **NIGDY** nie twórz custom PostgreSQL ENUM types (`CREATE TYPE ... AS ENUM`)
+4. **NIGDY** nie używaj `columnDefinition` z custom enum types
+5. **Opcjonalnie** możesz dodać CHECK constraint dla walidacji na poziomie bazy
+
 ## Domain-Driven Design (DDD)
 
 ### 1. Agregaty i Aggregate Roots

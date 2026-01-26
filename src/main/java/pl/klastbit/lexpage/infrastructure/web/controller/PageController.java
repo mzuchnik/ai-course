@@ -24,7 +24,7 @@ public class PageController {
         model.addAttribute("heroEyebrow", "Kancelaria prawna z 15-letnim doświadczeniem");
         model.addAttribute("heroTitle", "Skutecznie bronimy Twoich praw w sprawach cywilnych i karnych");
         model.addAttribute("heroSubtitle", "Profesjonalna obsługa prawna z gwarancją sukcesu. 98% wygranych spraw.");
-        model.addAttribute("heroImage", "https://placehold.co/1200x600/0ea5e9/ffffff?text=Lawyer");
+        model.addAttribute("heroImage", "https://placehold.co/1200x1600/0ea5e9/ffffff?text=Lawyer");
 
         // === SECTION 2: Trust Logos ===
         List<LogoItemDto> trustLogos = List.of(

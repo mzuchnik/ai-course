@@ -8,6 +8,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
+import pl.klastbit.lexpage.domain.service.ServiceCategory;
 
 /**
  * JPA Entity for services table.
@@ -36,7 +37,7 @@ public class ServiceEntity extends BaseEntity {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "category", nullable = false, columnDefinition = "service_category_enum")
+    @Column(name = "category", nullable = false, length = 50)
     private ServiceCategory category;
 
     @Column(name = "scope", columnDefinition = "TEXT")

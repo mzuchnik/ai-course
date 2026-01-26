@@ -37,7 +37,7 @@ public class ArticleMapper {
                 entity.getSlug(),
                 entity.getContent(),
                 entity.getExcerpt(),
-                toDomainStatus(entity.getStatus()),
+                entity.getStatus(),
                 getAuthorId(entity),
                 entity.getPublishedAt(),
                 entity.getMetaTitle(),
@@ -70,7 +70,7 @@ public class ArticleMapper {
         entity.setSlug(domain.getSlug());
         entity.setContent(domain.getContent());
         entity.setExcerpt(domain.getExcerpt());
-        entity.setStatus(toEntityStatus(domain.getStatus()));
+        entity.setStatus(domain.getStatus());
         entity.setPublishedAt(domain.getPublishedAt());
 
         // SEO fields
@@ -105,7 +105,7 @@ public class ArticleMapper {
         entity.setSlug(domain.getSlug());
         entity.setContent(domain.getContent());
         entity.setExcerpt(domain.getExcerpt());
-        entity.setStatus(toEntityStatus(domain.getStatus()));
+        entity.setStatus(domain.getStatus());
         entity.setPublishedAt(domain.getPublishedAt());
 
         // SEO fields
@@ -192,25 +192,4 @@ public class ArticleMapper {
         return Arrays.asList(array);
     }
 
-    /**
-     * Converts domain ArticleStatus to entity ArticleStatus.
-     */
-    private pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleStatus toEntityStatus(
-            pl.klastbit.lexpage.domain.article.ArticleStatus domainStatus) {
-        if (domainStatus == null) {
-            return null;
-        }
-        return pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleStatus.valueOf(domainStatus.name());
-    }
-
-    /**
-     * Converts entity ArticleStatus to domain ArticleStatus.
-     */
-    private pl.klastbit.lexpage.domain.article.ArticleStatus toDomainStatus(
-            pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleStatus entityStatus) {
-        if (entityStatus == null) {
-            return null;
-        }
-        return pl.klastbit.lexpage.domain.article.ArticleStatus.valueOf(entityStatus.name());
-    }
 }

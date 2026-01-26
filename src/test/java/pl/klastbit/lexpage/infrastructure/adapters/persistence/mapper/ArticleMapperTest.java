@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import pl.klastbit.lexpage.domain.article.Article;
+import pl.klastbit.lexpage.domain.article.ArticleStatus;
 import pl.klastbit.lexpage.domain.user.UserId;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleEntity;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.UserEntity;
@@ -165,7 +166,7 @@ class ArticleMapperTest {
             assertThat(result.getSlug()).isEqualTo("test-article");
             assertThat(result.getContent()).isEqualTo("Test content");
             assertThat(result.getExcerpt()).isEqualTo("Test excerpt");
-            assertThat(result.getStatus()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleStatus.PUBLISHED);
+            assertThat(result.getStatus()).isEqualTo(ArticleStatus.PUBLISHED);
             assertThat(result.getPublishedAt()).isNotNull();
             assertThat(result.getMetaTitle()).isEqualTo("Meta Title");
             assertThat(result.getMetaDescription()).isEqualTo("Meta Description");
@@ -319,7 +320,7 @@ class ArticleMapperTest {
             assertThat(entity.getSlug()).isEqualTo("updated-slug");
             assertThat(entity.getContent()).isEqualTo("Updated content");
             assertThat(entity.getExcerpt()).isEqualTo("Updated excerpt");
-            assertThat(entity.getStatus()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleStatus.DRAFT);
+            assertThat(entity.getStatus()).isEqualTo(ArticleStatus.DRAFT);
             assertThat(entity.getPublishedAt()).isNull();
             assertThat(entity.getMetaTitle()).isEqualTo("Updated Meta Title");
             assertThat(entity.getMetaDescription()).isEqualTo("Updated Meta Description");
@@ -508,7 +509,7 @@ class ArticleMapperTest {
         entity.setTitle("Test Article");
         entity.setSlug("test-article");
         entity.setContent("Test content");
-        entity.setStatus(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleStatus.DRAFT);
+        entity.setStatus(ArticleStatus.DRAFT);
         entity.setCreatedAt(LocalDateTime.now());
         entity.setUpdatedAt(LocalDateTime.now());
         return entity;
@@ -517,7 +518,7 @@ class ArticleMapperTest {
     private ArticleEntity createFullArticleEntity() {
         ArticleEntity entity = createMinimalArticleEntity();
         entity.setExcerpt("Test excerpt");
-        entity.setStatus(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ArticleStatus.PUBLISHED);
+        entity.setStatus(ArticleStatus.PUBLISHED);
         entity.setPublishedAt(LocalDateTime.now());
         entity.setMetaTitle("Meta Title");
         entity.setMetaDescription("Meta Description");

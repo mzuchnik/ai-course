@@ -8,6 +8,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
+import pl.klastbit.lexpage.domain.article.ArticleStatus;
 
 import java.time.LocalDateTime;
 
@@ -41,7 +42,7 @@ public class ArticleEntity extends BaseEntity {
     private String excerpt;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "article_status_enum")
+    @Column(name = "status", nullable = false, length = 50)
     private ArticleStatus status = ArticleStatus.DRAFT;
 
     @ManyToOne(fetch = FetchType.LAZY)

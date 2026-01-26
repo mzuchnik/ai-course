@@ -25,4 +25,7 @@
     <!-- 4. Create triggers and functions -->
     <include file="db/changelog/v1.0/10-create-triggers.xml"/>
 
+    <!-- 5. Migrate ENUM types to VARCHAR -->
+    <include file="db/changelog/v1.0/11-migrate-enums-to-varchar.xml"/>
+
 </databaseChangeLog>

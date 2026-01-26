@@ -42,7 +42,7 @@ public class ServiceMapper {
                 entity.getName(),
                 entity.getSlug(),
                 entity.getDescription(),
-                toDomainCategory(entity.getCategory()),
+                entity.getCategory(),
                 entity.getScope(),
                 entity.getProcess(),
                 jsonToFaqList(entity.getFaq()),
@@ -75,7 +75,7 @@ public class ServiceMapper {
         entity.setName(domain.getName());
         entity.setSlug(domain.getSlug());
         entity.setDescription(domain.getDescription());
-        entity.setCategory(toEntityCategory(domain.getCategory()));
+        entity.setCategory(domain.getCategory());
         entity.setScope(domain.getScope());
         entity.setProcess(domain.getProcess());
         entity.setFaq(faqListToJson(domain.getFaqItems()));
@@ -110,7 +110,7 @@ public class ServiceMapper {
         entity.setName(domain.getName());
         entity.setSlug(domain.getSlug());
         entity.setDescription(domain.getDescription());
-        entity.setCategory(toEntityCategory(domain.getCategory()));
+        entity.setCategory(domain.getCategory());
         entity.setScope(domain.getScope());
         entity.setProcess(domain.getProcess());
         entity.setFaq(faqListToJson(domain.getFaqItems()));
@@ -213,25 +213,4 @@ public class ServiceMapper {
         return Arrays.asList(array);
     }
 
-    /**
-     * Converts domain ServiceCategory to entity ServiceCategory.
-     */
-    private pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ServiceCategory toEntityCategory(
-            pl.klastbit.lexpage.domain.service.ServiceCategory domainCategory) {
-        if (domainCategory == null) {
-            return null;
-        }
-        return pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ServiceCategory.valueOf(domainCategory.name());
-    }
-
-    /**
-     * Converts entity ServiceCategory to domain ServiceCategory.
-     */
-    private pl.klastbit.lexpage.domain.service.ServiceCategory toDomainCategory(
-            pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ServiceCategory entityCategory) {
-        if (entityCategory == null) {
-            return null;
-        }
-        return pl.klastbit.lexpage.domain.service.ServiceCategory.valueOf(entityCategory.name());
-    }
 }

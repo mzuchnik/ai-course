@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.klastbit.lexpage.domain.ai.GenerationStatus;
 
 /**
  * JPA Entity for ai_generations table.
@@ -46,7 +47,7 @@ public class AIGenerationEntity extends BaseEntity {
     private Integer generationTimeMs;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "generation_status_enum")
+    @Column(name = "status", nullable = false, length = 50)
     private GenerationStatus status;
 
     @Column(name = "error_message", columnDefinition = "TEXT")

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import pl.klastbit.lexpage.domain.service.FaqItem;
 import pl.klastbit.lexpage.domain.service.Service;
+import pl.klastbit.lexpage.domain.service.ServiceCategory;
 import pl.klastbit.lexpage.domain.user.UserId;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ServiceEntity;
 import pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.UserEntity;
@@ -218,7 +219,7 @@ class ServiceMapperTest {
             assertThat(result.getName()).isEqualTo("Test Service");
             assertThat(result.getSlug()).isEqualTo("test-service");
             assertThat(result.getDescription()).isEqualTo("Test description");
-            assertThat(result.getCategory()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ServiceCategory.CIVIL_LAW);
+            assertThat(result.getCategory()).isEqualTo(ServiceCategory.CIVIL_LAW);
             assertThat(result.getScope()).isEqualTo("Test scope");
             assertThat(result.getProcess()).isEqualTo("Test process");
             assertThat(result.getDisplayOrder()).isEqualTo(1);
@@ -512,7 +513,7 @@ class ServiceMapperTest {
             assertThat(entity.getName()).isEqualTo("Updated Service");
             assertThat(entity.getSlug()).isEqualTo("updated-service");
             assertThat(entity.getDescription()).isEqualTo("Updated description");
-            assertThat(entity.getCategory()).isEqualTo(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ServiceCategory.CRIMINAL_LAW);
+            assertThat(entity.getCategory()).isEqualTo(ServiceCategory.CRIMINAL_LAW);
             assertThat(entity.getScope()).isEqualTo("Updated scope");
             assertThat(entity.getProcess()).isEqualTo("Updated process");
             assertThat(entity.getFaq()).contains("New Q").contains("New A");
@@ -729,7 +730,7 @@ class ServiceMapperTest {
         entity.setName("Test Service");
         entity.setSlug("test-service");
         entity.setDescription("Test description");
-        entity.setCategory(pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.ServiceCategory.CIVIL_LAW);
+        entity.setCategory(ServiceCategory.CIVIL_LAW);
         entity.setDisplayOrder(1);
         entity.setCreatedAt(LocalDateTime.now());
         entity.setUpdatedAt(LocalDateTime.now());

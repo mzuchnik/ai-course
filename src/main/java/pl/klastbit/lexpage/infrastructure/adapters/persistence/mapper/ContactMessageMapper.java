@@ -28,9 +28,9 @@ public class ContactMessageMapper {
             entity.getLastName(),
             entity.getEmail(),
             entity.getPhone(),
-            toDomainCategory(entity.getCategory()),
+            entity.getCategory(),
             entity.getMessage(),
-            toDomainStatus(entity.getStatus()),
+            entity.getStatus(),
             entity.getRecaptchaScore(),
             entity.getIpAddress(),
             entity.getUserAgent(),
@@ -56,9 +56,9 @@ public class ContactMessageMapper {
         entity.setLastName(domain.getLastName());
         entity.setEmail(domain.getEmail());
         entity.setPhone(domain.getPhone());
-        entity.setCategory(toEntityCategory(domain.getCategory()));
+        entity.setCategory(domain.getCategory());
         entity.setMessage(domain.getMessage());
-        entity.setStatus(toEntityStatus(domain.getStatus()));
+        entity.setStatus(domain.getStatus());
         entity.setRecaptchaScore(domain.getRecaptchaScore());
         entity.setIpAddress(domain.getIpAddress());
         entity.setUserAgent(domain.getUserAgent());
@@ -83,58 +83,13 @@ public class ContactMessageMapper {
         entity.setLastName(domain.getLastName());
         entity.setEmail(domain.getEmail());
         entity.setPhone(domain.getPhone());
-        entity.setCategory(toEntityCategory(domain.getCategory()));
+        entity.setCategory(domain.getCategory());
         entity.setMessage(domain.getMessage());
-        entity.setStatus(toEntityStatus(domain.getStatus()));
+        entity.setStatus(domain.getStatus());
         entity.setRecaptchaScore(domain.getRecaptchaScore());
         entity.setIpAddress(domain.getIpAddress());
         entity.setUserAgent(domain.getUserAgent());
         entity.setUpdatedAt(domain.getUpdatedAt());
     }
 
-    // Private helper methods for enum conversion
-
-    /**
-     * Converts domain MessageCategory to entity MessageCategory.
-     */
-    private pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageCategory toEntityCategory(
-            pl.klastbit.lexpage.domain.contact.MessageCategory domainCategory) {
-        if (domainCategory == null) {
-            return null;
-        }
-        return pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageCategory.valueOf(domainCategory.name());
-    }
-
-    /**
-     * Converts entity MessageCategory to domain MessageCategory.
-     */
-    private pl.klastbit.lexpage.domain.contact.MessageCategory toDomainCategory(
-            pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageCategory entityCategory) {
-        if (entityCategory == null) {
-            return null;
-        }
-        return pl.klastbit.lexpage.domain.contact.MessageCategory.valueOf(entityCategory.name());
-    }
-
-    /**
-     * Converts domain MessageStatus to entity MessageStatus.
-     */
-    private pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageStatus toEntityStatus(
-            pl.klastbit.lexpage.domain.contact.MessageStatus domainStatus) {
-        if (domainStatus == null) {
-            return null;
-        }
-        return pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageStatus.valueOf(domainStatus.name());
-    }
-
-    /**
-     * Converts entity MessageStatus to domain MessageStatus.
-     */
-    private pl.klastbit.lexpage.domain.contact.MessageStatus toDomainStatus(
-            pl.klastbit.lexpage.infrastructure.adapters.persistence.entity.MessageStatus entityStatus) {
-        if (entityStatus == null) {
-            return null;
-        }
-        return pl.klastbit.lexpage.domain.contact.MessageStatus.valueOf(entityStatus.name());
-    }
 }
