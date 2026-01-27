@@ -15,4 +15,13 @@ public interface GetArticleUseCase {
      * @return Article details
      */
     ArticleDetailDto execute(Long articleId);
+
+    /**
+     * Retrieves a single published article by slug.
+     *
+     * @param slug Article slug (URL-friendly identifier)
+     * @return Article details
+     * @throws pl.klastbit.lexpage.domain.article.exception.ArticleNotFoundException if article not found or not published
+     */
+    ArticleDetailDto executeBySlug(String slug);
 }

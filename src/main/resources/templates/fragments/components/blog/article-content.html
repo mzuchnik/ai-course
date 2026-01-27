@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Article Content Component - Formatted Article Body
+
+  Parametry:
+  - content: String (HTML content artykułu)
+
+  Features:
+  - Safe HTML rendering (th:utext)
+  - Tailwind Typography (prose classes)
+  - Responsive images
+  - Code blocks styling
+  - External links with target="_blank"
+-->
+
+<div th:fragment="articleContent(content)"
+     class="prose prose-lg max-w-none
+            prose-headings:font-bold prose-headings:text-gray-900
+            prose-h1:text-3xl prose-h1:md:text-4xl
+            prose-h2:text-2xl prose-h2:md:text-3xl
+            prose-h3:text-xl prose-h3:md:text-2xl
+            prose-p:text-gray-700 prose-p:leading-relaxed
+            prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline
+            prose-strong:text-gray-900 prose-strong:font-semibold
+            prose-ul:list-disc prose-ul:pl-6
+            prose-ol:list-decimal prose-ol:pl-6
+            prose-li:text-gray-700
+            prose-blockquote:border-l-4 prose-blockquote:border-primary-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-700
+            prose-code:text-burgundy-600 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
+            prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-lg prose-pre:p-4
+            prose-img:rounded-lg prose-img:shadow-md
+            prose-hr:border-gray-300">
+
+    <!-- Safe HTML rendering -->
+    <div th:utext="${content}">
+        <!-- Article content will be rendered here -->
+        <p>Article content placeholder</p>
+    </div>
+</div>
+
+<!--
+  Convenience fragment: articleContentWithReadTime
+  Adds estimated reading time above content
+-->
+<div th:fragment="articleContentWithReadTime(content, readTimeMinutes)">
+    <!-- Read Time Badge -->
+    <div class="flex items-center gap-2 mb-6 text-sm text-gray-600">
+        <i class="material-icons text-base">schedule</i>
+        <span th:text="'Czas czytania: ' + ${readTimeMinutes} + ' min'">Czas czytania: 5 min</span>
+    </div>
+
+    <!-- Article Content -->
+    <th:block th:replace="~{fragments/components/blog/article-content :: articleContent(${content})}"></th:block>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Related Articles Component - Shows related/recommended articles
+
+  Parametry:
+  - articles: List<ArticleListItemDto> (3-4 podobne artykuły)
+
+  Layout:
+  - Heading "Podobne artykuły"
+  - Grid 3 kolumny (desktop) / 1 kolumna (mobile)
+  - Compact article cards
+  - Link do /blog na dole
+-->
+
+<section th:fragment="relatedArticles(articles)"
+         th:if="${articles != null && !#lists.isEmpty(articles)}"
+         class="w-full bg-gray-50 py-12">
+
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- Section Header -->
+        <div class="mb-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                Podobne artykuły
+            </h2>
+            <p class="text-lg text-gray-600">
+                Przeczytaj również te interesujące artykuły
+            </p>
+        </div>
+
+        <!-- Articles Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Iterate through related articles -->
+            <th:block th:each="article : ${articles}">
+                <!-- Compact Article Card -->
+                <article class="group relative flex flex-col bg-white text-gray-700 shadow-md hover:shadow-lg bg-clip-border rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02]">
+
+                    <!-- Article Link Wrapper -->
+                    <a th:href="@{/blog/{slug}(slug=${article.slug})}"
+                       th:aria-label="'Czytaj więcej: ' + ${article.title}"
+                       class="absolute inset-0 z-10">
+                        <span class="sr-only" th:text="'Przejdź do artykułu: ' + ${article.title}">Przejdź do artykułu</span>
+                    </a>
+
+                    <!-- Compact Featured Image -->
+                    <div class="relative h-48 overflow-hidden bg-gray-100">
+                        <img th:if="${article.ogImageUrl != null && !#strings.isEmpty(article.ogImageUrl)}"
+                             th:src="${article.ogImageUrl}"
+                             th:alt="${article.title}"
+                             class="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                             loading="lazy" />
+
+                        <!-- Placeholder if no image -->
+                        <div th:unless="${article.ogImageUrl != null && !#strings.isEmpty(article.ogImageUrl)}"
+                             class="flex items-center justify-center w-full h-full bg-gradient-to-br from-primary-500 to-primary-600">
+                            <i class="material-icons text-white text-5xl">article</i>
+                        </div>
+                    </div>
+
+                    <!-- Compact Card Content -->
+                    <div class="relative p-4 flex-grow z-20 pointer-events-none">
+                        <!-- Title -->
+                        <h3 class="block mb-2 font-sans text-lg font-semibold leading-snug text-gray-900 line-clamp-2 group-hover:text-primary-600 transition-colors">
+                            <span th:text="${article.title}">Tytuł artykułu</span>
+                        </h3>
+
+                        <!-- Published Date -->
+                        <p class="flex items-center gap-2 text-sm text-gray-600">
+                            <i class="material-icons text-sm">schedule</i>
+                            <time th:datetime="${article.publishedAt}"
+                                  th:text="${#temporals.format(article.publishedAt, 'd MMMM yyyy', #locale)}">
+                                26 stycznia 2026
+                            </time>
+                        </p>
+                    </div>
+                </article>
+            </th:block>
+        </div>
+
+        <!-- View All Articles Link -->
+        <div class="text-center">
+            <a href="/blog"
+               class="inline-flex items-center gap-2 px-6 py-3 font-sans text-base font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 focus:ring-4 focus:ring-primary-300"
+               data-ripple-light="true">
+                Zobacz wszystkie artykuły
+                <i class="material-icons text-base">arrow_forward</i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!--
+  Convenience fragment: relatedArticlesCompact
+  Smaller version without "View All" button (for sidebars)
+-->
+<aside th:fragment="relatedArticlesCompact(articles)"
+       th:if="${articles != null && !#lists.isEmpty(articles)}"
+       class="w-full">
+
+    <!-- Section Header -->
+    <h3 class="text-xl font-bold text-gray-900 mb-4">
+        Podobne artykuły
+    </h3>
+
+    <!-- Articles List (vertical) -->
+    <div class="space-y-4">
+        <th:block th:each="article : ${articles}">
+            <article class="group flex gap-4">
+                <!-- Small thumbnail -->
+                <div class="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                    <img th:if="${article.ogImageUrl != null && !#strings.isEmpty(article.ogImageUrl)}"
+                         th:src="${article.ogImageUrl}"
+                         th:alt="${article.title}"
+                         class="object-cover w-full h-full"
+                         loading="lazy" />
+                    <div th:unless="${article.ogImageUrl != null && !#strings.isEmpty(article.ogImageUrl)}"
+                         class="flex items-center justify-center w-full h-full bg-primary-500">
+                        <i class="material-icons text-white text-xl">article</i>
+                    </div>
+                </div>
+
+                <!-- Article info -->
+                <div class="flex-grow">
+                    <h4 class="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-primary-600 transition-colors mb-1">
+                        <a th:href="@{/blog/{slug}(slug=${article.slug})}"
+                           th:text="${article.title}">
+                            Tytuł artykułu
+                        </a>
+                    </h4>
+                    <p class="text-xs text-gray-600">
+                        <time th:datetime="${article.publishedAt}"
+                              th:text="${#temporals.format(article.publishedAt, 'd MMM yyyy', #locale)}">
+                            26 sty 2026
+                        </time>
+                    </p>
+                </div>
+            </article>
+        </th:block>
+    </div>
+</aside>
+
+</body>
+</html>

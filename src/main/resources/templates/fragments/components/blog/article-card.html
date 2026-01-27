@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Article Card Component - Blog List Item
+
+  Parametry:
+  - article: ArticleListItemDto (id, title, slug, excerpt, publishedAt, etc.)
+
+  Layout: Card z obrazem, tytułem, excertem, datą publikacji, "Czytaj więcej" link
+  Responsive: full width mobile, 1/3 desktop (grid-cols-3)
+  Hover: shadow-lg, subtle scale
+-->
+
+<article th:fragment="articleCard(article)"
+         class="group relative flex flex-col bg-white text-gray-700 shadow-md hover:shadow-lg bg-clip-border rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02]">
+
+    <!-- Article Link Wrapper (entire card is clickable) -->
+    <a th:href="@{/blog/{slug}(slug=${article.slug})}"
+       th:aria-label="'Czytaj więcej: ' + ${article.title}"
+       class="absolute inset-0 z-10">
+        <span class="sr-only" th:text="'Przejdź do artykułu: ' + ${article.title}">Przejdź do artykułu</span>
+    </a>
+
+    <!-- Featured Image (OG Image) -->
+    <div class="relative h-56 overflow-hidden bg-gray-100">
+        <img th:if="${article.ogImageUrl != null && !#strings.isEmpty(article.ogImageUrl)}"
+             th:src="${article.ogImageUrl}"
+             th:alt="${article.title}"
+             class="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+             loading="lazy" />
+
+        <!-- Placeholder if no image -->
+        <div th:unless="${article.ogImageUrl != null && !#strings.isEmpty(article.ogImageUrl)}"
+             class="flex items-center justify-center w-full h-full bg-gradient-to-br from-primary-500 to-primary-600">
+            <i class="material-icons text-white text-6xl">article</i>
+        </div>
+    </div>
+
+    <!-- Card Content -->
+    <div class="relative p-6 flex-grow z-20 pointer-events-none">
+        <!-- Published Date -->
+        <p class="flex items-center gap-2 mb-2 text-sm text-gray-600">
+            <i class="material-icons text-base">schedule</i>
+            <time th:datetime="${article.publishedAt}"
+                  th:text="${#temporals.format(article.publishedAt, 'd MMMM yyyy', #locale)}">
+                26 stycznia 2026
+            </time>
+        </p>
+
+        <!-- Title -->
+        <h3 class="block mb-2 font-sans text-xl md:text-2xl antialiased font-semibold leading-snug text-gray-900 line-clamp-2 group-hover:text-primary-600 transition-colors">
+            <span th:text="${article.title}">Jak napisać pozew o zapłatę?</span>
+        </h3>
+
+        <!-- Excerpt (truncated to 2-3 lines) -->
+        <p th:if="${article.excerpt != null && !#strings.isEmpty(article.excerpt)}"
+           class="block font-sans text-base antialiased font-normal leading-relaxed text-gray-700 line-clamp-3 mb-4"
+           th:text="${article.excerpt}">
+            Krótki opis artykułu, który zachęci czytelnika do kliknięcia i przeczytania całego tekstu...
+        </p>
+    </div>
+
+    <!-- Read More Link -->
+    <div class="relative p-6 pt-0 z-20 pointer-events-none">
+        <span class="inline-flex items-center gap-2 font-sans text-base font-medium text-primary-600 group-hover:text-primary-700 transition-colors">
+            Czytaj więcej
+            <i class="material-icons text-base transition-transform group-hover:translate-x-1">arrow_forward</i>
+        </span>
+    </div>
+</article>
+
+</body>
+</html>

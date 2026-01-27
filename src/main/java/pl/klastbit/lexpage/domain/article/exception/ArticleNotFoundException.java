@@ -13,6 +13,11 @@ public class ArticleNotFoundException extends RuntimeException {
         this.articleId = articleId;
     }
 
+    public ArticleNotFoundException(String message) {
+        super(message);
+        this.articleId = null;
+    }
+
     public Long getArticleId() {
         return articleId;
     }

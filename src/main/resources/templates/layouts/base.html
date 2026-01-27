@@ -19,8 +19,31 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description" th:content="${pageDescription ?: 'Lexpage - Professional Legal Services'}">
-    <meta name="keywords" th:content="${pageKeywords ?: 'legal, lawyer, law firm'}">
+    <meta name="keywords" th:if="${keywords != null}" th:content="${keywords}">
+    <meta name="keywords" th:unless="${keywords != null}" th:content="${pageKeywords ?: 'legal, lawyer, law firm'}">
     <meta name="author" content="Lexpage">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" th:if="${canonicalUrl != null}" th:href="${canonicalUrl}">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" th:if="${pageTitle != null}" th:content="${pageTitle}">
+    <meta property="og:description" th:if="${pageDescription != null}" th:content="${pageDescription}">
+    <meta property="og:image" th:if="${ogImageUrl != null}" th:content="${ogImageUrl}">
+    <meta property="og:url" th:if="${canonicalUrl != null}" th:content="${canonicalUrl}">
+    <meta property="og:type" th:content="${ogType ?: 'website'}">
+    <meta property="og:site_name" content="Lexpage">
+    <meta property="og:locale" content="pl_PL">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" th:if="${pageTitle != null}" th:content="${pageTitle}">
+    <meta name="twitter:description" th:if="${pageDescription != null}" th:content="${pageDescription}">
+    <meta name="twitter:image" th:if="${ogImageUrl != null}" th:content="${ogImageUrl}">
+
+    <!-- Article-specific Meta Tags (for blog posts) -->
+    <meta property="article:published_time" th:if="${publishedAt != null}" th:content="${publishedAt}">
+    <meta property="article:modified_time" th:if="${updatedAt != null}" th:content="${updatedAt}">
 </head>
 <body class="font-sans antialiased">
     <!-- Navbar -->

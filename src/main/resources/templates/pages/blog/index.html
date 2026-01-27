@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: layout(~{::content})}">
+<head>
+    <title th:text="${pageTitle}">Blog - Lexpage</title>
+    <meta name="description" th:content="${pageDescription}" content="Blog description">
+
+    <!-- No index for pages beyond first -->
+    <meta th:if="${robotsContent != null}" name="robots" th:content="${robotsContent}">
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-primary-600 to-primary-400 py-16 md:py-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center text-white">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                    Blog Prawniczy
+                </h1>
+                <p class="text-xl text-white/90 max-w-2xl mx-auto">
+                    Odkryj nasze najnowsze artykuły. Praktyczne porady prawne, analizy i wskazówki dla każdego.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Articles Grid Section -->
+    <section class="bg-gray-50 py-12 md:py-16">
+        <div class="max-w-7xl mx-auto px-4">
+
+            <!-- Empty State (when no articles) -->
+            <div th:if="${articles.content().isEmpty()}"
+                 class="text-center py-16">
+                <i class="material-icons text-gray-400 text-6xl mb-4">article</i>
+                <h2 class="text-2xl font-semibold text-gray-700 mb-2">
+                    Brak artykułów do wyświetlenia
+                </h2>
+                <p class="text-gray-600 mb-6">
+                    Wkrótce pojawią się nowe artykuły. Wróć niebawem!
+                </p>
+                <a href="/"
+                   class="inline-flex items-center gap-2 px-6 py-3 font-sans text-base font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 focus:ring-4 focus:ring-primary-300"
+                   data-ripple-light="true">
+                    <i class="material-icons text-base">home</i>
+                    Wróć na stronę główną
+                </a>
+            </div>
+
+            <!-- Articles Grid (3x3 grid on desktop, 1 column on mobile) -->
+            <div th:unless="${articles.content().isEmpty()}"
+                 class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Iterate through articles and render article-card for each -->
+                <th:block th:each="article : ${articles.content()}">
+                    <th:block th:replace="~{fragments/components/blog/article-card :: articleCard(${article})}"></th:block>
+                </th:block>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pagination Section -->
+    <section th:unless="${articles.content().isEmpty()}"
+             class="bg-gray-50 py-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <!-- Pagination Component -->
+            <nav th:replace="~{fragments/components/pagination :: pagination(
+                ${currentPage},
+                ${totalPages},
+                '/blog',
+                'page',
+                'numbered',
+                true,
+                7,
+                ''
+            )}"></nav>
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>

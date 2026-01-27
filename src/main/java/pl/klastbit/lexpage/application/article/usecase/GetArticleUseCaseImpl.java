@@ -8,6 +8,7 @@ import pl.klastbit.lexpage.application.article.GetArticleUseCase;
 import pl.klastbit.lexpage.application.article.dto.ArticleDetailDto;
 import pl.klastbit.lexpage.domain.article.Article;
 import pl.klastbit.lexpage.domain.article.ArticleRepository;
+import pl.klastbit.lexpage.domain.article.ArticleStatus;
 import pl.klastbit.lexpage.domain.article.exception.ArticleNotFoundException;
 
 /**
@@ -28,6 +29,17 @@ public class GetArticleUseCaseImpl implements GetArticleUseCase {
 
         Article article = articleRepository.findByIdAndDeletedAtIsNull(articleId)
                 .orElseThrow(() -> new ArticleNotFoundException(articleId));
+
+        // TODO: Fetch real user names from UserRepository
+        return ArticleDetailDto.from(article, "Author Name", "Creator Name", "Updater Name");
+    }
+
+    @Override
+    public ArticleDetailDto executeBySlug(String slug) {
+        log.info("Fetching published article with slug: {}", slug);
+
+        Article article = articleRepository.findBySlugAndStatusAndDeletedAtIsNull(slug, ArticleStatus.PUBLISHED)
+                .orElseThrow(() -> new ArticleNotFoundException("Article not found or not published with slug: " + slug));
 
         // TODO: Fetch real user names from UserRepository
         return ArticleDetailDto.from(article, "Author Name", "Creator Name", "Updater Name");

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: layout(~{::content})}">
+<head>
+    <title th:text="${pageTitle}">Article Title - Lexpage</title>
+
+    <!-- SEO Meta Tags (most are handled by base.html, but we can override here) -->
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <!-- Breadcrumbs Section -->
+    <section class="bg-white py-4 border-b">
+        <div class="max-w-4xl mx-auto px-4">
+            <nav th:replace="~{fragments/components/breadcrumbs :: breadcrumbs(${breadcrumbs}, 'chevron_right', '')}"></nav>
+        </div>
+    </section>
+
+    <!-- Article Header Section -->
+    <section class="bg-white py-8 md:py-12">
+        <div class="max-w-4xl mx-auto px-4 md:px-6">
+            <!-- Article Title -->
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight"
+                th:text="${article.title()}">
+                Jak napisać pozew o zapłatę?
+            </h1>
+
+            <!-- Article Meta Info -->
+            <div class="flex items-center gap-6 text-gray-600 text-sm md:text-base mb-6">
+                <!-- Published Date -->
+                <div class="flex items-center gap-2">
+                    <i class="material-icons text-base md:text-lg">schedule</i>
+                    <span>
+                        Opublikowano:
+                        <time th:datetime="${article.publishedAt()}"
+                              th:text="${formattedPublishedDate}">
+                            26 stycznia 2026
+                        </time>
+                    </span>
+                </div>
+
+                <!-- Author (if available) -->
+                <div th:if="${article.authorName() != null && !#strings.isEmpty(article.authorName())}"
+                     class="flex items-center gap-2">
+                    <i class="material-icons text-base md:text-lg">person</i>
+                    <span th:text="${article.authorName()}">Anna Kowalska</span>
+                </div>
+            </div>
+
+            <!-- Featured Image (if available) -->
+            <div th:if="${ogImageUrl != null && !#strings.isEmpty(ogImageUrl)}"
+                 class="mb-8">
+                <img th:src="${ogImageUrl}"
+                     th:alt="${article.title()}"
+                     class="w-full h-auto max-h-[500px] object-cover rounded-xl shadow-lg"
+                     loading="eager">
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Content Section -->
+    <section class="bg-white py-8 md:py-12">
+        <div class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8">
+            <!-- Article Content (formatted with Tailwind Typography) -->
+            <th:block th:replace="~{fragments/components/blog/article-content :: articleContent(${article.content()})}"></th:block>
+        </div>
+    </section>
+
+    <!-- Related Articles Section -->
+    <th:block th:if="${relatedArticles != null && !#lists.isEmpty(relatedArticles)}">
+        <th:block th:replace="~{fragments/components/blog/related-articles :: relatedArticles(${relatedArticles})}"></th:block>
+    </th:block>
+
+    <!-- Schema.org Structured Data (JSON-LD) -->
+    <script type="application/ld+json" th:inline="javascript">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": /*[[${article.title()}]]*/ "",
+        "description": /*[[${article.metaDescription()}]]*/ "",
+        "image": /*[[${ogImageUrl}]]*/ "",
+        "datePublished": /*[[${article.publishedAt()}]]*/ "",
+        "dateModified": /*[[${article.updatedAt()}]]*/ "",
+        "author": {
+            "@type": "Organization",
+            "name": "Lexpage"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Lexpage",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://lexpage.pl/logo.png"
+            }
+        }
+    }
+    </script>
+</div>
+
+</body>
+</html>

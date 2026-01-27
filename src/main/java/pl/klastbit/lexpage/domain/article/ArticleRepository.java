@@ -108,4 +108,13 @@ public interface ArticleRepository {
      * @return true if exists, false otherwise
      */
     boolean existsBySlugAndDeletedAtIsNull(String slug);
+
+    /**
+     * Finds a non-deleted article by slug and status.
+     *
+     * @param slug   Article slug
+     * @param status Article status
+     * @return Optional containing the article if found and matching criteria
+     */
+    Optional<Article> findBySlugAndStatusAndDeletedAtIsNull(String slug, ArticleStatus status);
 }

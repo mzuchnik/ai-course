@@ -132,6 +132,13 @@ public class JpaArticleRepository implements ArticleRepository {
         return springDataRepository.existsBySlugAndDeletedAtIsNull(slug);
     }
 
+    @Override
+    public Optional<Article> findBySlugAndStatusAndDeletedAtIsNull(String slug, ArticleStatus status) {
+        log.debug("Finding article by slug: {} and status: {}", slug, status);
+        return springDataRepository.findBySlugAndStatusAndDeletedAtIsNull(slug, status)
+                .map(articleMapper::toDomain);
+    }
+
     // ==================== Private Helper Methods ====================
 
     /**

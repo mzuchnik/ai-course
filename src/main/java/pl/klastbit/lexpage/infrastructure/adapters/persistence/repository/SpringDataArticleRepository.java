@@ -35,6 +35,8 @@ public interface SpringDataArticleRepository extends JpaRepository<ArticleEntity
 
     boolean existsBySlugAndDeletedAtIsNull(String slug);
 
+    Optional<ArticleEntity> findBySlugAndStatusAndDeletedAtIsNull(String slug, ArticleStatus status);
+
     /**
      * Full-text search using PostgreSQL's tsvector.
      * Searches in title and content using the search_vector column.
