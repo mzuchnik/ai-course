@@ -16,6 +16,7 @@ import java.util.List;
  * Mapper between Article domain entity and ArticleEntity persistence entity.
  * Part of the infrastructure layer (Hexagonal Architecture outbound adapter).
  */
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class ArticleMapper {

@@ -43,10 +43,28 @@ public class Article {
     /**
      * Factory method to create a new draft article.
      */
-    public static Article createDraft(String title, String content, UserId authorId) {
+    public static Article createDraft(
+            String title,
+            String slug,
+            String content,
+            String excerpt,
+            String metaTitle,
+            String metaDescription,
+            String ogImageUrl,
+            String canonicalUrl,
+            List<String> keywords,
+            UserId authorId
+    ) {
         Article article = new Article();
         article.title = Objects.requireNonNull(title, "Title cannot be null");
+        article.slug = Objects.requireNonNull(slug, "Slug cannot be null");
         article.content = Objects.requireNonNull(content, "Content cannot be null");
+        article.excerpt = excerpt;
+        article.metaTitle = metaTitle;
+        article.metaDescription = metaDescription;
+        article.ogImageUrl = ogImageUrl;
+        article.canonicalUrl = canonicalUrl;
+        article.keywords = keywords;
         article.authorId = Objects.requireNonNull(authorId, "Author ID cannot be null");
         article.status = ArticleStatus.DRAFT;
         article.createdAt = LocalDateTime.now();
@@ -124,7 +142,9 @@ public class Article {
      */
     public void archive() {
         if (status != ArticleStatus.PUBLISHED) {
-            throw new IllegalStateException("Only published articles can be archived");
+            throw new IllegalStateException(
+                "Cannot archive article that is not in PUBLISHED status. Current status: " + status
+            );
         }
 
         this.status = ArticleStatus.ARCHIVED;
@@ -136,7 +156,9 @@ public class Article {
      */
     public void unpublish() {
         if (status != ArticleStatus.PUBLISHED) {
-            throw new IllegalStateException("Only published articles can be unpublished");
+            throw new IllegalStateException(
+                "Cannot unpublish article that is not in PUBLISHED status. Current status: " + status
+            );
         }
 
         this.status = ArticleStatus.DRAFT;
@@ -145,28 +167,35 @@ public class Article {
     }
 
     /**
-     * Updates article content.
-     * Business rule: Content must not be empty.
+     * Updates article content and metadata.
      */
-    public void updateContent(String newTitle, String newContent, UserId userId) {
+    public void updateContent(
+            String newTitle,
+            String newSlug,
+            String newContent,
+            String newExcerpt,
+            String newMetaTitle,
+            String newMetaDescription,
+            String newOgImageUrl,
+            String newCanonicalUrl,
+            List<String> newKeywords,
+            UserId userId
+    ) {
         this.title = Objects.requireNonNull(newTitle, "Title cannot be null");
+        this.slug = Objects.requireNonNull(newSlug, "Slug cannot be null");
         this.content = Objects.requireNonNull(newContent, "Content cannot be null");
 
         if (newContent.trim().isEmpty()) {
             throw new IllegalArgumentException("Content cannot be empty");
         }
 
+        this.excerpt = newExcerpt;
+        this.metaTitle = newMetaTitle;
+        this.metaDescription = newMetaDescription;
+        this.ogImageUrl = newOgImageUrl;
+        this.canonicalUrl = newCanonicalUrl;
+        this.keywords = newKeywords;
         this.updatedBy = userId;
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    /**
-     * Updates SEO metadata.
-     */
-    public void updateSeoMetadata(String metaTitle, String metaDescription, List<String> keywords) {
-        this.metaTitle = metaTitle;
-        this.metaDescription = metaDescription;
-        this.keywords = keywords;
         this.updatedAt = LocalDateTime.now();
     }
 

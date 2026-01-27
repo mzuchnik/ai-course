@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import pl.klastbit.lexpage.domain.article.exception.ArticleNotFoundException;
 import pl.klastbit.lexpage.domain.contact.exception.RateLimitExceededException;
 
 import java.net.URI;
@@ -75,6 +76,47 @@ public class GlobalExceptionApiHandler {
                 ))
                 .collect(Collectors.toList())
         );
+
+        return problemDetail;
+    }
+
+    /**
+     * Handles article not found exceptions.
+     * Returns 404 Not Found.
+     */
+    @ExceptionHandler(ArticleNotFoundException.class)
+    public ProblemDetail handleArticleNotFound(ArticleNotFoundException ex) {
+        log.warn("Article not found: {}", ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
+
+        problemDetail.setTitle("Article Not Found");
+        problemDetail.setType(URI.create("https://klastbit.pl/errors/article-not-found"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("articleId", ex.getArticleId());
+
+        return problemDetail;
+    }
+
+    /**
+     * Handles invalid article status transition exceptions.
+     * Returns 400 Bad Request.
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ProblemDetail handleIllegalState(IllegalStateException ex) {
+        log.warn("Invalid state: {}", ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
+        );
+
+        problemDetail.setTitle("Invalid Article Status Transition");
+        problemDetail.setType(URI.create("https://klastbit.pl/errors/invalid-status-transition"));
+        problemDetail.setProperty("timestamp", Instant.now());
 
         return problemDetail;
     }
