@@ -65,7 +65,7 @@
              class="bg-gray-50 py-8">
         <div class="max-w-7xl mx-auto px-4">
             <!-- Pagination Component -->
-            <nav th:replace="~{fragments/components/pagination :: pagination(
+            <th:block th:replace="~{fragments/components/pagination :: pagination(
                 ${currentPage},
                 ${totalPages},
                 '/blog',
@@ -74,7 +74,7 @@
                 true,
                 7,
                 ''
-            )}"></nav>
+            )}"></th:block>
         </div>
     </section>
 

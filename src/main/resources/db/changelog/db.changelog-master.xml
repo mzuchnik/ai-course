@@ -28,4 +28,7 @@
     <!-- 5. Migrate ENUM types to VARCHAR -->
     <include file="db/changelog/v1.0/11-migrate-enums-to-varchar.xml"/>
 
+    <!-- 6. Fix full-text search configuration -->
+    <include file="db/changelog/v1.0/12-fix-search-vector-config.xml"/>
+
 </databaseChangeLog>

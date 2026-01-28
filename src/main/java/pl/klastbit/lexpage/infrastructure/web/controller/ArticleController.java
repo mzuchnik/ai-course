@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  * REST Controller for Article management API.
  * Inbound adapter (Primary/Driving) in Hexagonal Architecture.
- * Provides 7 endpoints for CRUD operations and status management.
+ * Provides 8 endpoints for CRUD operations and status management.
  */
 @RestController
 @RequestMapping("/api/articles")
@@ -35,6 +35,7 @@ public class ArticleController {
     private final DeleteArticleUseCase deleteArticleUseCase;
     private final PublishArticleUseCase publishArticleUseCase;
     private final ArchiveArticleUseCase archiveArticleUseCase;
+    private final UnpublishArticleUseCase unpublishArticleUseCase;
     private final GetArticleUseCase getArticleUseCase;
     private final ListArticlesUseCase listArticlesUseCase;
 
@@ -115,7 +116,7 @@ public class ArticleController {
         log.info("POST /api/articles - title: {}", request.title());
 
         // TODO: Get real userId from Spring Security context
-        UUID userId = UUID.randomUUID(); // Placeholder - replace with actual authenticated user
+        UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000000"); // Placeholder - replace with actual authenticated user
 
         ArticleDetailDto created = createArticleUseCase.execute(request.toCommand(userId));
 
@@ -138,7 +139,7 @@ public class ArticleController {
         log.info("PUT /api/articles/{} - title: {}", id, request.title());
 
         // TODO: Get real userId from Spring Security context
-        UUID userId = UUID.randomUUID(); // Placeholder - replace with actual authenticated user
+        UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000000"); // Placeholder - replace with actual authenticated user
 
         ArticleDetailDto updated = updateArticleUseCase.execute(request.toCommand(id, userId));
 
@@ -188,5 +189,20 @@ public class ArticleController {
         ArticleDetailDto archived = archiveArticleUseCase.execute(id);
 
         return ResponseEntity.ok(ArticleResponse.from(archived));
+    }
+
+    /**
+     * PATCH /api/articles/{id}/unpublish - Cofnięcie publikacji artykułu (PUBLISHED → DRAFT).
+     *
+     * @param id ID artykułu
+     * @return Cofnięty do draftu artykuł
+     */
+    @PatchMapping("/{id}/unpublish")
+    public ResponseEntity<ArticleResponse> unpublishArticle(@PathVariable Long id) {
+        log.info("PATCH /api/articles/{}/unpublish", id);
+
+        ArticleDetailDto unpublished = unpublishArticleUseCase.execute(id);
+
+        return ResponseEntity.ok(ArticleResponse.from(unpublished));
     }
 }

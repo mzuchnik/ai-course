@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="12-fix-search-vector-config" author="system">
+        <comment>Fix full-text search configuration from 'polish' to 'simple' (polish config not available by default)</comment>
+
+        <!-- Update Function: Auto-update search_vector for articles with 'simple' config -->
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION update_article_search_vector()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.search_vector :=
+                    setweight(to_tsvector('simple', COALESCE(NEW.title, '')), 'A') ||
+                    setweight(to_tsvector('simple', COALESCE(NEW.content, '')), 'B');
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+
+        <!-- Update Function: Auto-update search_vector for services with 'simple' config -->
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION update_service_search_vector()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.search_vector :=
+                    setweight(to_tsvector('simple', COALESCE(NEW.name, '')), 'A') ||
+                    setweight(to_tsvector('simple', COALESCE(NEW.description, '')), 'B');
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+
+        <!-- Update existing records to regenerate search vectors -->
+        <sql>
+            UPDATE articles SET updated_at = updated_at WHERE search_vector IS NOT NULL;
+        </sql>
+
+        <sql>
+            UPDATE services SET updated_at = updated_at WHERE search_vector IS NOT NULL;
+        </sql>
+
+        <rollback>
+            <!-- Rollback to 'polish' config (will fail if polish config doesn't exist) -->
+            <sql splitStatements="false">
+                CREATE OR REPLACE FUNCTION update_article_search_vector()
+                RETURNS TRIGGER AS $$
+                BEGIN
+                    NEW.search_vector :=
+                        setweight(to_tsvector('polish', COALESCE(NEW.title, '')), 'A') ||
+                        setweight(to_tsvector('polish', COALESCE(NEW.content, '')), 'B');
+                    RETURN NEW;
+                END;
+                $$ LANGUAGE plpgsql;
+            </sql>
+
+            <sql splitStatements="false">
+                CREATE OR REPLACE FUNCTION update_service_search_vector()
+                RETURNS TRIGGER AS $$
+                BEGIN
+                    NEW.search_vector :=
+                        setweight(to_tsvector('polish', COALESCE(NEW.name, '')), 'A') ||
+                        setweight(to_tsvector('polish', COALESCE(NEW.description, '')), 'B');
+                    RETURN NEW;
+                END;
+                $$ LANGUAGE plpgsql;
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

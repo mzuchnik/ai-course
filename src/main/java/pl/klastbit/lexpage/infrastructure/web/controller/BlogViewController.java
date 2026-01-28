@@ -39,23 +39,26 @@ public class BlogViewController {
 
     /**
      * Displays paginated list of published articles (3x3 grid, 9 per page).
-     * Route: /blog?page=0
+     * Route: /blog?page=1 (1-indexed for user-facing URLs)
      */
     @GetMapping("/blog")
     public String listArticles(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             Model model
     ) {
         log.info("Displaying blog list page: {}", page);
 
-        // Validate page number
-        if (page < 0) {
-            log.warn("Invalid page number: {}, redirecting to page 0", page);
-            return "redirect:/blog?page=0";
+        // Validate page number (1-indexed)
+        if (page < 1) {
+            log.warn("Invalid page number: {}, redirecting to page 1", page);
+            return "redirect:/blog?page=1";
         }
 
+        // Convert to 0-indexed for Spring Data PageRequest
+        int pageIndex = page - 1;
+
         // Fetch published articles (9 per page, sorted by publishedAt DESC)
-        PageRequest pageable = PageRequest.of(page, 9, Sort.by(Sort.Direction.DESC, "publishedAt"));
+        PageRequest pageable = PageRequest.of(pageIndex, 9, Sort.by(Sort.Direction.DESC, "publishedAt"));
         PageDto<ArticleListItemDto> articles = listArticlesUseCase.execute(
                 ArticleStatus.PUBLISHED,
                 null,  // no author filter
@@ -64,8 +67,8 @@ public class BlogViewController {
         );
 
         // Handle out-of-bounds page number
-        if (page > 0 && articles.page().totalPages() > 0 && page >= articles.page().totalPages()) {
-            int lastPage = articles.page().totalPages() - 1;
+        if (articles.page().totalPages() > 0 && page > articles.page().totalPages()) {
+            int lastPage = articles.page().totalPages();
             log.warn("Page {} exceeds total pages {}, redirecting to last page", page, lastPage);
             return "redirect:/blog?page=" + lastPage;
         }
@@ -74,13 +77,13 @@ public class BlogViewController {
         model.addAttribute("pageTitle", "Blog - Lexpage");
         model.addAttribute("pageDescription", "Odkryj nasze najnowsze artykuły prawnicze. Porady, analizy i praktyczne wskazówki dla każdego.");
 
-        // Page data
+        // Page data (pass 1-indexed page to template for pagination component)
         model.addAttribute("articles", articles);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", articles.page().totalPages());
 
         // No index for pages beyond first
-        if (page > 0) {
+        if (page > 1) {
             model.addAttribute("robotsContent", "noindex, follow");
         }
 

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/admin :: layout(~{::content})}">
+<head>
+    <title th:text="${pageTitle}">Artykuł</title>
+</head>
+<body>
+<div th:fragment="content">
+    <!-- Header -->
+    <div class="mb-6">
+        <a href="/admin/blogs"
+           class="inline-flex items-center text-gray-600 hover:text-primary-600 mb-4 transition-colors">
+            <i class="material-icons mr-1">arrow_back</i>
+            Powrót do listy
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900" th:text="${mode == 'create' ? 'Nowy Artykuł' : 'Edytuj Artykuł'}">
+            Nowy Artykuł
+        </h1>
+    </div>
+
+    <!-- Loading State (only for edit mode) -->
+    <div id="loadingState"
+         class="bg-white rounded-xl shadow-md p-8 text-center"
+         th:classappend="${mode == 'create' ? 'hidden' : ''}">
+        <div class="flex flex-col items-center justify-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+            <p class="text-gray-600">Ładowanie artykułu...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="bg-white rounded-xl shadow-md p-8 text-center hidden">
+        <div class="flex flex-col items-center justify-center py-12">
+            <i class="material-icons text-6xl text-red-600 mb-4">error_outline</i>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Wystąpił błąd</h3>
+            <p id="errorMessage" class="text-gray-600 mb-4"></p>
+            <a href="/admin/blogs"
+               class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors inline-block"
+               data-ripple-light="true">
+                Powrót do listy
+            </a>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div id="articleForm" class="bg-white rounded-xl shadow-md p-6" th:classappend="${mode == 'edit' ? 'hidden' : ''}">
+        <!-- Article Info (only in edit mode, hidden by default) -->
+        <div id="articleInfo" class="mb-6 p-4 bg-gray-50 rounded-lg hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <span class="text-sm text-gray-600">Status:</span>
+                    <div id="articleStatus" class="mt-1"></div>
+                </div>
+                <div>
+                    <span class="text-sm text-gray-600">Data utworzenia:</span>
+                    <div id="articleCreatedAt" class="mt-1 text-sm font-medium text-gray-900"></div>
+                </div>
+                <div>
+                    <span class="text-sm text-gray-600">Autor:</span>
+                    <div id="articleAuthor" class="mt-1 text-sm font-medium text-gray-900"></div>
+                </div>
+            </div>
+        </div>
+
+        <form id="form" onsubmit="return false;">
+            <!-- Title Field -->
+            <div class="mb-6">
+                <label for="titleInput" class="block text-sm font-medium text-gray-700 mb-2">
+                    Tytuł <span class="text-red-600">*</span>
+                </label>
+                <input type="text"
+                       id="titleInput"
+                       maxlength="255"
+                       required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                       placeholder="Wpisz tytuł artykułu">
+                <div class="mt-1 flex justify-between items-center">
+                    <p id="titleError" class="text-sm text-red-600 hidden"></p>
+                    <p class="text-sm text-gray-500">
+                        <span id="titleCount">0</span>/255
+                    </p>
+                </div>
+            </div>
+
+            <!-- Content Field (Rich Editor) -->
+            <div class="mb-6">
+                <label for="contentEditor" class="block text-sm font-medium text-gray-700 mb-2">
+                    Treść <span class="text-red-600">*</span>
+                </label>
+
+                <!-- Editor Toolbar -->
+                <div class="border border-gray-300 rounded-t-lg bg-gray-50 p-2 flex flex-wrap gap-2">
+                    <button type="button"
+                            onclick="formatText('bold')"
+                            class="p-2 hover:bg-gray-200 rounded transition-colors"
+                            title="Pogrubienie">
+                        <i class="material-icons">format_bold</i>
+                    </button>
+                    <button type="button"
+                            onclick="formatText('italic')"
+                            class="p-2 hover:bg-gray-200 rounded transition-colors"
+                            title="Kursywa">
+                        <i class="material-icons">format_italic</i>
+                    </button>
+                    <button type="button"
+                            onclick="formatText('underline')"
+                            class="p-2 hover:bg-gray-200 rounded transition-colors"
+                            title="Podkreślenie">
+                        <i class="material-icons">format_underlined</i>
+                    </button>
+                    <div class="border-l border-gray-300 mx-1"></div>
+                    <button type="button"
+                            onclick="formatText('insertUnorderedList')"
+                            class="p-2 hover:bg-gray-200 rounded transition-colors"
+                            title="Lista punktowana">
+                        <i class="material-icons">format_list_bulleted</i>
+                    </button>
+                    <button type="button"
+                            onclick="formatText('insertOrderedList')"
+                            class="p-2 hover:bg-gray-200 rounded transition-colors"
+                            title="Lista numerowana">
+                        <i class="material-icons">format_list_numbered</i>
+                    </button>
+                    <div class="border-l border-gray-300 mx-1"></div>
+                    <button type="button"
+                            onclick="insertHeading()"
+                            class="p-2 hover:bg-gray-200 rounded transition-colors"
+                            title="Nagłówek">
+                        <i class="material-icons">title</i>
+                    </button>
+                    <button type="button"
+                            onclick="insertLink()"
+                            class="p-2 hover:bg-gray-200 rounded transition-colors"
+                            title="Link">
+                        <i class="material-icons">link</i>
+                    </button>
+                </div>
+
+                <!-- Editor Content -->
+                <div id="contentEditor"
+                     contenteditable="true"
+                     class="w-full px-4 py-3 border border-t-0 border-gray-300 rounded-b-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[400px] overflow-y-auto"
+                     style="outline: none;">
+                </div>
+
+                <div class="mt-1 flex justify-between items-center">
+                    <p id="contentError" class="text-sm text-red-600 hidden"></p>
+                    <p class="text-sm text-gray-500">
+                        <span id="contentCount">0</span> znaków (min. 50, max. 25000)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Excerpt Field -->
+            <div class="mb-6">
+                <label for="excerptInput" class="block text-sm font-medium text-gray-700 mb-2">
+                    Zajawka (opcjonalne)
+                </label>
+                <textarea id="excerptInput"
+                          rows="3"
+                          maxlength="500"
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+                          placeholder="Krótki opis artykułu..."></textarea>
+                <div class="mt-1 flex justify-between items-center">
+                    <p id="excerptError" class="text-sm text-red-600 hidden"></p>
+                    <p class="text-sm text-gray-500">
+                        <span id="excerptCount">0</span>/500
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+                <button type="button"
+                        id="saveDraftBtn"
+                        onclick="saveArticle(false)"
+                        class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors inline-flex items-center justify-center"
+                        data-ripple-light="true">
+                    <span class="button-spinner animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 hidden"></span>
+                    Zapisz jako Draft
+                </button>
+
+                <button type="button"
+                        id="savePublishBtn"
+                        onclick="saveArticle(true)"
+                        class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors inline-flex items-center justify-center"
+                        data-ripple-light="true">
+                    <span class="button-spinner animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 hidden"></span>
+                    <span th:text="${mode == 'create' ? 'Zapisz i Opublikuj' : 'Zapisz zmiany'}">Zapisz i Opublikuj</span>
+                </button>
+
+                <!-- Edit mode additional actions -->
+                <button type="button"
+                        id="publishBtn"
+                        onclick="publishArticle()"
+                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors inline-flex items-center justify-center hidden"
+                        data-ripple-light="true">
+                    <span class="button-spinner animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 hidden"></span>
+                    Opublikuj
+                </button>
+
+                <button type="button"
+                        id="archiveBtn"
+                        onclick="archiveArticle()"
+                        class="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors inline-flex items-center justify-center hidden"
+                        data-ripple-light="true">
+                    <span class="button-spinner animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 hidden"></span>
+                    Archiwizuj
+                </button>
+
+                <a href="/admin/blogs"
+                   class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors inline-flex items-center justify-center">
+                    Anuluj
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Success Alert -->
+    <div id="successAlert"
+         class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg hidden z-50">
+        <div class="flex items-center">
+            <i class="material-icons mr-2">check_circle</i>
+            <span id="successMessage"></span>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:inline="javascript">
+        // Thymeleaf variables
+        const mode = /*[[${mode}]]*/ 'create';
+        const articleId = /*[[${articleId}]]*/ null;
+
+        let currentArticle = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (mode === 'edit' && articleId) {
+                loadArticle();
+            } else {
+                showForm();
+            }
+
+            // Event listeners for character counters
+            const titleInput = document.getElementById('titleInput');
+            const contentEditor = document.getElementById('contentEditor');
+            const excerptInput = document.getElementById('excerptInput');
+
+            titleInput.addEventListener('input', function() {
+                updateCharCount('title', this.value.length, 255);
+                validateField('title');
+            });
+
+            contentEditor.addEventListener('input', function() {
+                const text = this.innerText || this.textContent;
+                updateCharCount('content', text.length, 25000);
+                validateField('content');
+            });
+
+            excerptInput.addEventListener('input', function() {
+                updateCharCount('excerpt', this.value.length, 500);
+                validateField('excerpt');
+            });
+        });
+
+        // Load article (edit mode only)
+        async function loadArticle() {
+            try {
+                const response = await fetch(`/api/articles/${articleId}`);
+
+                if (!response.ok) {
+                    throw new Error('Nie udało się załadować artykułu');
+                }
+
+                currentArticle = await response.json();
+
+                // Populate form fields
+                document.getElementById('titleInput').value = currentArticle.title;
+                document.getElementById('contentEditor').innerHTML = currentArticle.content;
+                document.getElementById('excerptInput').value = currentArticle.excerpt || '';
+
+                // Update character counts
+                updateCharCount('title', currentArticle.title.length, 255);
+                updateCharCount('content', (currentArticle.content.replace(/<[^>]*>/g, '')).length, 25000);
+                updateCharCount('excerpt', (currentArticle.excerpt || '').length, 500);
+
+                // Show article info
+                showArticleInfo(currentArticle);
+
+                // Show appropriate action buttons based on status
+                updateActionButtons(currentArticle.status);
+
+                showForm();
+            } catch (error) {
+                console.error('Error loading article:', error);
+                document.getElementById('errorMessage').textContent = error.message;
+                document.getElementById('errorState').classList.remove('hidden');
+                document.getElementById('loadingState').classList.add('hidden');
+            }
+        }
+
+        // Show article info (edit mode)
+        function showArticleInfo(article) {
+            const infoDiv = document.getElementById('articleInfo');
+            infoDiv.classList.remove('hidden');
+
+            // Status badge
+            const statusBadges = {
+                'DRAFT': '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Draft</span>',
+                'PUBLISHED': '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Published</span>',
+                'ARCHIVED': '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Archived</span>'
+            };
+            document.getElementById('articleStatus').innerHTML = statusBadges[article.status] || article.status;
+
+            // Dates
+            document.getElementById('articleCreatedAt').textContent = formatDate(article.createdAt);
+            document.getElementById('articleAuthor').textContent = article.authorName || 'Unknown';
+        }
+
+        // Update action buttons based on status
+        function updateActionButtons(status) {
+            const publishBtn = document.getElementById('publishBtn');
+            const archiveBtn = document.getElementById('archiveBtn');
+
+            if (status === 'DRAFT') {
+                publishBtn.classList.remove('hidden');
+                archiveBtn.classList.add('hidden');
+            } else if (status === 'PUBLISHED') {
+                publishBtn.classList.add('hidden');
+                archiveBtn.classList.remove('hidden');
+            } else {
+                publishBtn.classList.add('hidden');
+                archiveBtn.classList.add('hidden');
+            }
+        }
+
+        // Save article
+        async function saveArticle(shouldPublish) {
+            if (!validateForm()) {
+                return;
+            }
+
+            const button = shouldPublish ? document.getElementById('savePublishBtn') : document.getElementById('saveDraftBtn');
+            setButtonLoading(button, true);
+
+            try {
+                const title = document.getElementById('titleInput').value;
+                const content = document.getElementById('contentEditor').innerHTML;
+                const excerpt = document.getElementById('excerptInput').value;
+
+                const payload = {
+                    title: title,
+                    content: content,
+                    excerpt: excerpt || null
+                };
+
+                let response;
+                if (mode === 'create') {
+                    // Create new article
+                    response = await fetch('/api/articles', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    // Update existing article
+                    response = await fetch(`/api/articles/${articleId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                }
+
+                if (!response.ok) {
+                    throw new Error('Nie udało się zapisać artykułu');
+                }
+
+                const savedArticle = await response.json();
+
+                // If should publish and status is DRAFT, publish it
+                if (shouldPublish && savedArticle.status === 'DRAFT') {
+                    const publishResponse = await fetch(`/api/articles/${savedArticle.id}/publish`, {
+                        method: 'PATCH'
+                    });
+
+                    if (!publishResponse.ok) {
+                        throw new Error('Artykuł został zapisany, ale nie udało się go opublikować');
+                    }
+                }
+
+                showSuccess('Artykuł został zapisany pomyślnie');
+
+                // Redirect after 1.5 seconds
+                setTimeout(() => {
+                    window.location.href = '/admin/blogs';
+                }, 1500);
+            } catch (error) {
+                console.error('Error saving article:', error);
+                alert('Nie udało się zapisać artykułu: ' + error.message);
+            } finally {
+                setButtonLoading(button, false);
+            }
+        }
+
+        // Publish article (edit mode only)
+        async function publishArticle() {
+            if (!confirm('Czy na pewno chcesz opublikować ten artykuł?')) {
+                return;
+            }
+
+            const button = document.getElementById('publishBtn');
+            setButtonLoading(button, true);
+
+            try {
+                const response = await fetch(`/api/articles/${articleId}/publish`, {
+                    method: 'PATCH'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Nie udało się opublikować artykułu');
+                }
+
+                showSuccess('Artykuł został opublikowany pomyślnie');
+
+                setTimeout(() => {
+                    window.location.href = '/admin/blogs';
+                }, 1500);
+            } catch (error) {
+                console.error('Error publishing article:', error);
+                alert('Nie udało się opublikować artykułu: ' + error.message);
+            } finally {
+                setButtonLoading(button, false);
+            }
+        }
+
+        // Archive article (edit mode only)
+        async function archiveArticle() {
+            if (!confirm('Czy na pewno chcesz zarchiwizować ten artykuł?')) {
+                return;
+            }
+
+            const button = document.getElementById('archiveBtn');
+            setButtonLoading(button, true);
+
+            try {
+                const response = await fetch(`/api/articles/${articleId}/archive`, {
+                    method: 'PATCH'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Nie udało się zarchiwizować artykułu');
+                }
+
+                showSuccess('Artykuł został zarchiwizowany pomyślnie');
+
+                setTimeout(() => {
+                    window.location.href = '/admin/blogs';
+                }, 1500);
+            } catch (error) {
+                console.error('Error archiving article:', error);
+                alert('Nie udało się zarchiwizować artykułu: ' + error.message);
+            } finally {
+                setButtonLoading(button, false);
+            }
+        }
+
+        // Validation
+        function validateForm() {
+            let isValid = true;
+
+            if (!validateField('title')) isValid = false;
+            if (!validateField('content')) isValid = false;
+            if (!validateField('excerpt')) isValid = false;
+
+            return isValid;
+        }
+
+        function validateField(fieldName) {
+            let isValid = true;
+            let errorMessage = '';
+
+            if (fieldName === 'title') {
+                const value = document.getElementById('titleInput').value.trim();
+                if (!value) {
+                    errorMessage = 'Tytuł jest wymagany';
+                    isValid = false;
+                } else if (value.length > 255) {
+                    errorMessage = 'Tytuł nie może przekraczać 255 znaków';
+                    isValid = false;
+                }
+            } else if (fieldName === 'content') {
+                const editor = document.getElementById('contentEditor');
+                const text = (editor.innerText || editor.textContent).trim();
+                if (!text) {
+                    errorMessage = 'Treść jest wymagana';
+                    isValid = false;
+                } else if (text.length < 50) {
+                    errorMessage = 'Treść musi mieć minimum 50 znaków';
+                    isValid = false;
+                } else if (text.length > 25000) {
+                    errorMessage = 'Treść nie może przekraczać 25000 znaków';
+                    isValid = false;
+                }
+            } else if (fieldName === 'excerpt') {
+                const value = document.getElementById('excerptInput').value;
+                if (value.length > 500) {
+                    errorMessage = 'Zajawka nie może przekraczać 500 znaków';
+                    isValid = false;
+                }
+            }
+
+            if (isValid) {
+                hideFieldError(fieldName);
+            } else {
+                showFieldError(fieldName, errorMessage);
+            }
+
+            return isValid;
+        }
+
+        function showFieldError(fieldName, message) {
+            const errorElement = document.getElementById(fieldName + 'Error');
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+        }
+
+        function hideFieldError(fieldName) {
+            const errorElement = document.getElementById(fieldName + 'Error');
+            errorElement.classList.add('hidden');
+        }
+
+        // Rich text editor functions
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            document.getElementById('contentEditor').focus();
+        }
+
+        function insertHeading() {
+            document.execCommand('formatBlock', false, '<h2>');
+            document.getElementById('contentEditor').focus();
+        }
+
+        function insertLink() {
+            const url = prompt('Wprowadź URL:');
+            if (url) {
+                document.execCommand('createLink', false, url);
+                document.getElementById('contentEditor').focus();
+            }
+        }
+
+        // Utility functions
+        function updateCharCount(field, count, max) {
+            const element = document.getElementById(field + 'Count');
+            if (element) {
+                element.textContent = count;
+            }
+        }
+
+        function setButtonLoading(button, loading) {
+            const spinner = button.querySelector('.button-spinner');
+            if (loading) {
+                spinner.classList.remove('hidden');
+                button.disabled = true;
+            } else {
+                spinner.classList.add('hidden');
+                button.disabled = false;
+            }
+        }
+
+        function showSuccess(message) {
+            const alert = document.getElementById('successAlert');
+            document.getElementById('successMessage').textContent = message;
+            alert.classList.remove('hidden');
+
+            setTimeout(() => {
+                alert.classList.add('hidden');
+            }, 3000);
+        }
+
+        function showForm() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('articleForm').classList.remove('hidden');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pl-PL', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</div>
+</body>
+</html>

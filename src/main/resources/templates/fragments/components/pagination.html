@@ -23,7 +23,7 @@
     <th:block th:with="
         current=${currentPage},
         total=${totalPages},
-        param=${queryParam ?: 'page'},
+        pageParam=${queryParam ?: 'page'},
         variantType=${variant ?: 'numbered'},
         showFL=${showFirstLast != null ? showFirstLast : true},
         maxVis=${maxVisible ?: 7}">
@@ -32,7 +32,7 @@
 
             <!-- First Page Button -->
             <li th:if="${showFL && variantType == 'full'}">
-                <a th:href="${current > 1} ? ${baseUrl + '?' + param + '=1'} : '#'"
+                <a th:href="${current > 1} ? ${baseUrl + '?' + pageParam + '=1'} : '#'"
                    th:class="'flex items-center justify-center px-3 h-8 ml-0 leading-tight border border-gray-300 rounded-l-lg ' +
                             (${current > 1} ? 'text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700' : 'text-gray-300 bg-gray-50 cursor-not-allowed')"
                    th:aria-disabled="${current <= 1}">
@@ -42,7 +42,7 @@
 
             <!-- Previous Button -->
             <li>
-                <a th:href="${current > 1} ? ${baseUrl + '?' + param + '=' + (current - 1)} : '#'"
+                <a th:href="${current > 1} ? ${baseUrl + '?' + pageParam + '=' + (current - 1)} : '#'"
                    th:class="'flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 ' +
                             (${showFL && variantType == 'full'} ? '' : 'rounded-l-lg ml-0 ') +
                             (${current > 1} ? 'text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700' : 'text-gray-300 bg-gray-50 cursor-not-allowed')"
@@ -64,7 +64,7 @@
 
                     <!-- Page Numbers -->
                     <li th:each="pageNum : ${#numbers.sequence(startPage, endPage)}">
-                        <a th:href="${baseUrl + '?' + param + '=' + pageNum}"
+                        <a th:href="${baseUrl + '?' + pageParam + '=' + pageNum}"
                            th:class="'flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 ' +
                                     (${pageNum == current} ?
                                      'z-10 text-primary-600 bg-primary-50 border-primary-300 hover:bg-primary-100 hover:text-primary-700' :
@@ -89,7 +89,7 @@
 
             <!-- Next Button -->
             <li>
-                <a th:href="${current < total} ? ${baseUrl + '?' + param + '=' + (current + 1)} : '#'"
+                <a th:href="${current < total} ? ${baseUrl + '?' + pageParam + '=' + (current + 1)} : '#'"
                    th:class="'flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 ' +
                             (${showFL && variantType == 'full'} ? '' : 'rounded-r-lg ') +
                             (${current < total} ? 'text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700' : 'text-gray-300 bg-gray-50 cursor-not-allowed')"
@@ -100,7 +100,7 @@
 
             <!-- Last Page Button -->
             <li th:if="${showFL && variantType == 'full'}">
-                <a th:href="${current < total} ? ${baseUrl + '?' + param + '=' + total} : '#'"
+                <a th:href="${current < total} ? ${baseUrl + '?' + pageParam + '=' + total} : '#'"
                    th:class="'flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 rounded-r-lg ' +
                             (${current < total} ? 'text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700' : 'text-gray-300 bg-gray-50 cursor-not-allowed')"
                    th:aria-disabled="${current >= total}">

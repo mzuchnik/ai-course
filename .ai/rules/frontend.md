@@ -76,54 +76,210 @@ lexpage/
 
 ### 1. Layout Pattern
 
+**⚠️ KRYTYCZNA ZASADA: Parametryzowane Layouty**
+
+Layouty w projekcie **MUSZĄ** używać parametryzowanych fragmentów z nazwą `layout (content)`. To jedyny poprawny wzorzec!
+
 **Base Layout** (`layouts/base.html`):
 ```html
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<html xmlns:th="http://www.thymeleaf.org" lang="pl" th:fragment="layout (content)">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${pageTitle ?: 'Lexpage'}">Lexpage</title>
     <link rel="stylesheet" th:href="@{/css/output.css}">
     <!-- Material Icons, Fonts -->
 </head>
-<body>
-    <div th:replace="${content}"></div>
+<body class="font-sans antialiased">
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/components/navbar :: navbar}"></nav>
+
+    <!-- Main Content -->
+    <main class="min-h-screen bg-gray-50">
+        <th:block th:replace="${content}"></th:block>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/components/footer :: footer}"></footer>
+
+    <!-- Scripts -->
     <script th:src="@{/js/material-tailwind.js}"></script>
     <script th:src="@{/js/app.js}"></script>
 </body>
 </html>
 ```
 
-**Main Layout** (`layouts/main.html`):
+**Admin Layout** (`layouts/admin.html`):
 ```html
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layouts/base :: html}">
-<body>
-    <div th:fragment="content">
-        <nav th:replace="~{fragments/components/navbar :: navbar}"></nav>
-        <main class="min-h-screen bg-gray-50">
-            <th:block th:replace="${pageContent}"></th:block>
-        </main>
-        <footer th:replace="~{fragments/components/footer :: footer}"></footer>
-    </div>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl" th:fragment="layout (content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle ?: 'Admin - Lexpage'}">Admin - Lexpage</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <!-- Material Icons, Fonts -->
+</head>
+<body class="font-sans antialiased bg-gray-50">
+    <!-- Admin Topbar -->
+    <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200">
+        <!-- Topbar content -->
+    </nav>
+
+    <!-- Sidebar with active state (managed by JavaScript) -->
+    <aside class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-white border-r border-gray-200">
+        <ul class="space-y-2 font-medium">
+            <li>
+                <a href="/admin/blogs"
+                   data-nav-link
+                   data-nav-path="/admin/blogs"
+                   class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                    <i class="material-icons text-gray-500">article</i>
+                    <span class="ml-3">Artykuły</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="p-4 md:p-8 ml-64 pt-24">
+        <th:block th:replace="${content}"></th:block>
+    </main>
+
+    <!-- Scripts -->
+    <script th:src="@{/js/material-tailwind.js}"></script>
+    <script th:src="@{/js/app.js}"></script>
+
+    <!-- Admin Navigation Active State (JavaScript) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('[data-nav-link]');
+
+            navLinks.forEach(link => {
+                const navPath = link.getAttribute('data-nav-path');
+                const icon = link.querySelector('.material-icons');
+
+                const isActive = navPath === '/admin'
+                    ? currentPath === navPath
+                    : currentPath.startsWith(navPath);
+
+                if (isActive) {
+                    link.classList.add('bg-primary-100', 'text-primary-600');
+                    link.classList.remove('text-gray-900');
+                    if (icon) {
+                        icon.classList.add('text-primary-600');
+                        icon.classList.remove('text-gray-500');
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
+```
+
+**WAŻNE:** Od Thymeleaf 3.1+, obiekty `#request`, `#session`, `#servletContext` nie są dostępne domyślnie ze względów bezpieczeństwa. Zamiast używać wyrażeń Thymeleaf do oznaczania aktywnego stanu nawigacji, używaj **JavaScript**:
+
+```html
+<!-- ✅ DOBRZE - JavaScript zarządza aktywnym stanem -->
+<a href="/admin/blogs"
+   data-nav-link
+   data-nav-path="/admin/blogs"
+   class="...">
+    Menu Item
+</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('[data-nav-link]');
+
+        navLinks.forEach(link => {
+            const navPath = link.getAttribute('data-nav-path');
+            const isActive = currentPath.startsWith(navPath);
+            if (isActive) {
+                link.classList.add('active-class');
+            }
+        });
+    });
+</script>
+
+<!-- ❌ ŹLE - #request niedostępny w Thymeleaf 3.1+ -->
+<a th:classappend="${#strings.startsWith(#request.requestURI, '/admin') ? 'active' : ''}">
 ```
 
 **Page Template** (`pages/example.html`):
 ```html
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layouts/main :: html}">
+      th:replace="~{layouts/base :: layout(~{::content})}">
 <head>
     <title th:text="${pageTitle}">Page Title</title>
 </head>
 <body>
-<div th:fragment="pageContent">
+<div th:fragment="content">
     <!-- Your page content here -->
+
+    <!-- JavaScript musi być WEWNĄTRZ fragmentu content! -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your JavaScript here
+        });
+    </script>
 </div>
 </body>
 </html>
+```
+
+**Admin Page Template** (`pages/admin/example.html`):
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/admin :: layout(~{::content})}">
+<head>
+    <title th:text="${pageTitle}">Admin Page</title>
+</head>
+<body>
+<div th:fragment="content">
+    <!-- Your admin page content here -->
+
+    <!-- JavaScript musi być WEWNĄTRZ fragmentu content! -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your JavaScript here
+        });
+    </script>
+</div>
+</body>
+</html>
+```
+
+**Kluczowe zasady:**
+1. Layout ZAWSZE używa `th:fragment="layout (content)"` z parametrem
+2. Strona ZAWSZE używa `th:replace="~{layouts/xxx :: layout(~{::content})}"`
+3. Fragment w stronie ZAWSZE nazywa się `content` (nie `pageContent`)
+4. JavaScript ZAWSZE musi być wewnątrz fragmentu `content`
+
+**❌ BŁĘDY DO UNIKNIĘCIA:**
+```html
+<!-- ❌ ŹLE - brak parametru w layout -->
+<html th:fragment="layout">
+
+<!-- ❌ ŹLE - niepoprawne użycie w stronie -->
+<html th:replace="~{layouts/admin :: html}">
+
+<!-- ❌ ŹLE - zła nazwa fragmentu -->
+<div th:fragment="pageContent">
+
+<!-- ❌ ŹLE - skrypt poza fragmentem -->
+<div th:fragment="content">
+    <!-- Content -->
+</div>
+<script>
+    // Ten skrypt NIE ZOSTANIE wyrenderowany!
+</script>
 ```
 
 **⚠️ KRYTYCZNE: JavaScript w fragmentach content**

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl" th:fragment="layout (content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title th:text="${pageTitle ?: 'Admin - Lexpage'}">Admin - Lexpage</title>
+
+    <!-- Tailwind CSS Output -->
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans antialiased bg-gray-50">
+    <!-- Admin Topbar -->
+    <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200">
+        <div class="px-3 py-3 lg:px-5 lg:pl-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center justify-start">
+                    <a href="/admin" class="flex ml-2 md:mr-24">
+                        <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-primary-600">
+                            Lexpage Admin
+                        </span>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <a href="/"
+                       class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">
+                        <i class="material-icons mr-2 text-xl">arrow_back</i>
+                        Powrót do strony
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform bg-white border-r border-gray-200">
+        <div class="h-full px-3 pb-4 overflow-y-auto">
+            <ul class="space-y-2 font-medium">
+                <!-- Dashboard -->
+                <li>
+                    <a href="/admin"
+                       data-nav-link
+                       data-nav-path="/admin"
+                       class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                        <i class="material-icons text-gray-500 group-hover:text-gray-900">
+                            dashboard
+                        </i>
+                        <span class="ml-3">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Artykuły -->
+                <li>
+                    <a href="/admin/blogs"
+                       data-nav-link
+                       data-nav-path="/admin/blogs"
+                       class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                        <i class="material-icons text-gray-500 group-hover:text-gray-900">
+                            article
+                        </i>
+                        <span class="ml-3">Artykuły</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Spacer for fixed topbar -->
+    <div class="h-20"></div>
+
+    <!-- Main Content Area -->
+    <main class="p-4 md:p-8 ml-64">
+        <th:block th:replace="${content}"></th:block>
+    </main>
+
+    <!-- Material Tailwind JS -->
+    <script th:src="@{/js/material-tailwind.js}"></script>
+
+    <!-- Custom App JS -->
+    <script th:src="@{/js/app.js}"></script>
+
+    <!-- Admin Navigation Active State -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('[data-nav-link]');
+
+            navLinks.forEach(link => {
+                const navPath = link.getAttribute('data-nav-path');
+                const icon = link.querySelector('.material-icons');
+
+                // Check if current path matches or starts with nav path
+                const isActive = navPath === '/admin'
+                    ? currentPath === navPath
+                    : currentPath.startsWith(navPath);
+
+                if (isActive) {
+                    // Add active classes to link
+                    link.classList.add('bg-primary-100', 'text-primary-600');
+                    link.classList.remove('text-gray-900');
+
+                    // Add active classes to icon
+                    if (icon) {
+                        icon.classList.add('text-primary-600');
+                        icon.classList.remove('text-gray-500');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
