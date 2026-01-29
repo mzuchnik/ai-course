@@ -457,10 +457,12 @@ Implementacja zgodna z **Hexagonal Architecture** (Ports & Adapters) i **DDD**.
 - Przykład użycia do wygenerowania test password:
 
 ### CSRF Protection
-- Enabled dla wszystkich POST/PUT/DELETE/PATCH requestów
+- **WŁĄCZONE** dla formularzy webowych (/admin/**, /login, /logout)
+- **WYŁĄCZONE** dla REST API (/api/**)
 - Token automatycznie dodawany do formularzy Thymeleaf przez Spring Security
 - W formularzach Thymeleaf: automatyczne dodanie input hidden z CSRF token
-- Dla API endpoints: można rozważyć wyłączenie CSRF dla /api/** (jeśli używane stateless JWT w przyszłości)
+- Implementacja: `.csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))`
+- Uzasadnienie: REST API jest stateless i nie potrzebuje CSRF protection
 
 ### Session Management
 - Session creation: IF_REQUIRED

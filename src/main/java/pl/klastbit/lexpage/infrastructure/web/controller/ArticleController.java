@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.klastbit.lexpage.application.article.*;
 import pl.klastbit.lexpage.application.article.dto.ArticleDetailDto;
@@ -15,6 +17,7 @@ import pl.klastbit.lexpage.application.article.dto.ArticleListItemDto;
 import pl.klastbit.lexpage.application.article.dto.PageDto;
 import pl.klastbit.lexpage.domain.article.ArticleStatus;
 import pl.klastbit.lexpage.domain.user.UserId;
+import pl.klastbit.lexpage.infrastructure.adapters.security.UserPrincipal;
 import pl.klastbit.lexpage.infrastructure.web.controller.dto.*;
 
 import java.util.UUID;
@@ -111,12 +114,10 @@ public class ArticleController {
     @PostMapping
     public ResponseEntity<ArticleResponse> createArticle(
             @Valid @RequestBody CreateArticleRequest request
-            // TODO: Add @AuthenticationPrincipal UserDetails userDetails when Spring Security is configured
     ) {
         log.info("POST /api/articles - title: {}", request.title());
 
-        // TODO: Get real userId from Spring Security context
-        UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000000"); // Placeholder - replace with actual authenticated user
+        UUID userId = getCurrentUserId();
 
         ArticleDetailDto created = createArticleUseCase.execute(request.toCommand(userId));
 
@@ -134,12 +135,10 @@ public class ArticleController {
     public ResponseEntity<ArticleResponse> updateArticle(
             @PathVariable Long id,
             @Valid @RequestBody UpdateArticleRequest request
-            // TODO: Add @AuthenticationPrincipal UserDetails userDetails when Spring Security is configured
     ) {
         log.info("PUT /api/articles/{} - title: {}", id, request.title());
 
-        // TODO: Get real userId from Spring Security context
-        UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000000"); // Placeholder - replace with actual authenticated user
+        UUID userId = getCurrentUserId();
 
         ArticleDetailDto updated = updateArticleUseCase.execute(request.toCommand(id, userId));
 
@@ -204,5 +203,29 @@ public class ArticleController {
         ArticleDetailDto unpublished = unpublishArticleUseCase.execute(id);
 
         return ResponseEntity.ok(ArticleResponse.from(unpublished));
+    }
+
+    /**
+     * Helper method to get currently authenticated user's ID from Spring Security context.
+     *
+     * @return UUID of the currently authenticated user
+     * @throws IllegalStateException if user is not authenticated or authentication is invalid
+     */
+    private UUID getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            log.error("No authenticated user found in security context");
+            throw new IllegalStateException("User must be authenticated to perform this action");
+        }
+
+        if (authentication.getPrincipal() instanceof UserPrincipal userPrincipal) {
+            UUID userId = userPrincipal.getUserId().userid();
+            log.debug("Retrieved userId from security context: {}", userId);
+            return userId;
+        }
+
+        log.error("Authentication principal is not UserPrincipal: {}", authentication.getPrincipal().getClass());
+        throw new IllegalStateException("Invalid authentication principal");
     }
 }

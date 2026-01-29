@@ -3,6 +3,9 @@ package pl.klastbit.lexpage.infrastructure.web.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -148,6 +151,68 @@ public class GlobalExceptionApiHandler {
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
+        problemDetail.setProperty("timestamp", Instant.now());
+
+        return problemDetail;
+    }
+
+    /**
+     * Handles Spring Security authentication exceptions (for API endpoints).
+     * Returns 401 Unauthorized.
+     * Does not reveal whether user exists (security best practice).
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthenticationException(AuthenticationException ex) {
+        log.warn("Authentication failed: {}", ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                "Authentication failed. Please check your credentials."
+        );
+
+        problemDetail.setTitle("Unauthorized");
+        problemDetail.setType(URI.create("https://klastbit.pl/errors/unauthorized"));
+        problemDetail.setProperty("timestamp", Instant.now());
+
+        return problemDetail;
+    }
+
+    /**
+     * Handles Spring Security access denied exceptions (for API endpoints).
+     * Returns 403 Forbidden.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ProblemDetail handleAccessDeniedException(AccessDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN,
+                "Access denied. You do not have permission to access this resource."
+        );
+
+        problemDetail.setTitle("Forbidden");
+        problemDetail.setType(URI.create("https://klastbit.pl/errors/forbidden"));
+        problemDetail.setProperty("timestamp", Instant.now());
+
+        return problemDetail;
+    }
+
+    /**
+     * Handles username not found exceptions (for API endpoints).
+     * Returns 401 Unauthorized.
+     * Does not reveal whether user exists (security best practice).
+     */
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ProblemDetail handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        log.warn("User not found during authentication: {}", ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                "Authentication failed. Please check your credentials."
+        );
+
+        problemDetail.setTitle("Unauthorized");
+        problemDetail.setType(URI.create("https://klastbit.pl/errors/unauthorized"));
         problemDetail.setProperty("timestamp", Instant.now());
 
         return problemDetail;

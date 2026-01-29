@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.klastbit.lexpage.application.article.UnpublishArticleUseCase;
 import pl.klastbit.lexpage.application.article.dto.ArticleDetailDto;
+import pl.klastbit.lexpage.application.user.ports.UserRepository;
 import pl.klastbit.lexpage.domain.article.Article;
 import pl.klastbit.lexpage.domain.article.ArticleRepository;
 import pl.klastbit.lexpage.domain.article.exception.ArticleNotFoundException;
+import pl.klastbit.lexpage.domain.user.UserId;
 
 /**
  * Implementation of UnpublishArticleUseCase.
@@ -21,6 +23,7 @@ import pl.klastbit.lexpage.domain.article.exception.ArticleNotFoundException;
 public class UnpublishArticleUseCaseImpl implements UnpublishArticleUseCase {
 
     private final ArticleRepository articleRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ArticleDetailDto execute(Long articleId) {
@@ -35,7 +38,25 @@ public class UnpublishArticleUseCaseImpl implements UnpublishArticleUseCase {
 
         log.info("Article unpublished successfully with ID: {}", articleId);
 
-        // TODO: Fetch real user names from UserRepository
-        return ArticleDetailDto.from(unpublishedArticle, "Author Name", "Creator Name", "Updater Name");
+        // Fetch real user names from UserRepository
+        String authorName = getUsernameById(unpublishedArticle.getAuthorId());
+        String createdByName = getUsernameById(unpublishedArticle.getCreatedBy());
+        String updatedByName = getUsernameById(unpublishedArticle.getUpdatedBy());
+
+        return ArticleDetailDto.from(unpublishedArticle, authorName, createdByName, updatedByName);
+    }
+
+    /**
+     * Fetches username by user ID from UserRepository.
+     * Returns "Unknown User" if user not found.
+     */
+    private String getUsernameById(UserId userId) {
+        if (userId == null) {
+            return "Unknown User";
+        }
+
+        return userRepository.findById(userId)
+                .map(user -> user.getUsername())
+                .orElse("Unknown User");
     }
 }

@@ -32,11 +32,11 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
-.claude
+.claude/
 
 ### VS Code ###
 .vscode/
-./nul
+nul
 
 ### Frontend ###
 node_modules/

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: layout(~{::content})}">
+<head>
+    <title th:text="${pageTitle}">Logowanie - Lexpage</title>
+</head>
+<body>
+<div th:fragment="content">
+    <!-- Login Section -->
+    <section class="min-h-screen flex items-center justify-center py-16 px-4 bg-gradient-to-br from-primary-50 to-gray-50">
+        <div class="w-full max-w-md">
+            <!-- Login Card -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <!-- Card Header -->
+                <div class="bg-gradient-to-r from-primary-600 to-primary-500 px-8 py-8 text-center">
+                    <i class="material-icons text-white text-5xl mb-3">lock</i>
+                    <h1 class="text-3xl font-bold text-white">Panel Administracyjny</h1>
+                    <p class="text-primary-100 mt-2">Zaloguj się aby kontynuować</p>
+                </div>
+
+                <!-- Card Body -->
+                <div class="px-8 py-8">
+                    <!-- Error Message -->
+                    <div th:if="${errorMessage}"
+                         class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
+                        <i class="material-icons text-red-600 mr-3 mt-0.5">error</i>
+                        <div class="flex-1">
+                            <h3 class="text-red-900 font-semibold mb-1">Błąd logowania</h3>
+                            <p class="text-red-700 text-sm" th:text="${errorMessage}">Nieprawidłowy email lub hasło</p>
+                        </div>
+                    </div>
+
+                    <!-- Logout Success Message -->
+                    <div th:if="${logoutMessage}"
+                         class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start">
+                        <i class="material-icons text-green-600 mr-3 mt-0.5">check_circle</i>
+                        <div class="flex-1">
+                            <p class="text-green-700 text-sm" th:text="${logoutMessage}">Zostałeś pomyślnie wylogowany</p>
+                        </div>
+                    </div>
+
+                    <!-- Login Form -->
+                    <form th:action="@{/login}" method="post" class="space-y-6">
+                        <!-- Email Input -->
+                        <div class="relative">
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                required
+                                autofocus
+                                placeholder=" "
+                                class="peer w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                            />
+                            <label
+                                for="email"
+                                class="absolute left-3 -top-2.5 px-1 bg-white text-sm font-medium text-gray-700 transition-all
+                                       peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-placeholder-shown:left-4
+                                       peer-focus:-top-2.5 peer-focus:left-3 peer-focus:text-sm peer-focus:text-primary-600"
+                            >
+                                <i class="material-icons text-xs align-middle mr-1">email</i>
+                                Email
+                            </label>
+                        </div>
+
+                        <!-- Password Input -->
+                        <div class="relative">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                required
+                                placeholder=" "
+                                class="peer w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                            />
+                            <label
+                                for="password"
+                                class="absolute left-3 -top-2.5 px-1 bg-white text-sm font-medium text-gray-700 transition-all
+                                       peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-placeholder-shown:left-4
+                                       peer-focus:-top-2.5 peer-focus:left-3 peer-focus:text-sm peer-focus:text-primary-600"
+                            >
+                                <i class="material-icons text-xs align-middle mr-1">lock</i>
+                                Hasło
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button
+                            type="submit"
+                            data-ripple-light="true"
+                            class="w-full bg-primary-600 text-white font-semibold py-3 px-6 rounded-lg
+                                   hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300
+                                   shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200
+                                   flex items-center justify-center gap-2"
+                        >
+                            <i class="material-icons">login</i>
+                            <span>Zaloguj się</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Card Footer -->
+                <div class="bg-gray-50 px-8 py-4 border-t border-gray-100 text-center">
+                    <a href="/"
+                       class="text-sm text-gray-600 hover:text-primary-600 transition-colors inline-flex items-center gap-1">
+                        <i class="material-icons text-base">arrow_back</i>
+                        Powrót do strony głównej
+                    </a>
+                </div>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-500 flex items-center justify-center gap-2">
+                    <i class="material-icons text-base">shield</i>
+                    Bezpieczne połączenie SSL
+                </p>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

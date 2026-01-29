@@ -21,9 +21,22 @@ Package structure: `pl.klastbit.lexpage`
 ```
 
 ### Running the application
+
+**Default profile (production-like):**
 ```bash
 ./gradlew bootRun
 ```
+
+**Test profile (with automatic test user creation):**
+```bash
+./gradlew bootRun --args='--spring.profiles.active=test'
+```
+
+When running with `test` profile, a test admin user is automatically created:
+- Email: `admin@lexpage.pl`
+- Password: `admin123`
+- The user is created/updated on application startup via `TestUserInitializer`
+- **WARNING:** Do NOT use test profile in production!
 
 ### Running tests
 ```bash

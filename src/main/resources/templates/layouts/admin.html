@@ -29,12 +29,20 @@
                         </span>
                     </a>
                 </div>
-                <div class="flex items-center">
+                <div class="flex items-center gap-2">
                     <a href="/"
                        class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">
                         <i class="material-icons mr-2 text-xl">arrow_back</i>
                         Powrót do strony
                     </a>
+                    <form th:action="@{/logout}" method="post" class="inline">
+                        <button
+                            type="submit"
+                            class="flex items-center px-4 py-2 text-sm font-medium text-red-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                            <i class="material-icons mr-2 text-xl">logout</i>
+                            Wyloguj
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

@@ -7,9 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.klastbit.lexpage.application.article.UpdateArticleUseCase;
 import pl.klastbit.lexpage.application.article.command.UpdateArticleCommand;
 import pl.klastbit.lexpage.application.article.dto.ArticleDetailDto;
+import pl.klastbit.lexpage.application.user.ports.UserRepository;
 import pl.klastbit.lexpage.domain.article.Article;
 import pl.klastbit.lexpage.domain.article.ArticleRepository;
 import pl.klastbit.lexpage.domain.article.exception.ArticleNotFoundException;
+import pl.klastbit.lexpage.domain.user.UserId;
 
 import java.text.Normalizer;
 
@@ -24,6 +26,7 @@ import java.text.Normalizer;
 public class UpdateArticleUseCaseImpl implements UpdateArticleUseCase {
 
     private final ArticleRepository articleRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ArticleDetailDto execute(UpdateArticleCommand command) {
@@ -66,8 +69,12 @@ public class UpdateArticleUseCaseImpl implements UpdateArticleUseCase {
         Article updatedArticle = articleRepository.save(article);
         log.info("Article updated successfully with ID: {}", updatedArticle.getId());
 
-        // TODO: Fetch real user names from UserRepository
-        return ArticleDetailDto.from(updatedArticle, "Author Name", "Creator Name", "Updater Name");
+        // Fetch real user names from UserRepository
+        String authorName = getUsernameById(updatedArticle.getAuthorId());
+        String createdByName = getUsernameById(updatedArticle.getCreatedBy());
+        String updatedByName = getUsernameById(updatedArticle.getUpdatedBy());
+
+        return ArticleDetailDto.from(updatedArticle, authorName, createdByName, updatedByName);
     }
 
     // ==================== Helper Methods ====================
@@ -108,5 +115,19 @@ public class UpdateArticleUseCaseImpl implements UpdateArticleUseCase {
         }
 
         return plainText;
+    }
+
+    /**
+     * Fetches username by user ID from UserRepository.
+     * Returns "Unknown User" if user not found.
+     */
+    private String getUsernameById(UserId userId) {
+        if (userId == null) {
+            return "Unknown User";
+        }
+
+        return userRepository.findById(userId)
+                .map(user -> user.getUsername())
+                .orElse("Unknown User");
     }
 }
