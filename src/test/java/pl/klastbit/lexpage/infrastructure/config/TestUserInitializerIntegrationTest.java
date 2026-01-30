@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import pl.klastbit.lexpage.AbstractIntegrationTest;
 import pl.klastbit.lexpage.application.user.ports.PasswordEncoder;
 import pl.klastbit.lexpage.application.user.ports.UserRepository;
 import pl.klastbit.lexpage.domain.user.Email;
@@ -18,12 +19,14 @@ import static org.assertj.core.api.Assertions.*;
  * Integration test for TestUserInitializer.
  * Verifies that test admin user is created/updated when application starts with 'test' profile.
  * <p>
+ * Uses TestContainers PostgreSQL for isolated integration testing.
+ * <p>
  * Note: TestUserInitializer updates the user if it already exists, ensuring consistent credentials.
  */
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("TestUserInitializer Integration Tests")
-class TestUserInitializerIntegrationTest {
+class TestUserInitializerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;

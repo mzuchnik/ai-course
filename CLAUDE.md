@@ -66,6 +66,39 @@ When running with `test` profile, a test admin user is automatically created:
 
 Database connection details must be configured in `application.properties` before running the application.
 
+## Testing
+
+### Integration Tests with TestContainers
+
+The project uses **TestContainers** for integration tests that require a real PostgreSQL database.
+
+**Key Points:**
+- Integration tests extend `AbstractIntegrationTest` base class
+- TestContainers automatically starts a PostgreSQL container (postgres:16-alpine)
+- Database is isolated for each test class
+- No need to configure database connection - handled automatically
+- Liquibase migrations run automatically against the test container
+
+**Example:**
+```java
+@SpringBootTest
+@ActiveProfiles("test")
+class MyIntegrationTest extends AbstractIntegrationTest {
+
+    @Autowired
+    private MyRepository repository;
+
+    @Test
+    void myIntegrationTest() {
+        // Test code using real PostgreSQL via TestContainers
+    }
+}
+```
+
+**Prerequisites:**
+- Docker must be installed and running on your machine
+- TestContainers will automatically download the PostgreSQL image on first run
+
 ## Detailed Implementation Guidelines
 
 **IMPORTANT:** This project has comprehensive coding standards and best practices:
