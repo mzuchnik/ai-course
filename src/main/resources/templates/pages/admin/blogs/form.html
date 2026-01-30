@@ -3,126 +3,11 @@
       th:replace="~{layouts/admin :: layout(~{::content})}">
 <head>
     <title th:text="${pageTitle}">Artykuł</title>
-    <style>
-        /* Styles for contenteditable rich text editor */
-        #contentEditor h1 {
-            font-size: 2em;
-            font-weight: bold;
-            margin: 0.67em 0;
-            line-height: 1.2;
-        }
-
-        #contentEditor h2 {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin: 0.75em 0;
-            line-height: 1.3;
-        }
-
-        #contentEditor h3 {
-            font-size: 1.17em;
-            font-weight: bold;
-            margin: 0.83em 0;
-            line-height: 1.4;
-        }
-
-        #contentEditor p {
-            margin: 1em 0;
-            line-height: 1.6;
-        }
-
-        #contentEditor ul, #contentEditor ol {
-            margin: 1em 0;
-            padding-left: 2.5em;
-        }
-
-        #contentEditor li {
-            margin: 0.5em 0;
-            line-height: 1.6;
-        }
-
-        #contentEditor ul {
-            list-style-type: disc;
-        }
-
-        #contentEditor ol {
-            list-style-type: decimal;
-        }
-
-        #contentEditor strong, #contentEditor b {
-            font-weight: bold;
-        }
-
-        #contentEditor em, #contentEditor i {
-            font-style: italic;
-        }
-
-        #contentEditor u {
-            text-decoration: underline;
-        }
-
-        #contentEditor a {
-            color: #2563eb;
-            text-decoration: underline;
-        }
-
-        #contentEditor a:hover {
-            color: #1d4ed8;
-        }
-
-        #contentEditor blockquote {
-            border-left: 4px solid #e5e7eb;
-            padding-left: 1em;
-            margin: 1em 0;
-            color: #6b7280;
-            font-style: italic;
-        }
-
-        #contentEditor code {
-            background-color: #f3f4f6;
-            padding: 0.2em 0.4em;
-            border-radius: 0.25em;
-            font-family: monospace;
-            font-size: 0.9em;
-        }
-
-        #contentEditor pre {
-            background-color: #f3f4f6;
-            padding: 1em;
-            border-radius: 0.5em;
-            overflow-x: auto;
-            margin: 1em 0;
-        }
-
-        #contentEditor pre code {
-            background-color: transparent;
-            padding: 0;
-        }
-
-        /* Remove default margins for first/last children */
-        #contentEditor > *:first-child {
-            margin-top: 0;
-        }
-
-        #contentEditor > *:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Placeholder for empty editor */
-        #contentEditor:empty:before {
-            content: attr(data-placeholder);
-            color: #9ca3af;
-            pointer-events: none;
-        }
-
-        /* Better focus state */
-        #contentEditor:focus {
-            outline: none;
-        }
-    </style>
 </head>
 <body>
 <div th:fragment="content">
+    <!-- TinyMCE (CDN) - must be loaded before inline script -->
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js" referrerpolicy="origin" id="tinymce-script"></script>
     <!-- Header -->
     <div class="mb-6">
         <a href="/admin/blogs"
@@ -219,67 +104,14 @@
                 </div>
             </div>
 
-            <!-- Content Field (Rich Editor) -->
+            <!-- Content Field (TinyMCE Editor) -->
             <div class="mb-6">
                 <label for="contentEditor" class="block text-sm font-medium text-gray-700 mb-2">
                     Treść <span class="text-red-600">*</span>
                 </label>
 
-                <!-- Editor Toolbar -->
-                <div class="border border-gray-300 rounded-t-lg bg-gray-50 p-2 flex flex-wrap gap-2">
-                    <button type="button"
-                            onclick="formatText('bold')"
-                            class="p-2 hover:bg-gray-200 rounded transition-colors"
-                            title="Pogrubienie">
-                        <i class="material-icons">format_bold</i>
-                    </button>
-                    <button type="button"
-                            onclick="formatText('italic')"
-                            class="p-2 hover:bg-gray-200 rounded transition-colors"
-                            title="Kursywa">
-                        <i class="material-icons">format_italic</i>
-                    </button>
-                    <button type="button"
-                            onclick="formatText('underline')"
-                            class="p-2 hover:bg-gray-200 rounded transition-colors"
-                            title="Podkreślenie">
-                        <i class="material-icons">format_underlined</i>
-                    </button>
-                    <div class="border-l border-gray-300 mx-1"></div>
-                    <button type="button"
-                            onclick="formatText('insertUnorderedList')"
-                            class="p-2 hover:bg-gray-200 rounded transition-colors"
-                            title="Lista punktowana">
-                        <i class="material-icons">format_list_bulleted</i>
-                    </button>
-                    <button type="button"
-                            onclick="formatText('insertOrderedList')"
-                            class="p-2 hover:bg-gray-200 rounded transition-colors"
-                            title="Lista numerowana">
-                        <i class="material-icons">format_list_numbered</i>
-                    </button>
-                    <div class="border-l border-gray-300 mx-1"></div>
-                    <button type="button"
-                            onclick="insertHeading()"
-                            class="p-2 hover:bg-gray-200 rounded transition-colors"
-                            title="Nagłówek">
-                        <i class="material-icons">title</i>
-                    </button>
-                    <button type="button"
-                            onclick="insertLink()"
-                            class="p-2 hover:bg-gray-200 rounded transition-colors"
-                            title="Link">
-                        <i class="material-icons">link</i>
-                    </button>
-                </div>
-
-                <!-- Editor Content -->
-                <div id="contentEditor"
-                     contenteditable="true"
-                     class="w-full px-4 py-3 border border-t-0 border-gray-300 rounded-b-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[400px] overflow-y-auto"
-                     style="outline: none;"
-                     data-placeholder="Wpisz treść artykułu lub użyj AI do wygenerowania...">
-                </div>
+                <!-- TinyMCE will replace this textarea -->
+                <textarea id="contentEditor" name="content"></textarea>
 
                 <div class="mt-1 flex justify-between items-center">
                     <p id="contentError" class="text-sm text-red-600 hidden"></p>
@@ -457,29 +289,89 @@
         const articleId = /*[[${articleId}]]*/ null;
 
         let currentArticle = null;
+        let tinymceEditor = null;
+        let tinymceReady = false;
+        let domReady = false;
+
+        // Function to initialize TinyMCE
+        function initializeTinyMCE() {
+            if (typeof tinymce === 'undefined') {
+                // TinyMCE not loaded yet, wait and retry
+                console.log('Waiting for TinyMCE to load...');
+                setTimeout(initializeTinyMCE, 100);
+                return;
+            }
+
+            tinymce.init({
+                selector: '#contentEditor',
+                height: 500,
+                menubar: false,
+                plugins: [
+                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                ],
+                toolbar: 'undo redo | blocks | ' +
+                    'bold italic underline strikethrough | forecolor backcolor | ' +
+                    'alignleft aligncenter alignright alignjustify | ' +
+                    'bullist numlist outdent indent | ' +
+                    'link image media | ' +
+                    'removeformat code fullscreen | help',
+                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; }',
+                setup: function(editor) {
+                    tinymceEditor = editor;
+
+                    // Update character count on content change
+                    editor.on('keyup change', function() {
+                        const text = editor.getContent({format: 'text'});
+                        updateCharCount('content', text.length, 25000);
+                        validateField('content');
+                    });
+                },
+                init_instance_callback: function(editor) {
+                    // TinyMCE is fully initialized
+                    tinymceReady = true;
+                    checkAndLoadArticle();
+                }
+            });
+        }
+
+        // Check if we can load article (both DOM and TinyMCE ready)
+        function checkAndLoadArticle() {
+            if (domReady && tinymceReady && mode === 'edit' && articleId) {
+                loadArticle();
+            } else if (domReady && tinymceReady && mode === 'create') {
+                showForm();
+            }
+        }
+
+        // Wait for TinyMCE script to load before initializing
+        const tinymceScript = document.getElementById('tinymce-script');
+        if (tinymceScript) {
+            tinymceScript.addEventListener('load', function() {
+                initializeTinyMCE();
+            });
+            // If script is already loaded (cached), initialize immediately
+            if (typeof tinymce !== 'undefined') {
+                initializeTinyMCE();
+            }
+        } else {
+            // Fallback if script element not found
+            initializeTinyMCE();
+        }
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            if (mode === 'edit' && articleId) {
-                loadArticle();
-            } else {
-                showForm();
-            }
+            domReady = true;
+            checkAndLoadArticle();
 
             // Event listeners for character counters
             const titleInput = document.getElementById('titleInput');
-            const contentEditor = document.getElementById('contentEditor');
             const excerptInput = document.getElementById('excerptInput');
 
             titleInput.addEventListener('input', function() {
                 updateCharCount('title', this.value.length, 255);
                 validateField('title');
-            });
-
-            contentEditor.addEventListener('input', function() {
-                const text = this.innerText || this.textContent;
-                updateCharCount('content', text.length, 25000);
-                validateField('content');
             });
 
             excerptInput.addEventListener('input', function() {
@@ -501,12 +393,24 @@
 
                 // Populate form fields
                 document.getElementById('titleInput').value = currentArticle.title;
-                document.getElementById('contentEditor').innerHTML = currentArticle.content;
+                if (typeof tinymce !== 'undefined' && tinymce.get('contentEditor')) {
+                    tinymce.get('contentEditor').setContent(currentArticle.content);
+                }
                 document.getElementById('excerptInput').value = currentArticle.excerpt || '';
 
                 // Update character counts
                 updateCharCount('title', currentArticle.title.length, 255);
-                updateCharCount('content', (currentArticle.content.replace(/<[^>]*>/g, '')).length, 25000);
+
+                // Wait for TinyMCE to be ready, then get plain text for character count
+                if (typeof tinymce !== 'undefined' && tinymce.get('contentEditor')) {
+                    const contentText = tinymce.get('contentEditor').getContent({format: 'text'});
+                    updateCharCount('content', contentText.length, 25000);
+                } else {
+                    // Fallback if TinyMCE not ready yet
+                    const contentText = currentArticle.content.replace(/<[^>]*>/g, '');
+                    updateCharCount('content', contentText.length, 25000);
+                }
+
                 updateCharCount('excerpt', (currentArticle.excerpt || '').length, 500);
 
                 // Show article info
@@ -570,7 +474,7 @@
 
             try {
                 const title = document.getElementById('titleInput').value;
-                const content = document.getElementById('contentEditor').innerHTML;
+                const content = (typeof tinymce !== 'undefined' && tinymce.get('contentEditor')) ? tinymce.get('contentEditor').getContent() : '';
                 const excerpt = document.getElementById('excerptInput').value;
 
                 const payload = {
@@ -718,8 +622,9 @@
                     isValid = false;
                 }
             } else if (fieldName === 'content') {
-                const editor = document.getElementById('contentEditor');
-                const text = (editor.innerText || editor.textContent).trim();
+                const text = (typeof tinymce !== 'undefined' && tinymce.get('contentEditor'))
+                    ? tinymce.get('contentEditor').getContent({format: 'text'}).trim()
+                    : '';
                 if (!text) {
                     errorMessage = 'Treść jest wymagana';
                     isValid = false;
@@ -756,25 +661,6 @@
         function hideFieldError(fieldName) {
             const errorElement = document.getElementById(fieldName + 'Error');
             errorElement.classList.add('hidden');
-        }
-
-        // Rich text editor functions
-        function formatText(command) {
-            document.execCommand(command, false, null);
-            document.getElementById('contentEditor').focus();
-        }
-
-        function insertHeading() {
-            document.execCommand('formatBlock', false, '<h2>');
-            document.getElementById('contentEditor').focus();
-        }
-
-        function insertLink() {
-            const url = prompt('Wprowadź URL:');
-            if (url) {
-                document.execCommand('createLink', false, url);
-                document.getElementById('contentEditor').focus();
-            }
         }
 
         // Utility functions
@@ -920,10 +806,16 @@
             if (!aiGeneratedData) return;
 
             document.getElementById('titleInput').value = aiGeneratedData.title;
-            document.getElementById('contentEditor').innerHTML = aiGeneratedData.content;
+            if (typeof tinymce !== 'undefined' && tinymce.get('contentEditor')) {
+                tinymce.get('contentEditor').setContent(aiGeneratedData.content);
+            }
 
             updateCharCount('title', aiGeneratedData.title.length, 255);
-            const contentText = aiGeneratedData.content.replace(/<[^>]+>/g, '');
+
+            // Get plain text content from TinyMCE for character counting
+            const contentText = (typeof tinymce !== 'undefined' && tinymce.get('contentEditor'))
+                ? tinymce.get('contentEditor').getContent({format: 'text'})
+                : '';
             updateCharCount('content', contentText.length, 25000);
 
             validateField('title');
