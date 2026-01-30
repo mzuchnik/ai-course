@@ -43,6 +43,10 @@ When running with `test` profile, a test admin user is automatically created:
 ./gradlew test
 ```
 
+**Note:** JaCoCo coverage report is automatically generated after tests run.
+- HTML report: `build/reports/jacoco/test/html/index.html`
+- XML report: `build/reports/jacoco/test/jacocoTestReport.xml`
+
 ### Running a single test class
 ```bash
 ./gradlew test --tests pl.klastbit.lexpage.SpecificTestClass
@@ -51,6 +55,11 @@ When running with `test` profile, a test admin user is automatically created:
 ### Running a single test method
 ```bash
 ./gradlew test --tests pl.klastbit.lexpage.SpecificTestClass.testMethod
+```
+
+### Generate coverage report only
+```bash
+./gradlew jacocoTestReport
 ```
 
 ### Clean build
