@@ -1,10 +1,10 @@
-name: Test & Build Master
+name: Test & Build
 
 on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
+    types: [ opened, synchronize, reopened, ready_for_review ]
   workflow_dispatch:
 
 jobs:
@@ -26,9 +26,104 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run tests with coverage
+        id: tests
         run: ./gradlew test
         env:
           SPRING_PROFILES_ACTIVE: test
+        continue-on-error: true
 
       - name: Build application
+        id: build
         run: ./gradlew build -x test
+        continue-on-error: true
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            build/reports/tests/test/
+            build/test-results/test/
+          retention-days: 5
+
+      - name: Upload JaCoCo coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-reports
+          path: build/reports/jacoco/test/
+          retention-days: 5
+
+      - name: Upload build artifacts
+        if: steps.build.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            build/libs/*.jar
+          retention-days: 5
+
+      - name: Comment PR with status
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const testStatus = '${{ steps.tests.outcome }}';
+            const buildStatus = '${{ steps.build.outcome }}';
+
+            const testIcon = testStatus === 'success' ? '✅' : '❌';
+            const buildIcon = buildStatus === 'success' ? '✅' : '❌';
+            const overallStatus = (testStatus === 'success' && buildStatus === 'success') ? '✅ Passed' : '❌ Failed';
+
+            const comment = `## Build Status: ${overallStatus}
+
+            | Step | Status |
+            |------|--------|
+            | Tests & Coverage | ${testIcon} ${testStatus} |
+            | Build | ${buildIcon} ${buildStatus} |
+
+            ${testStatus === 'success' && buildStatus === 'success'
+              ? '✨ All checks passed! This PR is ready for review.'
+              : '⚠️ Some checks failed. Please review the logs above.'}
+
+            ### 📦 Artifacts (available for 5 days)
+            - [Test Reports](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [JaCoCo Coverage Reports](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            ${buildStatus === 'success' ? '- [Build JAR](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})' : ''}
+
+            <sub>Workflow run: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>`;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Build Status:')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+      - name: Fail workflow if tests or build failed
+        if: steps.tests.outcome != 'success' || steps.build.outcome != 'success'
+        run: exit 1

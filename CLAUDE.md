@@ -108,6 +108,41 @@ class MyIntegrationTest extends AbstractIntegrationTest {
 - Docker must be installed and running on your machine
 - TestContainers will automatically download the PostgreSQL image on first run
 
+## Continuous Integration (GitHub Actions)
+
+The project uses GitHub Actions for automated testing and building.
+
+**Workflow triggers:**
+- Push to `master` branch
+- Pull Request events: opened, synchronized, reopened, ready_for_review
+- Manual workflow dispatch
+
+**What it does:**
+1. Runs all tests with JaCoCo coverage report
+2. Builds the application
+3. Uploads artifacts (available for 5 days):
+   - Test reports (HTML)
+   - JaCoCo coverage reports (HTML + XML)
+   - Build JAR file (if build succeeds)
+4. Comments on Pull Requests with status:
+   - ✅ Tests passed/failed
+   - ✅ Build succeeded/failed
+   - Links to downloadable artifacts
+   - Link to workflow run for detailed logs
+
+**PR Status Comments:**
+- Automatically updates existing comment (no spam)
+- Shows clear visual status with icons
+- Links to detailed workflow logs and artifacts
+- Helps reviewers quickly see if PR is ready
+
+**Artifacts Retention:**
+- All artifacts are stored for **5 days**
+- Accessible from workflow run page
+- Direct links provided in PR comments
+
+**Configuration:** `.github/workflows/test-build.yaml`
+
 ## Detailed Implementation Guidelines
 
 **IMPORTANT:** This project has comprehensive coding standards and best practices:
