@@ -143,6 +143,14 @@ The project uses GitHub Actions for automated testing and building.
 
 **Configuration:** `.github/workflows/test-build.yaml`
 
+**Permissions:**
+The workflow requires the following permissions to function properly:
+- `contents: read` - Read repository code
+- `pull-requests: write` - Comment on Pull Requests
+- `issues: write` - Create/update PR comments (PRs are issues in GitHub API)
+
+These permissions are configured in the workflow file and allow the bot to automatically comment on PRs with build status.
+
 ## Detailed Implementation Guidelines
 
 **IMPORTANT:** This project has comprehensive coding standards and best practices:
