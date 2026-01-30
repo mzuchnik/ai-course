@@ -20,6 +20,12 @@ repositories {
     maven {
         url 'https://projectlombok.org/edge-releases'
     }
+    maven {
+        url 'https://repo.spring.io/snapshot'
+    }
+    maven {
+        url 'https://repo.spring.io/milestone'
+    }
 }
 
 // Node.js configuration
@@ -64,6 +70,14 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:edge-SNAPSHOT'
     testCompileOnly 'org.projectlombok:lombok:edge-SNAPSHOT'
     testAnnotationProcessor 'org.projectlombok:lombok:edge-SNAPSHOT'
+
+    // Spring AI for OpenRouter integration
+    // Using 2.0.0-M2 compatible with Spring Boot 4.0
+    implementation platform('org.springframework.ai:spring-ai-bom:2.0.0-M2')
+    implementation 'org.springframework.ai:spring-ai-openai'
+
+    // CommonMark for Markdown to HTML conversion
+    implementation 'org.commonmark:commonmark:0.27.1'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-liquibase-test'

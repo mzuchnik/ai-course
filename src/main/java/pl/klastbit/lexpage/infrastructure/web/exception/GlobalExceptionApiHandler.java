@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import pl.klastbit.lexpage.application.article.exception.AIGenerationException;
 import pl.klastbit.lexpage.domain.article.exception.ArticleNotFoundException;
 import pl.klastbit.lexpage.domain.contact.exception.RateLimitExceededException;
 
@@ -100,6 +101,26 @@ public class GlobalExceptionApiHandler {
         problemDetail.setType(URI.create("https://klastbit.pl/errors/article-not-found"));
         problemDetail.setProperty("timestamp", Instant.now());
         problemDetail.setProperty("articleId", ex.getArticleId());
+
+        return problemDetail;
+    }
+
+    /**
+     * Handles AI generation failures.
+     * Returns 503 Service Unavailable.
+     */
+    @ExceptionHandler(AIGenerationException.class)
+    public ProblemDetail handleAIGenerationException(AIGenerationException ex) {
+        log.warn("AI generation failed: {}", ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Nie udało się wygenerować artykułu przez AI. Spróbuj ponownie."
+        );
+
+        problemDetail.setTitle("AI Generation Failed");
+        problemDetail.setType(URI.create("https://klastbit.pl/errors/ai-generation-failed"));
+        problemDetail.setProperty("timestamp", Instant.now());
 
         return problemDetail;
     }
